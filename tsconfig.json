@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es2017",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "preserveConstEnums": true,
+    "moduleResolution": "node",
+    "outDir": "dist/",
+    "sourceMap": false
+  },
+  "include": ["src/"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
