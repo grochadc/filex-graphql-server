@@ -70,12 +70,13 @@ const resolvers = {
       db.applicants.filter((applicant) =>
         new RegExp(obj.id).test(applicant.option_id)
       ),
-      reservations_by_day: (obj, args) => {
-        const { day } = args;
-        const teacher = obj.id;
-        const regex = new RegExp(`${teacher}${day}`)
-        return db.applicants.filter(applicant => regex.test(applicant.option_id))
-      }
+    reservations_by_day: (obj, args) => {
+      const { day } = args;
+      const teacher = obj.id;
+      const regex = new RegExp(`${teacher}${day}`);
+      return db.applicants.filter((applicant) =>
+        regex.test(applicant.option_id)
+      );
     },
   },
 };
