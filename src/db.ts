@@ -13,13 +13,13 @@ interface Workshop {
 
 interface WorkshopOption {
   id: string;
-  teacher: string;
+  teacher_id: string;
   time: string;
   day: "lunes" | "martes" | "miercoles" | "jueves";
   workshop_id: WorkshopId;
 }
 
-export interface Applicant {
+interface Applicant {
   id: string;
   code: string;
   name: string;
@@ -27,10 +27,17 @@ export interface Applicant {
   option_id: string;
 }
 
+type Teacher = {
+  id: string;
+  name: string;
+  options: string[];
+};
+
 const db: {
   workshops: Workshop[];
   options: WorkshopOption[];
   applicants: Applicant[];
+  teachers: Teacher[];
 } = {
   workshops: [
     {
@@ -67,140 +74,140 @@ const db: {
   options: [
     {
       id: "alondralunes",
-      teacher: "alondra",
+      teacher_id: "alondra",
       time: "13:00 - 14:00",
       day: "lunes",
       workshop_id: "conversation",
     },
     {
       id: "gonzalolunes",
-      teacher: "gonzalo",
+      teacher_id: "gonzalo",
       time: "14:00 - 15:00",
       day: "lunes",
       workshop_id: "conversation",
     },
     {
       id: "alondramartes",
-      teacher: "alondra",
+      teacher_id: "alondra",
       time: "13:00 - 14:00",
       day: "martes",
       workshop_id: "conversation",
     },
     {
       id: "sergiomartes",
-      teacher: "sergio",
+      teacher_id: "sergio",
       time: "14:00 - 15:00",
       day: "martes",
       workshop_id: "conversation",
     },
     {
       id: "gisselmartes",
-      teacher: "gissel",
+      teacher_id: "gissel",
       time: "16:00 - 17:00",
       day: "martes",
       workshop_id: "conversation",
     },
     {
       id: "carlosmiercoles",
-      teacher: "carlos",
+      teacher_id: "carlos",
       time: "12:00 - 13:00",
       day: "miercoles",
       workshop_id: "conversation",
     },
     {
       id: "sergiomiercoles",
-      teacher: "sergio",
+      teacher_id: "sergio",
       time: "14:00 - 15:00",
       day: "miercoles",
       workshop_id: "conversation",
     },
     {
       id: "gisselmiercoles",
-      teacher: "gissel",
+      teacher_id: "gissel",
       time: "16:00 - 17:00",
       day: "miercoles",
       workshop_id: "conversation",
     },
     {
       id: "gonzalojueves",
-      teacher: "gonzalo",
+      teacher_id: "gonzalo",
       time: "14:00 - 15:00",
       day: "jueves",
       workshop_id: "conversation",
     },
     {
       id: "zulletjueves",
-      teacher: "zullet",
+      teacher_id: "zullet",
       time: "13:00 - 14:00",
       day: "jueves",
       workshop_id: "conversation",
     },
     {
       id: "carloslunes",
-      teacher: "carlos",
+      teacher_id: "carlos",
       time: "12:00 - 13:00",
       day: "lunes",
       workshop_id: "toeflpreparation",
     },
     {
       id: "carlosmartes",
-      teacher: "carlos",
+      teacher_id: "carlos",
       time: "12:00 - 13:00",
       day: "martes",
       workshop_id: "toeflpreparation",
     },
     {
       id: "jiselainemiercoles",
-      teacher: "jiselaine",
+      teacher_id: "jiselaine",
       time: "11:00 - 12:00",
       day: "miercoles",
       workshop_id: "toeflpreparation",
     },
     {
       id: "jiselainejueves",
-      teacher: "jiselaine",
+      teacher_id: "jiselaine",
       time: "11:00 - 12:00",
       day: "jueves",
       workshop_id: "toeflpreparation",
     },
     {
       id: "alondramiercoles",
-      teacher: "alondra",
+      teacher_id: "alondra",
       time: "13:00 - 14:00",
       day: "miercoles",
       workshop_id: "basicreading",
     },
     {
       id: "zulletlunes",
-      teacher: "zullet",
+      teacher_id: "zullet",
       time: "12:00 - 13:00",
       day: "lunes",
       workshop_id: "basicadvancedlistening",
     },
     {
       id: "zulletmartes",
-      teacher: "zullet",
+      teacher_id: "zullet",
       time: "12:00 - 13:00",
       day: "martes",
       workshop_id: "basicadvancedlistening",
     },
     {
       id: "sergiolunes",
-      teacher: "sergio",
+      teacher_id: "sergio",
       time: "14:00 - 15:00",
       day: "lunes",
       workshop_id: "tutoring",
     },
     {
       id: "gissellunes",
-      teacher: "gissel",
+      teacher_id: "gissel",
       time: "16:00 - 17:00",
       day: "lunes",
       workshop_id: "tutoring",
     },
     {
       id: "zulletmiercoles",
-      teacher: "zullet",
+      teacher_id: "zullet",
       time: "11:00 - 12:00",
       day: "miercoles",
       workshop_id: "tutoring",
@@ -227,6 +234,48 @@ const db: {
       name: "Lenin",
       workshop_id: "conversation",
       option_id: "alondralunes",
+    },
+  ],
+  teachers: [
+    {
+      id: "alondra",
+      name: "Alondra",
+      options: ["alondralunes", "alondramartes", "alondramiercoles"],
+    },
+    {
+      id: "gonzalo",
+      name: "Gonzalo",
+      options: ["gonzalolunes", "gonzalojueves"],
+    },
+    {
+      id: "sergio",
+      name: "Sergio",
+      options: ["sergiolunes", "sergiomartes", "sergiomiercoles"],
+    },
+    {
+      id: "gissel",
+      name: "Gissel",
+      options: ["gissellunes", "gisselmartes", "gisselmiercoles"],
+    },
+    {
+      id: "carlos",
+      name: "Carlos",
+      options: ["carloslunes", "carlosmartes", "carlosmiercoles"],
+    },
+    {
+      id: "zullet",
+      name: "Zullet",
+      options: [
+        "zulletlunes",
+        "zulletmartes",
+        "zulletmiercoles",
+        "zulletjueves",
+      ],
+    },
+    {
+      id: "jiselaine",
+      name: "Jiselaine",
+      options: ["jiselainemiercoles", "jiselainejueves"],
     },
   ],
 };
