@@ -11,7 +11,7 @@ const typeDefs = gql`
     teacher: String
     time: String
     day: String
-    workshop: Workshop!
+    workshop: String!
   }
 
   type Applicant {

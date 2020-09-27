@@ -66,7 +66,7 @@ const resolvers = {
     option: (obj) => getById("options", obj.option_id),
   },
   Option: {
-    workshop: (obj) => getById("workshops", obj.workshop_id),
+    workshop: (obj) => obj.workshop_id,
     teacher: (obj) => obj.teacher_id,
   },
   Teacher: {
