@@ -19,6 +19,8 @@ const server = new ApolloServer({
   resolvers,
   context: { firebaseClient },
   cors: true,
+  introspection: true,
+  playground: true,
 });
 
 server.listen(process.env.PORT || 5000).then(({ url }) => {
