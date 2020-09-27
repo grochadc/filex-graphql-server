@@ -1,4 +1,5 @@
-import db from "./db.js";
+export {};
+const db = require("./db");
 
 const getById = (key: string, id: string) =>
   db[key].filter((item) => item.id === id)[0];
@@ -38,4 +39,4 @@ const resolvers = {
   },
 };
 
-export default resolvers;
+module.exports = resolvers;

@@ -40,5 +40,4 @@ const typeDefs = gql`
     teacher(id: ID!, name: String): Teacher
   }
 `;
-
-export default typeDefs;
+module.exports = typeDefs;

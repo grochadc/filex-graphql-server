@@ -1,6 +1,9 @@
-import { ApolloServer } from "apollo-server";
-import typeDefs from "./schema";
-import resolvers from "./resolvers";
+export {};
+const apollo = require("apollo-server");
+const db = require("./db.js");
+const { ApolloServer } = apollo;
+const typeDefs = require("./schema");
+const resolvers = require("./resolvers");
 
 const server = new ApolloServer({ typeDefs, resolvers, cors: true });
 

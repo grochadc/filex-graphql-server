@@ -1,3 +1,5 @@
+export {};
+
 type WorkshopId =
   | "conversation"
   | "toeflpreparation"
@@ -280,4 +282,4 @@ const db: {
   ],
 };
 
-export default db;
+module.exports = db;

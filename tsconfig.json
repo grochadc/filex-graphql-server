@@ -1,7 +1,10 @@
 {
   "allowJs": true,
   "compilerOptions": {
+<<<<<<< HEAD
     "noImplicitAny": false,
+=======
+>>>>>>> 8a6ea031ee0038c3ac29c285ddf619ff9761b5a4
     "outDir": "dist/"
   },
   "include": ["src/"],
