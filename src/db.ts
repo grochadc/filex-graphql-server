@@ -215,29 +215,6 @@ const db: {
       workshop_id: "tutoring",
     },
   ],
-  applicants: [
-    {
-      id: "4kmlkb",
-      code: "52841",
-      name: "Juan Gabriel",
-      workshop_id: "conversation",
-      option_id: "alondralunes",
-    },
-    {
-      id: "qaveis",
-      code: "12345",
-      name: "Pedro Paramo",
-      workshop_id: "conversation",
-      option_id: "alondramartes",
-    },
-    {
-      id: "rww626",
-      code: "54321",
-      name: "Lenin",
-      workshop_id: "conversation",
-      option_id: "alondralunes",
-    },
-  ],
   teachers: [
     {
       id: "alondra",

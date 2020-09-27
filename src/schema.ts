@@ -39,5 +39,28 @@ const typeDefs = gql`
     teachers: [Teacher]
     teacher(id: ID!, name: String): Teacher
   }
+
+  type Reservation {
+    code: String
+    name: String
+    option_id: String
+    workshop_id: String
+  }
+
+  input ReservationInput {
+    code: String
+    name: String
+    option_id: String
+    workshop_id: String
+  }
+
+  type Mutation {
+    makeReservation(
+      code: String
+      name: String
+      option_id: String
+      workshop_id: String
+    ): Reservation
+  }
 `;
 module.exports = typeDefs;
