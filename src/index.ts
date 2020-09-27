@@ -1,3 +1,4 @@
+export {};
 const apollo = require("apollo-server");
 const db = require("./db.js");
 const { ApolloServer } = apollo;

@@ -1,3 +1,4 @@
+export {};
 const db = require("./db");
 
 const getById = (key: string, id: string) =>
