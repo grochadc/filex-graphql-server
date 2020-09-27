@@ -21,14 +21,6 @@ interface WorkshopOption {
   workshop_id: WorkshopId;
 }
 
-interface Applicant {
-  id: string;
-  code: string;
-  name: string;
-  workshop_id: WorkshopId;
-  option_id: string;
-}
-
 type Teacher = {
   id: string;
   name: string;
@@ -38,7 +30,6 @@ type Teacher = {
 const db: {
   workshops: Workshop[];
   options: WorkshopOption[];
-  applicants: Applicant[];
   teachers: Teacher[];
 } = {
   workshops: [

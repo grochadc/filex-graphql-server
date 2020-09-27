@@ -11,6 +11,12 @@ const generateId = () => {
   return str;
 };
 
+interface ApplicantFromDb {
+  code: string;
+  name: string;
+  option_id: string;
+}
+
 const firebaseQuery = (context: { firebaseClient }, endpoint: string) => {
   const finalEndpoint =
     endpoint.charAt(0) === "/" ? endpoint : "/".concat(endpoint);
@@ -68,7 +74,7 @@ const resolvers = {
       db.options.filter((option) => option.teacher_id === obj.id),
     reservations: async (obj, __, context) => {
       const data = await firebaseQuery(context, "/applicants");
-      return Object.values(data).filter((applicant) =>
+      return Object.values(data).filter((applicant: ApplicantFromDb) =>
         new RegExp(obj.id).test(applicant.option_id)
       );
     },
