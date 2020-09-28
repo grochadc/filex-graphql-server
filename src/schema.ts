@@ -1,6 +1,21 @@
 import { gql } from "apollo-server";
 
 const typeDefs = gql`
+  type Student {
+    code: String
+    name: String
+    first_last_name: String
+    second_last_name: String
+    gender: String
+    ciclo: String
+    career: String
+    telephone: String
+    email: String
+    level: Int
+    group: String
+    id: ID
+  }
+
   type Workshop {
     name: String
     description: String
@@ -38,6 +53,8 @@ const typeDefs = gql`
     applicant(id: ID!): Applicant
     teachers: [Teacher]
     teacher(id: ID!, name: String): Teacher
+    students: [Student]
+    student(code: String): Student!
   }
 
   type Reservation {

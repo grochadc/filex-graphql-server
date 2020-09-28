@@ -1,5 +1,6 @@
 export {};
 const db = require("./db");
+const masterlist = require("./datasources/masterlist.js");
 
 const baseUrl = "/workshops";
 
@@ -44,6 +45,10 @@ const resolvers = {
     },
     teachers: () => db.teachers,
     teacher: (_, args) => getById("teachers", args.id),
+    students: () => masterlist.students,
+    student: (_, args) => {
+      return masterlist.students.filter((item) => args.code === item.code)[0];
+    },
   },
   Mutation: {
     makeReservation: async (_, args, context) => {

@@ -15,7 +15,9 @@
     "apollo-server": "^2.18.1",
     "dotenv": "^8.2.0",
     "firebase": "^7.21.1",
-    "graphql": "^15.3.0",
-    "typescript": "^4.0.3"
+    "graphql": "^15.3.0"
+  },
+  "devDependencies": {
+    "typescript-tools": "^0.3.1"
   }
 }
