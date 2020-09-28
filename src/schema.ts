@@ -19,6 +19,7 @@ const typeDefs = gql`
   type Workshop {
     name: String
     description: String
+    options: [Option!]!
   }
 
   type Option {
@@ -27,6 +28,38 @@ const typeDefs = gql`
     time: String
     day: String
     workshop: String!
+    option_id: String!
+  }
+
+  type Teacher {
+    id: ID!
+    name: String
+    options: [Option]
+    reservations: [Reservation]
+    reservations_by_day(day: String): [Reservation]
+  }
+
+  type Query {
+    workshops: [Workshop]
+    workshop(id: ID!): Workshop
+    options: [Option]
+    option(id: ID!): Option
+    reservations: [Reservation]
+    reservation(id: ID!): Reservation
+    teachers: [Teacher]
+    teacher(id: ID!, name: String): Teacher
+    students: [Student]
+    student(code: String): Student!
+  }
+
+  type Reservation {
+    id: ID!
+    code: String!
+    name: String!
+    timestamp: String!
+    option: Option
+    option_id: String!
+    workshop_id: String
   }
 
   type Applicant {
@@ -36,38 +69,11 @@ const typeDefs = gql`
     option: Option!
   }
 
-  type Teacher {
-    id: ID!
-    name: String
-    options: [Option]
-    reservations: [Applicant]
-    reservations_by_day(day: String): [Applicant]
-  }
-
-  type Query {
-    workshops: [Workshop]
-    workshop(id: ID!): Workshop
-    options: [Option]
-    option(id: ID!): Option
-    applicants: [Applicant]
-    applicant(id: ID!): Applicant
-    teachers: [Teacher]
-    teacher(id: ID!, name: String): Teacher
-    students: [Student]
-    student(code: String): Student!
-  }
-
-  type Reservation {
-    code: String
-    name: String
-    option_id: String
-    workshop_id: String
-  }
-
   input ReservationInput {
-    code: String
-    name: String
-    option_id: String
+    code: String!
+    name: String!
+    timestamp: String!
+    option_id: String!
     workshop_id: String
   }
 

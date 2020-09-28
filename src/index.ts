@@ -2,7 +2,7 @@ export {};
 const apollo = require("apollo-server");
 const { ApolloServer } = apollo;
 const firebase = require("firebase");
-const db = require("./db.js");
+const db = require("./datasources/db.js");
 const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
 require("dotenv").config();

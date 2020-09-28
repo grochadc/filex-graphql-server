@@ -11,6 +11,7 @@ interface Workshop {
   id: WorkshopId;
   name: string;
   description: string;
+  option_ids: string[];
 }
 
 interface WorkshopOption {
@@ -38,30 +39,51 @@ const db: {
       name: "Conversation",
       description:
         "El alumno se expresa oralmente utilizando las funciones comunicativas y vocabulario adquirido, mejorar la fluidez, y perder el temor a hablar.",
+      option_ids: [
+        "alondralunes",
+        "gonzalolunes",
+        "alondramartes",
+        "sergiomartes",
+        "gisselmartes",
+        "carlosmiercoles",
+        "sergiomiercoles",
+        "gisselmiercoles",
+        "gonzalojueves",
+        "zulletjueves",
+      ],
     },
     {
       id: "toeflpreparation",
       name: "TOEFL Preparation",
       description:
         "Ayuda a desarrollar habilidades para el examen de certificación, a partir del dominio ya adquirido del idioma. Duracion: 1 mes.",
+      option_ids: [
+        "carloslunes",
+        "carlosmartes",
+        "jiselainemiercoles",
+        "jiselainejueves",
+      ],
     },
     {
       id: "basicreading",
       name: "Basic Reading",
       description:
         "Lectura de textos e historias sencillas para trabajar con vocabulario y lectura de comprensión. Niveles 1-3",
+      option_ids: ["alondramiercoles"],
     },
     {
       id: "basicadvancedlistening",
       name: "Basic/Advanced Listening",
       description:
         "Ayuda a desarrollar la habilidad de comprensión de escucha por medio de audios. Basic: Niveles 1-3; Advanced: Niveles 4-6",
+      option_ids: ["zulletlunes", "zulletmartes"],
     },
     {
       id: "tutoring",
       name: "Tutoring",
       description:
         "Es un proceso de acompañamiento, aclarando dudas. El alumno deberá saber exactamente el tema a repasar.",
+      option_ids: ["sergiolunes", "gissellunes", "zulletmiercoles"],
     },
   ],
   options: [
