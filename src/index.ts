@@ -7,6 +7,8 @@ const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
 require("dotenv").config();
 
+console.log("DB URL from env", process.env.FIREBASE_DATABASE_URL);
+
 const firebaseClient = firebase.initializeApp({
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
