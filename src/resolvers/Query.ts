@@ -20,8 +20,12 @@ const Query = {
   options: () => db.options,
   option: (_, args) => getById("options", args.id),
   reservations: async (_, __, context) => {
-    const data = await firebaseQuery(context, "/applicants");
-    return Object.values(data);
+    try {
+      const data = await firebaseQuery(context, "/applicants");
+      return Object.values(data);
+    } catch (error) {
+      console.log(error);
+    }
   },
   reservation: async (_, args, context) => {
     const data = await firebaseQuery(context, `/applicants/${args.id}`);
