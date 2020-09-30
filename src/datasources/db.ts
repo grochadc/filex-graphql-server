@@ -1,5 +1,3 @@
-export {};
-
 type WorkshopId =
   | "conversation"
   | "toeflpreparation"
@@ -28,7 +26,7 @@ type Teacher = {
   options: string[];
 };
 
-const db: {
+const database: {
   workshops: Workshop[];
   options: WorkshopOption[];
   teachers: Teacher[];
@@ -272,4 +270,4 @@ const db: {
   ],
 };
 
-module.exports = db;
+module.exports = database;

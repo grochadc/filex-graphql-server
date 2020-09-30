@@ -1,9 +1,8 @@
-export {};
-const { Query } = require("./Query");
-const { Mutation } = require("./Mutation");
+const utils = require("utils");
 const db = require("../datasources/db");
 const masterlist = require("../datasources/masterlist.js");
-const { firebaseQuery, getById } = require("../utils");
+const Query = require("./Query");
+const Mutation = require("./Mutation");
 
 interface ReservationFromDb {
   code: string;
@@ -12,38 +11,29 @@ interface ReservationFromDb {
   option_id: string;
 }
 
-const resolvers = {
+const myResolvers = {
   Query,
   Mutation,
   Workshop: {
-    options: (obj) => obj.option_ids.map((id) => getById(db, "options", id)),
+    options: (obj) =>
+      obj.option_ids.map((id) => utils.getById(db, "options", id)),
   },
   Reservation: {
-    option: (obj) => getById(db, "options", obj.option_id),
+    option: (obj) => utils.getById(db, "options", obj.option_id),
   },
   Option: {
     workshop: (obj) => obj.workshop_id,
     teacher: (obj) => obj.teacher_id,
   },
   Teacher: {
-    options: (obj) =>
-      db.options.filter((option) => option.teacher_id === obj.id),
-    reservations: async (obj, __, context) => {
-      const data = await firebaseQuery(context, "/applicants");
-      return Object.values(data).filter((reservation: ReservationFromDb) =>
-        new RegExp(obj.id).test(reservation.option_id)
-      );
+    options: (obj) => {
+      return db.options.filter((option) => option.teacher_id === obj.id);
     },
-    reservations_by_day: async (obj, args, context) => {
-      const { day } = args;
-      const teacher = obj.id;
-      const regex = new RegExp(`${teacher}${day}`);
-      const data = await firebaseQuery(context, "/applicants");
-      return data.filter((reservation: ReservationFromDb) =>
-        regex.test(reservation.option_id)
-      );
+    reservations: async (_, __, { dataSources }) => {
+      const data = await dataSources.firebaseAPI.getReservations();
+      return Object.values(data);
     },
   },
 };
 
-module.exports = resolvers;
+module.exports = myResolvers;
