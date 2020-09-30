@@ -3,13 +3,6 @@ const db = require("../datasources/db");
 const Query = require("./Query");
 const Mutation = require("./Mutation");
 
-interface ReservationFromDb {
-  code: string;
-  name: string;
-  timestamp: string;
-  option_id: string;
-}
-
 const resolvers = {
   Query,
   Mutation,
@@ -32,8 +25,8 @@ const resolvers = {
     options: (obj) => {
       return db.options.filter((option) => option.teacher_id === obj.id);
     },
-    reservations: async (_, __, { dataSources }) => {
-      const data = await dataSources.firebaseAPI.getReservations();
+    reservations: async (obj, __, { dataSources }) => {
+      const data = await dataSources.firebaseAPI.getReservations(obj.id);
       return Object.values(data);
     },
   },

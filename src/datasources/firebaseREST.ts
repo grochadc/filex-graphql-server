@@ -6,10 +6,10 @@ class firebaseAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/";
   }
 
-  async getReservations() {
-    const data = await this.get("workshops/applicants.json");
+  async getReservations(teacher_id) {
+    const data = await this.get(`workshops/reservations/${teacher_id}.json`);
     return data;
   }
 }
 
-module.exports = firebaseAPI;
+export = firebaseAPI;
