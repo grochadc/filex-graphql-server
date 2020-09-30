@@ -3,7 +3,7 @@ const { ApolloServer } = apollo;
 const FirebaseAPI = require("./datasources/firebaseREST");
 const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
-require("dotenv").config();
+const optionLoader = require("./loaders/OptionLoader");
 
 const server = new ApolloServer({
   typeDefs,
@@ -13,6 +13,11 @@ const server = new ApolloServer({
       firebaseAPI: new FirebaseAPI(),
     };
   },
+  context: () => ({
+    loaders: {
+      optionLoader: optionLoader(),
+    },
+  }),
   cors: true,
   introspection: true,
   playground: true,

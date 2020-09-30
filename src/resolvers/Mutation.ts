@@ -1,7 +1,7 @@
 const { generateId } = require("../utils");
 
 const baseUrl = "/workshops";
-const mutation = {
+const Mutation = {
   makeReservation: async (_, args, context) => {
     const date = new Date();
     const timestamp = date.toJSON();
@@ -22,4 +22,4 @@ const mutation = {
   },
 };
 
-module.exports = { mutation };
+export = Mutation;

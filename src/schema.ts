@@ -86,4 +86,4 @@ const typeDefs = gql`
     ): Reservation
   }
 `;
-module.exports = typeDefs;
+export = typeDefs;

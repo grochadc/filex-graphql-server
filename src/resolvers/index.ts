@@ -1,6 +1,5 @@
-const utils = require("utils");
+const utils = require("../utils");
 const db = require("../datasources/db");
-const masterlist = require("../datasources/masterlist.js");
 const Query = require("./Query");
 const Mutation = require("./Mutation");
 
@@ -11,15 +10,19 @@ interface ReservationFromDb {
   option_id: string;
 }
 
-const myResolvers = {
+const resolvers = {
   Query,
   Mutation,
   Workshop: {
     options: (obj) =>
-      obj.option_ids.map((id) => utils.getById(db, "options", id)),
+      obj.option_ids.map((id) =>
+        utils.getById(db, "options", id, () =>
+          console.log("Called by Workshop.options")
+        )
+      ),
   },
   Reservation: {
-    option: (obj) => utils.getById(db, "options", obj.option_id),
+    option: (obj, _, { loaders }) => loaders.optionLoader.load(obj.option_id),
   },
   Option: {
     workshop: (obj) => obj.workshop_id,
@@ -36,4 +39,4 @@ const myResolvers = {
   },
 };
 
-module.exports = myResolvers;
+export = resolvers;
