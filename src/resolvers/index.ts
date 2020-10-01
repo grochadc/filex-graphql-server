@@ -15,6 +15,8 @@ const resolvers = {
   Option: {
     workshop: (obj) => obj.workshop_id,
     teacher: (obj) => obj.teacher_id,
+    url: (obj) => utils.getById(db, "options", obj.id).url,
+    zoom_id: (obj) => utils.getById(db, "options", obj.id).zoom_id,
   },
   Teacher: {
     options: (obj) => {

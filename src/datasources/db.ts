@@ -18,6 +18,8 @@ interface WorkshopOption {
   time: string;
   day: "lunes" | "martes" | "miercoles" | "jueves";
   workshop_id: WorkshopId;
+  url: string;
+  zoom_id?: string;
 }
 
 type Teacher = {
@@ -91,6 +93,7 @@ const database: {
       time: "13:00 - 14:00",
       day: "lunes",
       workshop_id: "conversation",
+      url: "https://meet.google.com/lookup/fnms6k7cad",
     },
     {
       id: "gonzalolunes",
@@ -98,6 +101,7 @@ const database: {
       time: "14:00 - 15:00",
       day: "lunes",
       workshop_id: "conversation",
+      url: "none",
     },
     {
       id: "alondramartes",
@@ -105,6 +109,7 @@ const database: {
       time: "13:00 - 14:00",
       day: "martes",
       workshop_id: "conversation",
+      url: "https://meet.google.com/lookup/fnms6k7cad",
     },
     {
       id: "sergiomartes",
@@ -112,6 +117,7 @@ const database: {
       time: "14:00 - 15:00",
       day: "martes",
       workshop_id: "conversation",
+      url: "https://meet.google.com/psr-adqx-ebv",
     },
     {
       id: "gisselmartes",
@@ -119,6 +125,7 @@ const database: {
       time: "16:00 - 17:00",
       day: "martes",
       workshop_id: "conversation",
+      url: "meet.google.com/ujd-dwfz-hpp",
     },
     {
       id: "carlosmiercoles",
@@ -126,6 +133,9 @@ const database: {
       time: "12:00 - 13:00",
       day: "miercoles",
       workshop_id: "conversation",
+      url:
+        "https://us02web.zoom.us/j/86845226720?pwd=dTVmbllvaXpDLzJneDV1TEVVVU83Zz09",
+      zoom_id: "3175",
     },
     {
       id: "sergiomiercoles",
@@ -133,6 +143,7 @@ const database: {
       time: "14:00 - 15:00",
       day: "miercoles",
       workshop_id: "conversation",
+      url: "https://meet.google.com/psr-adqx-ebv",
     },
     {
       id: "gisselmiercoles",
@@ -140,6 +151,7 @@ const database: {
       time: "16:00 - 17:00",
       day: "miercoles",
       workshop_id: "conversation",
+      url: "meet.google.com/ujd-dwfz-hpp",
     },
     {
       id: "gonzalojueves",
@@ -147,6 +159,7 @@ const database: {
       time: "14:00 - 15:00",
       day: "jueves",
       workshop_id: "conversation",
+      url: "none",
     },
     {
       id: "zulletjueves",
@@ -154,6 +167,7 @@ const database: {
       time: "13:00 - 14:00",
       day: "jueves",
       workshop_id: "conversation",
+      url: "https://meet.google.com/lookup/hajdogn5gm",
     },
     {
       id: "carloslunes",
@@ -161,6 +175,9 @@ const database: {
       time: "12:00 - 13:00",
       day: "lunes",
       workshop_id: "toeflpreparation",
+      url:
+        "https://us02web.zoom.us/j/86597209094?pwd=cHRQQkZsQmVnamtXYVJqQ0V2L1dFZz09",
+      zoom_id: "3175",
     },
     {
       id: "carlosmartes",
@@ -168,6 +185,9 @@ const database: {
       time: "12:00 - 13:00",
       day: "martes",
       workshop_id: "toeflpreparation",
+      url:
+        "https://us02web.zoom.us/j/86597209094?pwd=cHRQQkZsQmVnamtXYVJqQ0V2L1dFZz09",
+      zoom_id: "3175",
     },
     {
       id: "jiselainemiercoles",
@@ -175,6 +195,7 @@ const database: {
       time: "11:00 - 12:00",
       day: "miercoles",
       workshop_id: "toeflpreparation",
+      url: "https://meet.google.com/bdo-ejjr-uwv",
     },
     {
       id: "jiselainejueves",
@@ -182,6 +203,7 @@ const database: {
       time: "11:00 - 12:00",
       day: "jueves",
       workshop_id: "toeflpreparation",
+      url: "https://meet.google.com/bdo-ejjr-uwv",
     },
     {
       id: "alondramiercoles",
@@ -189,6 +211,7 @@ const database: {
       time: "13:00 - 14:00",
       day: "miercoles",
       workshop_id: "basicreading",
+      url: "https://meet.google.com/lookup/gdourilkmv",
     },
     {
       id: "zulletlunes",
@@ -196,6 +219,7 @@ const database: {
       time: "12:00 - 13:00",
       day: "lunes",
       workshop_id: "basicadvancedlistening",
+      url: "https://classroom.google.com/c/MTM5MTQxNjg1Mjkw?cjc=p2hpkdw",
     },
     {
       id: "zulletmartes",
@@ -203,6 +227,7 @@ const database: {
       time: "12:00 - 13:00",
       day: "martes",
       workshop_id: "basicadvancedlistening",
+      url: "https://classroom.google.com/c/MTM5MTQxNjg1Mjkw?cjc=p2hpkdw",
     },
     {
       id: "sergiolunes",
@@ -210,6 +235,7 @@ const database: {
       time: "14:00 - 15:00",
       day: "lunes",
       workshop_id: "tutoring",
+      url: "https://meet.google.com/mxs-brnf-mug",
     },
     {
       id: "gissellunes",
@@ -217,6 +243,7 @@ const database: {
       time: "16:00 - 17:00",
       day: "lunes",
       workshop_id: "tutoring",
+      url: "meet.google.com/nbn-vcnq-wpo",
     },
     {
       id: "zulletmiercoles",
@@ -224,6 +251,7 @@ const database: {
       time: "11:00 - 12:00",
       day: "miercoles",
       workshop_id: "tutoring",
+      url: "https://meet.google.com/lookup/f72kstl6px",
     },
   ],
   teachers: [

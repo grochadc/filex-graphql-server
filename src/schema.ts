@@ -17,16 +17,19 @@ const typeDefs = gql`
   }
 
   type Workshop {
-    name: String
-    description: String
+    id: ID!
+    name: String!
+    description: String!
     options: [Option!]!
   }
 
   type Option {
     id: ID!
-    teacher: String
-    time: String
-    day: String
+    teacher: String!
+    time: String!
+    day: String!
+    url: String!
+    zoom_id: String
     workshop: String!
     option_id: String!
   }
