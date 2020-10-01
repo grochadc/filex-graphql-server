@@ -1,6 +1,7 @@
 const { generateId, getById } = require("../utils");
 const db = require("../datasources/db");
 const utils = require("../utils");
+const sheetsAPI = require("../sheetsAPI");
 
 const baseUrl = "/workshops";
 const Mutation = {
@@ -23,6 +24,19 @@ const Mutation = {
       reservation
     );
     return reservation;
+  },
+  saveAttendance: (_, args) => {
+    const matrix = utils.createMatrix(args.input);
+    console.log("Posting to sheet", matrix);
+    sheetsAPI.update(
+      "1MeP4aiVl0iIwFAjXcaGzRBKMSvDllYVW-fXhYEa4EsY",
+      matrix,
+      "attendance!A1"
+    );
+    return {
+      status: 200,
+      message: "Attendance saved succesfully",
+    };
   },
 };
 

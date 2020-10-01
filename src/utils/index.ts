@@ -18,4 +18,8 @@ const generateId = () => {
   return str;
 };
 
-export = { getById, getByIds, generateId };
+const createMatrix = (arr) => {
+  return arr.map((item) => Object.values(item));
+};
+
+export = { getById, getByIds, generateId, createMatrix };

@@ -78,6 +78,13 @@ const typeDefs = gql`
     teacher_id: String!
   }
 
+  input SavedReservation {
+    attendance: Boolean!
+    code: String!
+    name: String
+    timestamp: String
+  }
+
   type Mutation {
     makeReservation(
       code: String
@@ -85,6 +92,17 @@ const typeDefs = gql`
       option_id: String
       workshop_id: String
     ): Reservation
+    saveAttendance(input: [AttendanceInput]): SaveAttendanceResponse
+  }
+  input AttendanceInput {
+    attendance: Boolean!
+    code: String!
+    name: String!
+  }
+  type SaveAttendanceResponse {
+    status: Int!
+    message: String
+    error: String
   }
 `;
 export = typeDefs;
