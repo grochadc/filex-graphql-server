@@ -1,8 +1,9 @@
-const { generateId } = require("../utils");
+const { generateId, getById } = require("../utils");
+const db = require("../datasources/db");
 
 const baseUrl = "/workshops";
 const Mutation = {
-  makeReservation: async (_, args, context) => {
+  makeReservation: async (_, args, { dataSources }) => {
     const date = new Date();
     const timestamp = date.toJSON();
     const reservationId = generateId();
@@ -13,11 +14,10 @@ const Mutation = {
       timestamp,
       option_id: args.option_id,
       workshop_id: args.workshop_id,
+      teacher_id: args.teacher_id,
     };
-    context.firebaseClient
-      .database()
-      .ref(`${baseUrl}/applicants/${reservationId}`)
-      .set(reservation);
+    console.log("Using datasource post");
+    await dataSources.firebaseAPI.makeReservation(args.teacher_id, reservation);
     return reservation;
   },
 };

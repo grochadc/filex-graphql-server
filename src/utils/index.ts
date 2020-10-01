@@ -1,8 +1,11 @@
 const { groupBy } = require("ramda");
 const getById = (obj: any, key: string, id: string, callback: () => void) => {
-  console.log("Called getById for", key);
   if (callback) callback();
-  return obj[key].filter((item) => item.id === id)[0];
+  const data = obj[key].filter((item) => {
+    return item.id === id;
+  });
+  if (data.length === 0) throw new Error(`Couldn't find ${id} in ${key}`);
+  return data[0];
 };
 
 const getByIds = (arr: any[], ids: string[], callback: () => void) => {

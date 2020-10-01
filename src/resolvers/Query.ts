@@ -23,9 +23,7 @@ const Query = {
       console.log("Called by Query.teacher")
     ),
   students: () => masterlist.students,
-  student: (_, args) => {
-    return masterlist.students.filter((item) => args.code === item.code)[0];
-  },
+  student: (_, args) => utils.getById(masterlist, "students", args.code),
 };
 
 export = Query;
