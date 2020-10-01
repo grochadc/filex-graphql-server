@@ -84,7 +84,6 @@ const typeDefs = gql`
       name: String
       option_id: String
       workshop_id: String
-      teacher_id: String!
     ): Reservation
   }
 `;
