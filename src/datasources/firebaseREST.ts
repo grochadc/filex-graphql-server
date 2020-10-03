@@ -1,5 +1,4 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
-const fetch = require("node-fetch");
 
 class firebaseAPI extends RESTDataSource {
   constructor() {
@@ -14,6 +13,11 @@ class firebaseAPI extends RESTDataSource {
 
   async makeReservation(teacher_id, reservation) {
     return this.post(`reservations/${teacher_id}.json`, reservation);
+  }
+
+  async getOptionAvailability(option_id) {
+    const data = await this.get(`available/${option_id}/registered.json`);
+    return data;
   }
 }
 

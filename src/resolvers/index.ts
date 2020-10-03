@@ -17,6 +17,10 @@ const resolvers = {
     teacher: (obj) => obj.teacher_id,
     url: (obj) => utils.getById(db, "options", obj.id).url,
     zoom_id: (obj) => utils.getById(db, "options", obj.id).zoom_id,
+    available: async (obj, _, { dataSources }) => {
+      const data = await dataSources.firebaseAPI.getOptionAvailability(obj.id);
+      return Boolean(data > 14);
+    },
   },
   Teacher: {
     options: (obj) => {

@@ -32,6 +32,7 @@ const typeDefs = gql`
     zoom_id: String
     workshop: String!
     option_id: String!
+    available: Boolean
   }
 
   type Teacher {
