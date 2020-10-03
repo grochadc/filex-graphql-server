@@ -7,7 +7,7 @@ const resolvers = {
   Query,
   Mutation,
   Workshop: {
-    options: (obj) => utils.getByIds(db.options, obj.option_ids),
+    options: (obj: {option_ids: string[]}) => utils.getByIds(db.options, obj.option_ids),
   },
   Reservation: {
     option: (obj, _, { loaders }) => loaders.optionLoader.load(obj.option_id),

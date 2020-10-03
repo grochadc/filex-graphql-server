@@ -1,4 +1,4 @@
-module.exports = {
+const db: {students: Student[]} = {
   students: [
     {
       code: '12345',
@@ -12,7 +12,7 @@ module.exports = {
       email: 'juan.gabriel@alumnos.udg.mx',
       level: 1,
       group: 'E1-1',
-      id: '12345'
+      id: '12345',
     },
     {
       code: '212617062',
@@ -25314,3 +25314,5 @@ module.exports = {
     }
   ]
 }
+
+module.exports = db;
