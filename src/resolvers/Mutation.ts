@@ -6,6 +6,7 @@ const sheetsAPI = require("../sheetsAPI");
 const baseUrl = "/workshops";
 const Mutation = {
   makeReservation: async (_, args, { dataSources }) => {
+    await dataSources.firebaseAPI.addRegistered(args.option_id);
     const date = new Date();
     const timestamp = date.toJSON();
     const reservationId = generateId();
