@@ -28,6 +28,7 @@ const resolvers = {
     },
     reservations: async (obj, __, { dataSources }) => {
       const data = await dataSources.firebaseAPI.getReservations(obj.id);
+      if(data===null) return [];
       return Object.values(data);
     },
   },
