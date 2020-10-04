@@ -3,30 +3,23 @@ const db = require("../datasources/db");
 const utils = require("../utils");
 const sheetsAPI = require("../sheetsAPI");
 
-const baseUrl = "/workshops";
 const Mutation = {
-  makeReservation: async (_, args, { dataSources }) => {
-    await dataSources.firebaseAPI.addRegistered(args.option_id);
+  makeReservation: async (_, { input }: { input: Reservation }, { dataSources }) => {
+    await dataSources.firebaseAPI.addRegistered(input.option_id);
     const date = new Date();
-    const timestamp = date.toJSON();
-    const reservationId = generateId();
-    const reservation = {
-      id: reservationId,
-      code: args.code,
-      name: args.name,
-      timestamp,
-      option_id: args.option_id,
-      workshop_id: args.workshop_id,
+    const reservation: ReservationForDb = {
+      id: generateId(),
+      timestamp: date.toJSON(),
+      ...input
     };
-    const teacher_endpoint = utils.getById(db, "options", args.option_id)
-      .teacher_id;
+    const option: Option = utils.getById(db, "options", input.option_id);
     await dataSources.firebaseAPI.makeReservation(
-      teacher_endpoint,
+      option.teacher_id,
       reservation
     );
-    return reservation;
+    return {...reservation, url: option.url, zoom_id: option.zoom_id};
   },
-  saveAttendance: (_, args) => {
+  saveAttendance: (_, args: { input: any[] }) => {
     const matrix = utils.createMatrix(args.input);
     console.log("Posting to sheet", matrix);
     sheetsAPI.update(

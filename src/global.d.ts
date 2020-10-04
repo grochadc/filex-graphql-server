@@ -13,6 +13,21 @@ interface Student {
   id: string;
 }
 
+type Reservation = {
+  code: string;
+  name: string;
+  first_last_name: string;
+  second_last_name: string;
+  level: number;
+  group: string;
+  option_id: string;
+};
+
+type ReservationForDb = Reservation & {
+  id: string;
+  timestamp: string;
+}
+
 type Option = {
   id: string;
   teacher_id: string;

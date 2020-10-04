@@ -2,25 +2,22 @@ import { gql } from "apollo-server";
 
 const typeDefs = gql`
   type Student {
+    id: ID!
     code: String
     name: String
     first_last_name: String
     second_last_name: String
-    gender: String
-    ciclo: String
-    career: String
-    telephone: String
-    email: String
-    level: Int
-    group: String
-    id: ID
+    telephone: String!
+    email: String!
+    level: Int!
+    group: String!
   }
 
   type Workshop {
     id: ID!
     name: String!
     description: String!
-    options: [Option!]!
+    options: [Option!]
   }
 
   type Option {
@@ -31,16 +28,29 @@ const typeDefs = gql`
     url: String!
     zoom_id: String
     workshop: String!
-    option_id: String!
-    available: Boolean
+    available: Boolean!
   }
 
   type Teacher {
     id: ID!
-    name: String
-    options: [Option]
-    reservations: [Reservation]
-    reservations_by_day(day: String): [Reservation]
+    name: String!
+    options: [Option!]
+    reservations: [Reservation]!
+  }
+
+  type Reservation {
+    id: ID!
+    code: String!
+    name: String!
+    first_last_name: String!
+    second_last_name: String!
+    level: Int!
+    group: String!
+    timestamp: String!
+    option: Option!
+    option_id: String!
+    url: String!
+    zoom_id: String
   }
 
   type Query {
@@ -52,18 +62,8 @@ const typeDefs = gql`
     reservation(id: ID!): Reservation
     teachers: [Teacher]
     teacher(id: ID!, name: String): Teacher
-    students: [Student]
+    students: [Student!]!
     student(code: String): Student!
-  }
-
-  type Reservation {
-    id: ID!
-    code: String!
-    name: String!
-    timestamp: String!
-    option: Option
-    option_id: String!
-    workshop_id: String
   }
 
   type Applicant {
@@ -76,10 +76,25 @@ const typeDefs = gql`
   input ReservationInput {
     code: String!
     name: String!
-    timestamp: String!
+    first_last_name: String!
+  	second_last_name: String!
+  	level: Int!
+  	group: String!
     option_id: String!
-    workshop_id: String
-    teacher_id: String!
+  }
+
+  type ReturnedReservation {
+    id: ID!
+    code: String!
+    name: String!
+    timestamp: String!
+    first_last_name: String!
+    second_last_name: String!
+    level: Int!
+    group: String!
+    option_id: String!
+    url: String!
+    zoom_id: String
   }
 
   input SavedReservation {
@@ -90,12 +105,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    makeReservation(
-      code: String
-      name: String
-      option_id: String
-      workshop_id: String
-    ): Reservation
+    makeReservation(input: ReservationInput): ReturnedReservation
     saveAttendance(input: [AttendanceInput]): SaveAttendanceResponse
   }
   input AttendanceInput {
