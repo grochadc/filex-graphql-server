@@ -7,7 +7,7 @@ const resolvers = {
   Query,
   Mutation,
   Workshop: {
-    options: (obj) => utils.getByIds(db.options, obj.option_ids),
+    options: (obj: {option_ids: string[]}) => utils.getByIds(db.options, obj.option_ids),
   },
   Reservation: {
     option: (obj, _, { loaders }) => loaders.optionLoader.load(obj.option_id),
@@ -17,6 +17,10 @@ const resolvers = {
     teacher: (obj) => obj.teacher_id,
     url: (obj) => utils.getById(db, "options", obj.id).url,
     zoom_id: (obj) => utils.getById(db, "options", obj.id).zoom_id,
+    available: async (obj, _, { dataSources }) => {
+      const data: number = await dataSources.firebaseAPI.getRegistered(obj.id);
+      return Boolean(data < 15);
+    },
   },
   Teacher: {
     options: (obj) => {
@@ -24,6 +28,7 @@ const resolvers = {
     },
     reservations: async (obj, __, { dataSources }) => {
       const data = await dataSources.firebaseAPI.getReservations(obj.id);
+      if(data===null) return [];
       return Object.values(data);
     },
   },
