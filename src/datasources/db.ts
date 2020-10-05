@@ -12,25 +12,9 @@ interface Workshop {
   option_ids: string[];
 }
 
-interface WorkshopOption {
-  id: string;
-  teacher_id: string;
-  time: string;
-  day: "lunes" | "martes" | "miercoles" | "jueves";
-  workshop_id: WorkshopId;
-  url: string;
-  zoom_id?: string;
-}
-
-type Teacher = {
-  id: string;
-  name: string;
-  options: string[];
-};
-
 const database: {
   workshops: Workshop[];
-  options: WorkshopOption[];
+  options: Option[];
   teachers: Teacher[];
 } = {
   workshops: [
