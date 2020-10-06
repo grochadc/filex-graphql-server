@@ -1,5 +1,5 @@
 const db = require("../datasources/db");
-const masterlist = require("../datasources/masterlist.js");
+const masterlist = require("../datasources/masterlist");
 const utils = require("../utils");
 
 const Query = {
