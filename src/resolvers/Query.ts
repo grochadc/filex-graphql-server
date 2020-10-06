@@ -8,7 +8,13 @@ const Query = {
     utils.getById(db, "workshops", args.id, () =>
       console.log("Called by Query.workshop")
     ),
-  options: () => db.options,
+  options: (_, args) => {
+    if (args.workshop_id)
+      return db.options.filter(
+        (option: Option) => option.workshop_id === args.workshop_id
+      );
+    return db.options;
+  },
   option: (_, args) =>
     utils.getById(db, "options", args.id, () =>
       console.log("Called by Query.option")

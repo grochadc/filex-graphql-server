@@ -57,7 +57,7 @@ const typeDefs = gql`
   type Query {
     workshops: [Workshop]
     workshop(id: ID!): Workshop
-    options: [Option]
+    options(workshop_id: String): [Option!]!
     option(id: ID!): Option
     reservations: [Reservation]
     reservation(id: ID!): Reservation
