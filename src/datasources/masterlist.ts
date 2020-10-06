@@ -1,6 +1,20 @@
 module.exports = {
   students: [
     {
+      code: '12345',
+      name: 'ALBERTO',
+      first_last_name: 'AGUILERA',
+      second_last_name: 'VALADEZ',
+      gender: 'M',
+      ciclo: '2020B',
+      career: 'LICENCIATURA EN MEDICINA VETERINARIA Y ZOOTECNIA (MVZ)',
+      telephone: '3421080628',
+      email: 'juan.gabriel@alumnos.udg.mx',
+      level: 1,
+      group: 'E1-1',
+      id: '12345'
+    },
+    {
       code: '212617062',
       name: 'YULISA GUADALUPE ',
       first_last_name: 'VARGAS',
