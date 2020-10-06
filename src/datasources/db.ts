@@ -3,12 +3,14 @@ type WorkshopId =
   | "toeflpreparation"
   | "basicreading"
   | "basicadvancedlistening"
+  | "advancedreading"
   | "tutoring";
 
 interface Workshop {
   id: WorkshopId;
   name: string;
   description: string;
+  levels: number[];
   option_ids: string[];
 }
 
@@ -23,6 +25,7 @@ const database: {
       name: "Conversation",
       description:
         "El alumno se expresa oralmente utilizando las funciones comunicativas y vocabulario adquirido, mejorar la fluidez, y perder el temor a hablar.",
+      levels: [1, 2, 3, 4, 5, 6],
       option_ids: [
         "alondralunes",
         "gonzalolunes",
@@ -41,11 +44,12 @@ const database: {
       name: "TOEFL Preparation",
       description:
         "Ayuda a desarrollar habilidades para el examen de certificación, a partir del dominio ya adquirido del idioma. Duracion: 1 mes.",
+      levels: [6],
       option_ids: [
         "carloslunes",
         "carlosmartes",
-        "jiselainemiercoles",
-        "jiselainejueves",
+        "brendamiercoles",
+        "brendajueves",
       ],
     },
     {
@@ -53,13 +57,23 @@ const database: {
       name: "Basic Reading",
       description:
         "Lectura de textos e historias sencillas para trabajar con vocabulario y lectura de comprensión. Niveles 1-3",
+      levels: [1, 2, 3],
       option_ids: ["alondramiercoles"],
+    },
+    {
+      id: "advancedreading",
+      name: "Advanced Reading",
+      description:
+        "Lectura de textos e historias sencillas para trabajar con vocabulario y lectura de comprensión. Niveles 1-3",
+      levels: [4, 5, 6],
+      option_ids: ["brendamartes"],
     },
     {
       id: "basicadvancedlistening",
       name: "Basic/Advanced Listening",
       description:
         "Ayuda a desarrollar la habilidad de comprensión de escucha por medio de audios. Basic: Niveles 1-3; Advanced: Niveles 4-6",
+      levels: [1, 2, 3, 4, 5, 6],
       option_ids: ["zulletlunes", "zulletmartes"],
     },
     {
@@ -67,6 +81,7 @@ const database: {
       name: "Tutoring",
       description:
         "Es un proceso de acompañamiento, aclarando dudas. El alumno deberá saber exactamente el tema a repasar.",
+      levels: [1, 2, 3, 4, 5, 6],
       option_ids: ["sergiolunes", "gissellunes", "zulletmiercoles"],
     },
   ],
@@ -174,19 +189,27 @@ const database: {
       zoom_id: "3175",
     },
     {
-      id: "jiselainemiercoles",
-      teacher_id: "jiselaine",
+      id: "brendamiercoles",
+      teacher_id: "brenda",
       time: "11:00 - 12:00",
       day: "miercoles",
       workshop_id: "toeflpreparation",
-      url: "https://meet.google.com/bdo-ejjr-uwv",
+      url: "https://classroom.google.com/c/MTgyNjAyMjUzMjU1?cjc=to7s5ow",
     },
     {
-      id: "jiselainejueves",
-      teacher_id: "jiselaine",
+      id: "brendajueves",
+      teacher_id: "brenda",
       time: "11:00 - 12:00",
       day: "jueves",
       workshop_id: "toeflpreparation",
+      url: "https://classroom.google.com/c/MTgyNjAyMjUzMjU1?cjc=to7s5ow",
+    },
+    {
+      id: "brendamartes",
+      teacher_id: "brenda",
+      time: "11:00 - 12:00",
+      day: "martes",
+      workshop_id: "advancedreading",
       url: "https://meet.google.com/bdo-ejjr-uwv",
     },
     {
@@ -275,9 +298,9 @@ const database: {
       ],
     },
     {
-      id: "jiselaine",
-      name: "Jiselaine",
-      options: ["jiselainemiercoles", "jiselainejueves"],
+      id: "brenda",
+      name: "Brenda",
+      options: ["brendamiercoles", "brendajueves"],
     },
   ],
 };

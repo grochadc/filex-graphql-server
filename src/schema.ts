@@ -17,6 +17,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     description: String!
+    levels: [Int!]!
     options: [Option!]
   }
 
@@ -77,9 +78,9 @@ const typeDefs = gql`
     code: String!
     name: String!
     first_last_name: String!
-  	second_last_name: String!
-  	level: Int!
-  	group: String!
+    second_last_name: String!
+    level: Int!
+    group: String!
     option_id: String!
   }
 

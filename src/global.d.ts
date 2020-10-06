@@ -26,7 +26,7 @@ type Reservation = {
 type ReservationForDb = Reservation & {
   id: string;
   timestamp: string;
-}
+};
 
 type Option = {
   id: string;
@@ -34,9 +34,15 @@ type Option = {
   time: string;
   day: "lunes" | "martes" | "miercoles" | "jueves";
   url: string;
-  workshop_id: "conversation" | "toeflpreparation" | "basicreading" | "basicadvancedlistening" | "tutoring";
+  workshop_id:
+    | "conversation"
+    | "toeflpreparation"
+    | "basicreading"
+    | "basicadvancedlistening"
+    | "tutoring"
+    | "advancedreading";
   zoom_id?: string;
-}
+};
 
 type Teacher = {
   id: string;
