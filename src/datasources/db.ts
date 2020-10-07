@@ -218,7 +218,7 @@ const database: {
       time: "13:00 - 14:00",
       day: "miercoles",
       workshop_id: "basicreading",
-      url: "https://meet.google.com/lookup/gdourilkmv",
+      url: "https://classroom.google.com/c/MTc4NjI5MDcxMDM4?cjc=i464gik",
     },
     {
       id: "zulletlunes",
