@@ -113,6 +113,12 @@ const typeDefs = gql`
     attendance: Boolean!
     code: String!
     name: String!
+    first_last_name: String!
+    second_last_name: String!
+    telephone: String!
+    email: String!
+    level: Int!
+    group: String!
   }
   type SaveAttendanceResponse {
     status: Int!
