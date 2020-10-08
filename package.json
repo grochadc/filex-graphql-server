@@ -7,7 +7,8 @@
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx typescript@latest",
-    "dev": "nodemon --ext ts,tsx --exec 'tsc && node' dist/server.js"
+    "dev": "nodemon --ext ts,tsx --exec 'tsc && node' dist/server.js",
+    "publish": "git push heroku master && heroku logs --tail"
   },
   "author": "",
   "license": "ISC",
