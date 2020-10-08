@@ -3,12 +3,10 @@ import { gql } from "apollo-server";
 const typeDefs = gql`
   type Student {
     id: ID!
-    code: String
-    name: String
-    first_last_name: String
-    second_last_name: String
-    telephone: String!
-    email: String!
+    code: String!
+    name: String!
+    first_last_name: String!
+    second_last_name: String!
     level: Int!
     group: String!
   }
@@ -115,8 +113,8 @@ const typeDefs = gql`
     name: String!
     first_last_name: String!
     second_last_name: String!
-    telephone: String!
-    email: String!
+    telephone: String
+    email: String
     level: Int!
     group: String!
   }
