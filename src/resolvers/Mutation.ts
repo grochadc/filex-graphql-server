@@ -4,8 +4,11 @@ const utils = require("../utils");
 const sheetsAPI = require("../sheetsAPI");
 
 const Mutation = {
-  makeReservation: async (_, { input }: { input: Reservation }, { dataSources }) => {
-    await dataSources.firebaseAPI.addRegistered(input.option_id);
+  makeReservation: async (
+    _,
+    { input }: { input: Reservation },
+    { dataSources }
+  ) => {
     const date = new Date();
     const reservation: ReservationForDb = {
       id: generateId(),

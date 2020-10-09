@@ -7,7 +7,8 @@ const resolvers = {
   Query,
   Mutation,
   Workshop: {
-    options: (obj: {option_ids: string[]}) => utils.getByIds(db.options, obj.option_ids),
+    options: (obj: { option_ids: string[] }) =>
+      utils.getByIds(db.options, obj.option_ids),
   },
   Reservation: {
     option: (obj, _, { loaders }) => loaders.optionLoader.load(obj.option_id),
@@ -28,8 +29,9 @@ const resolvers = {
     },
     reservations: async (obj, __, { dataSources }) => {
       const data = await dataSources.firebaseAPI.getReservations(obj.id);
-      if(data===null) return [];
-      return Object.values(data);
+      if (data === null) return [];
+      console.log("Teacher.reservations", data);
+      return data;
     },
   },
 };

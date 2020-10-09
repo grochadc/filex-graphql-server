@@ -11,13 +11,31 @@ class firebaseAPI extends RESTDataSource {
     return data;
   }
 
-  async makeReservation(teacher_id, reservation) {
-    return this.post(`reservations/${teacher_id}.json`, reservation);
+  async makeReservation(teacher_id, reservation, option_id) {
+    if (option_id) {
+      const reservations = await this.get(
+        `reservations/${teacher_id}/${option_id}.json`
+      );
+      if (
+        reservations &&
+        Object.values(reservations).filter(
+          ({ code }) => reservation.code === code
+        ).length > 0
+      )
+        throw new Error(
+          "Ya hiciste una reservación para ese taller. Por favor elige uno diferente."
+        );
+    }
+    this.addRegistered(option_id);
+    return this.post(
+      `reservations/${teacher_id}/${option_id}.json`,
+      reservation
+    );
   }
 
   async getRegistered(option_id: string): Promise<number> {
     const data = await this.get(`available/${option_id}/registered.json`);
-    const registered = data && Object.keys(data).length
+    const registered = data && Object.keys(data).length;
     return registered;
   }
 
