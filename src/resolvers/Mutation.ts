@@ -18,7 +18,8 @@ const Mutation = {
     const option: Option = utils.getById(db, "options", input.option_id);
     await dataSources.firebaseAPI.makeReservation(
       option.teacher_id,
-      reservation
+      reservation,
+      option.id
     );
     return {...reservation, url: option.url, zoom_id: option.zoom_id};
   },

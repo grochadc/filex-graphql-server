@@ -11,7 +11,7 @@ class firebaseAPI extends RESTDataSource {
     return data;
   }
 
-  async makeReservation(teacher_id, reservation, option_id) {
+  async makeReservation(teacher_id: string, reservation, option_id: string) {
     if (option_id) {
       const reservations = await this.get(
         `reservations/${teacher_id}/${option_id}.json`
@@ -25,12 +25,14 @@ class firebaseAPI extends RESTDataSource {
         throw new Error(
           "Ya hiciste una reservación para ese taller. Por favor elige uno diferente."
         );
+        this.addRegistered(option_id);
+        return this.post(
+          `reservations/${teacher_id}/${option_id}.json`,
+          reservation
+        );
+    } else if(option_id === undefined){
+      throw new Error("No option id provided")
     }
-    this.addRegistered(option_id);
-    return this.post(
-      `reservations/${teacher_id}/${option_id}.json`,
-      reservation
-    );
   }
 
   async getRegistered(option_id: string): Promise<number> {
