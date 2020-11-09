@@ -9,10 +9,12 @@ class firebaseAPI extends RESTDataSource {
 
   async getReservations(teacher_id: String) {
     const data = await this.get(`reservations/${teacher_id}.json`); //{alondralunes : {}, alondramiercoleds:{}}
-    const options = Object.values(data);
-    const args = options.map((option) => Object.values(option));
-    const finaldata = R.apply(R.concat, args);
-    return finaldata;
+    const parse = R.compose(
+      R.flatten,
+      R.map(R.values),
+      R.values
+    )
+    return parse(data);
   }
 
   async makeReservation(teacher_id: string, reservation, option_id: string) {
