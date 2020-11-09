@@ -28,7 +28,6 @@ const database: {
       levels: [1, 2, 3, 4, 5, 6],
       option_ids: [
         "alondralunes",
-        "gonzalolunes",
         "alondramartes",
         "sergiomartes",
         "gisselmartes",
@@ -95,14 +94,6 @@ const database: {
       url: "https://meet.google.com/lookup/fnms6k7cad",
     },
     {
-      id: "gonzalolunes",
-      teacher_id: "gonzalo",
-      time: "14:00 - 15:00",
-      day: "lunes",
-      workshop_id: "conversation",
-      url: "none",
-    },
-    {
       id: "alondramartes",
       teacher_id: "alondra",
       time: "13:00 - 14:00",
@@ -158,7 +149,7 @@ const database: {
       time: "14:00 - 15:00",
       day: "jueves",
       workshop_id: "conversation",
-      url: "none",
+      url: "https://meet.google.com/wbu-jzfw-hbs",
     },
     {
       id: "zulletjueves",
