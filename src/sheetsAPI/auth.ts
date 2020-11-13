@@ -10,8 +10,12 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const TOKEN_PATH = "token.json";
 
 function getSpreadSheet(callback) {
+  const credentials_file =
+    process.env.NODE_ENV === "production"
+      ? "google-credentials.json"
+      : "credentials.json";
   // Load client secrets from a local file.
-  fs.readFile("credentials.json", (err, content) => {
+  fs.readFile(credentials_file, (err, content) => {
     if (err) return console.log("Error loading client secret file:", err);
     // Authorize a client with credentials, then call the Google Sheets API.
     authorize(JSON.parse(content), callback);
