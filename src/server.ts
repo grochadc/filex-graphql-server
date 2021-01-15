@@ -18,6 +18,10 @@ const firebaseClient = firebase.initializeApp({
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  modules: [
+    require("./modules/placement_exam"),
+    require("./modules/test_questions"),
+  ],
   dataSources: () => {
     return {
       firebaseAPI: new FirebaseAPI(),

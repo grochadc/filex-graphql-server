@@ -14,11 +14,57 @@ interface Workshop {
   option_ids: string[];
 }
 
+interface Carrera {
+  name: string;
+}
+
 const database: {
+  carreras: Carrera[];
   workshops: Workshop[];
   options: Option[];
   teachers: Teacher[];
 } = {
+  carreras: [
+    { name: "Academico" },
+    { name: "Administrativo" },
+    { name: "Abogado" },
+    { name: "Administración de Negocios" },
+    { name: "Agrobiotecnología" },
+    { name: "Agronegocios" },
+    { name: "Carrera en Enfermería (ENFE)" },
+    {
+      name:
+        "Ciencia del Comportamiento con Orientación en Alimentación y Nutrición",
+    },
+    {
+      name:
+        "Ciencia del Comportamiento con orientación en Alimentación y Nutrición",
+    },
+    { name: "Cultura Física y Deportes" },
+    { name: "Derecho" },
+    { name: "Desarrollo Turístico Sustentable" },
+    { name: "Enfermería" },
+    { name: "Enfermería Semiescolarizada" },
+    { name: "Estudios Socioterritoriales" },
+    { name: "Ingeniería en Geofísica" },
+    { name: "Ingeniería en Sistemas Biológicos" },
+    { name: "Ingeniería en Telemática" },
+    { name: "Letras Hispánicas" },
+    { name: "Médico Cirujano y Partero" },
+    { name: "Médico Veterinario y Zootecnista" },
+    { name: "Negocios Internacionales" },
+    { name: "Nivelación en Licenciatura en Enfermería" },
+    { name: "Nutrición" },
+    { name: "Periodismo" },
+    { name: "Protección Civil y Emergencias" },
+    { name: "Psicología" },
+    { name: "Psicología con Orientación en Calidad de Vida y Salud" },
+    { name: "Psicología con Orientación en Calidad de Vida y Salud" },
+    { name: "Salud Pública" },
+    { name: "Seguridad Laboral" },
+    { name: "Tecnologías para el Aprendizaje" },
+    { name: "Trabajo Social" },
+  ],
   workshops: [
     {
       id: "conversation",

@@ -35,27 +35,13 @@ function authorize(credentials, callback) {
     client_secret,
     redirect_uris[0]
   );
+  // Check if we have previously stored a token.
+  fs.readFile(TOKEN_PATH, (err, token) => {
+    if (err) return getNewToken(oAuth2Client, callback);
 
-  //if on heroku get token from env
-  if (process.env.NODE_ENV === "production") {
-    const token = {
-      acces_token: process.env.GOOGLE_ACCESS_TOKEN,
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-      scope: process.env.GOOGLE_SCOPE,
-      token_type: process.env.GOOGLE_TOKEN_TYPE,
-      expiry_date: process.env.GOOGLE_EXPIRY_DATE,
-    };
-    oAuth2Client.setCredentials(token);
+    oAuth2Client.setCredentials(JSON.parse(token));
     callback(oAuth2Client);
-  } else {
-    // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-      if (err) return getNewToken(oAuth2Client, callback);
-
-      oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client);
-    });
-  }
+  });
 }
 
 /**

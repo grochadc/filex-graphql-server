@@ -3,7 +3,7 @@ const { getSpreadSheet } = require("./auth");
 
 function request(auth, spreadsheetId, values, range) {
   const sheets = google.sheets({ version: "v4", auth });
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const request = {
       spreadsheetId,
       auth,
@@ -23,7 +23,7 @@ function request(auth, spreadsheetId, values, range) {
 }
 
 function update(sheetId, values, range) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     getSpreadSheet((auth) => request(auth, sheetId, values, range));
   });
 }

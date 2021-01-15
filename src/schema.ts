@@ -53,6 +53,7 @@ const typeDefs = gql`
   }
 
   type Query {
+    carreras: [Carrera]
     workshops: [Workshop]
     workshop(id: ID!): Workshop
     options(workshop_id: String): [Option!]!

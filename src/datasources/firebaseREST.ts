@@ -4,23 +4,19 @@ const R = require("ramda");
 class firebaseAPI extends RESTDataSource {
   constructor() {
     super();
-    this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
+    this.baseURL = "https://filex-5726c.firebaseio.com/";
   }
 
   async getReservations(teacher_id: String) {
-    const data = await this.get(`reservations/${teacher_id}.json`); //{alondralunes : {}, alondramiercoleds:{}}
-    const parse = R.compose(
-      R.flatten,
-      R.map(R.values),
-      R.values
-    )
+    const data = await this.get(`workshops/reservations/${teacher_id}.json`); //{alondralunes : {}, alondramiercoleds:{}}
+    const parse = R.compose(R.flatten, R.map(R.values), R.values);
     return parse(data);
   }
 
   async makeReservation(teacher_id: string, reservation, option_id: string) {
     if (option_id) {
       const reservations = await this.get(
-        `reservations/${teacher_id}/${option_id}.json`
+        `workshops/reservations/${teacher_id}/${option_id}.json`
       );
       if (
         reservations &&
@@ -33,7 +29,7 @@ class firebaseAPI extends RESTDataSource {
         );
       this.addRegistered(option_id);
       return this.post(
-        `reservations/${teacher_id}/${option_id}.json`,
+        `workshops/reservations/${teacher_id}/${option_id}.json`,
         reservation
       );
     } else if (option_id === undefined) {
@@ -42,13 +38,19 @@ class firebaseAPI extends RESTDataSource {
   }
 
   async getRegistered(option_id: string): Promise<number> {
-    const data = await this.get(`available/${option_id}/registered.json`);
+    const data = await this.get(
+      `workshops/available/${option_id}/registered.json`
+    );
     const registered = data && Object.keys(data).length;
     return registered;
   }
 
   async addRegistered(option_id: string) {
-    return this.post(`available/${option_id}/registered.json`, 1);
+    return this.post(`workshops/available/${option_id}/registered.json`, 1);
+  }
+
+  async addApplicant(applicant) {
+    return this.post(`placement/applications.json`, applicant);
   }
 }
 
