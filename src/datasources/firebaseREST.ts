@@ -1,6 +1,7 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
 const R = require("ramda");
 
+//DATASOURCE DEPRECATED IN FAVOR OF datasources/firebase
 class firebaseAPI extends RESTDataSource {
   constructor() {
     super();
@@ -51,6 +52,10 @@ class firebaseAPI extends RESTDataSource {
 
   async addApplicant(applicant) {
     return this.post(`placement/applications.json`, applicant);
+  }
+
+  async getOpened() {
+    return this.get("placement/open.json");
   }
 }
 
