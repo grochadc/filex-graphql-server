@@ -23,7 +23,11 @@ class FirebaseAPI extends DataSource {
     return this.client
       .ref(ref)
       .once("value")
-      .then((snapshot: { val: any }) => snapshot.val());
+      .then((snapshot: { val: any }) => {
+        const data = snapshot.val();
+        console.log(`DataSource got value ${data}`);
+        return data;
+      });
   }
 
   async post(ref: string, data: any) {
