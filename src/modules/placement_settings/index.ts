@@ -13,9 +13,15 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     meetLinks: async (root, args, { dataSources }) => {
-      const data = await dataSources.firebaseClient.get("placement/meetLinks/");
-      console.log(data);
-      return data;
+      try {
+        const data = await dataSources.firebaseClient.get(
+          "placement/meetLinks/"
+        );
+        return data;
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
     },
   },
 
