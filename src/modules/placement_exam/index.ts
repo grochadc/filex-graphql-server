@@ -4,6 +4,7 @@ const typeDefs = gql`
   extend type Query {
     carrera(id: ID!): Carrera
     carreras: [Carrera]
+    isClosed: Boolean!
   }
 
   type Carrera {
@@ -13,6 +14,7 @@ const typeDefs = gql`
 
   extend type Mutation {
     saveWrittenResults(input: WrittenResultsInput): MutationResponse
+    closeExam: CloseExamResponse
   }
 
   input WrittenResultsInput {
@@ -29,6 +31,10 @@ const typeDefs = gql`
     curso: String!
     externo: Boolean!
     reubicacion: Boolean!
+  }
+
+  type CloseExamResponse {
+    isClosed: Boolean!
   }
 
   type MutationResponse {
@@ -58,20 +64,23 @@ interface TestInput {
 
 const resolvers = {
   Query: {
-    carrera(_, { id }) {
+    carrera: (_, args, context) => {
       return {
-        id,
+        id: args.id,
         name: "Licenciatura en valer madre",
       };
     },
-    carreras() {
+    carreras: () => {
       return [...carreras];
+    },
+    isClosed: () => {
+      return getIsClosed();
     },
   },
 
   Mutation: {
     saveWrittenResults: async (_, args, context) => {
-      const reconstructApplicant = (applicant, meetLink) => {
+      const composeApplicant = (applicant, meetLink) => {
         const makeExterno = (applicant) => {
           return {
             ...applicant,
@@ -91,7 +100,7 @@ const resolvers = {
           applicant.externo ? makeExterno(applicant) : applicant
         );
       };
-      const applicant = reconstructApplicant(
+      const applicant = composeApplicant(
         args.input,
         meetLinks[meetLinkCounter(meetLinks.length - 1)]
       );
@@ -104,6 +113,10 @@ const resolvers = {
         meetLink: applicant.meetLink,
         id: applicant.id,
       };
+    },
+    closeExam: (_, args) => {
+      toggleIsClosed();
+      return { isClosed: getIsClosed() };
     },
   },
 };
@@ -129,6 +142,14 @@ const meetLinkCounter = (max) => {
 const generateId = (level: number) => {
   let str = Math.random().toString(36).substring(7);
   return str.substr(0, 3) + level + str.substr(3);
+};
+
+let isClosed = true;
+const getIsClosed = () => {
+  return isClosed;
+};
+const toggleIsClosed = () => {
+  isClosed = !isClosed;
 };
 
 const carreras = [
