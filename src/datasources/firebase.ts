@@ -27,7 +27,8 @@ class FirebaseAPI extends DataSource {
         const data = snapshot.val();
         console.log(`DataSource got value ${data}`);
         return data;
-      });
+      })
+      .catch((e) => console.log(`Caught eror ${e}`));
   }
 
   async post(ref: string, data: any) {
