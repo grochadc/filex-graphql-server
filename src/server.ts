@@ -1,8 +1,6 @@
 import { ApolloServer } from "apollo-server";
 require("dotenv").config();
-import FirebaseAPI = require("./datasources/firebase");
-import typeDefs from "./schema";
-import resolvers from "./resolvers";
+const { FirebaseAPI } = require("./datasources/myREST");
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -12,8 +10,6 @@ const firebaseConfig = {
 };
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
   modules: [
     require("./modules/placement_exam"),
     require("./modules/placement_settings"),
@@ -22,7 +18,7 @@ const server = new ApolloServer({
   ],
   dataSources: () => {
     return {
-      firebaseClient: new FirebaseAPI(firebaseConfig),
+      firebaseAPI: new FirebaseAPI(),
     };
   },
   cors: true,

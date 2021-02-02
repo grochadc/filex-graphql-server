@@ -100,6 +100,8 @@ const resolvers = {
           applicant.externo ? makeExterno(applicant) : applicant
         );
       };
+
+      const meetLinks = await context.dataSources.firebaseAPI.getMeetLinks();
       const applicant = composeApplicant(
         args.input,
         meetLinks[meetLinkCounter(meetLinks.length - 1)]
@@ -120,14 +122,6 @@ const resolvers = {
     },
   },
 };
-
-const meetLinks = [
-  "meetLink1memory",
-  "meetLink2memory",
-  "meetLink3memory",
-  "meetLink4memory",
-  "meetLink5memory",
-];
 
 let count = 0;
 const meetLinkCounter = (max) => {

@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 
 const typeDefs = gql`
   extend type Query {
-    database(ref: String!): String
+    database(ref: String!): [String]
   }
 
   extend type Mutation {
@@ -20,16 +20,15 @@ const resolvers = {
     database: async (
       root,
       args: { ref: string },
-      context: { dataSources: { firebaseClient: { get: (arg0: any) => any } } }
+      context: { dataSources: { firebaseAPI: any } }
     ) => {
-      const data = await context.dataSources.firebaseClient.get(args.ref);
-      return JSON.stringify(data);
+      return context.dataSources.firebaseAPI.getRef(args.ref);
     },
   },
   Mutation: {
     databaseSet: async (root, args, context) => {
       try {
-        await context.dataSources.firebaseClient.post(
+        await context.dataSources.firebaseAPI.setRef(
           args.input.ref,
           args.input.data
         );

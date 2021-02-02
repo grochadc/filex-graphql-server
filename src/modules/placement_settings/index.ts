@@ -14,9 +14,7 @@ const resolvers = {
   Query: {
     meetLinks: async (root, args, { dataSources }) => {
       try {
-        const data = await dataSources.firebaseClient.get(
-          "placement/meetLinks/"
-        );
+        const data = await dataSources.firebaseAPI.getMeetLinks();
         return data;
       } catch (e) {
         console.error(e);
@@ -28,10 +26,7 @@ const resolvers = {
   Mutation: {
     setMeetLinks: async (root, args, { dataSources }) => {
       try {
-        await dataSources.firebaseClient.post(
-          "placement/meetLinks/",
-          args.links
-        );
+        await dataSources.firebaseAPI.post("placement/meetLinks/", args.links);
         return 200;
       } catch (e) {
         return 400;
