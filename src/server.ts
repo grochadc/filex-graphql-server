@@ -16,7 +16,6 @@ const server = new ApolloServer({
     require("./modules/test_questions"),
     require("./modules/firebase_api"),
     require("./modules/registro"),
-    require("./modules/workshops"),
   ],
   dataSources: () => {
     return {
