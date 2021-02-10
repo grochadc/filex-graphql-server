@@ -8,8 +8,7 @@ const getById = (obj: any, key: string, id: string, callback: () => void) => {
   return data[0];
 };
 
-const getByIds = (arr: any[], ids: string[], callback: () => void) => {
-  if (callback) callback();
+const getByIds = (arr: any[], ids: string[]) => {
   return arr.filter((item) => ids.indexOf(item.id) > -1);
 };
 
