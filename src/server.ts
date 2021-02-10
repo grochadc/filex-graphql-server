@@ -1,7 +1,12 @@
 import { ApolloServer } from "apollo-server";
 require("dotenv").config();
-const { FirebaseAPI } = require("./datasources/myREST");
-const { RegistroAPI } = require("./datasources/RegistroAPI");
+import {
+  FirebaseAPI,
+  RegistroAPI,
+  StudentsAPI,
+  WorkshopsAPI,
+  ExamAPI,
+} from "./datasources";
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -17,11 +22,15 @@ const server = new ApolloServer({
     require("./modules/test_questions"),
     require("./modules/firebase_api"),
     require("./modules/registro"),
+    require("./modules/workshops"),
   ],
   dataSources: () => {
     return {
       firebaseAPI: new FirebaseAPI(),
       registroAPI: new RegistroAPI(),
+      studentsAPI: new StudentsAPI(),
+      workshopsAPI: new WorkshopsAPI(),
+      examAPI: new ExamAPI(),
     };
   },
   cors: true,

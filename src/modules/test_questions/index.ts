@@ -1,5 +1,4 @@
 import { gql } from "apollo-server";
-import db from "./db";
 
 export const typeDefs = gql`
   extend type Query {
@@ -7,6 +6,7 @@ export const typeDefs = gql`
   }
 
   type Section {
+    course: String!
     questions: [Question]
     pageInfo: PageInfo
   }
@@ -18,10 +18,10 @@ export const typeDefs = gql`
 
   type Question {
     title: String!
-    options: [Option]
+    options: [AnswerOption]
   }
 
-  type Option {
+  type AnswerOption {
     text: String!
     correct: Boolean!
   }
@@ -29,11 +29,17 @@ export const typeDefs = gql`
 
 export const resolvers = {
   Query: {
-    section: (_, { course, level }) => {
+    section: (_, { course, level }, { dataSources }) => {
+      console.log("Sending section", level);
+      const { questions, totalSections } = dataSources.examAPI.getSection(
+        course,
+        level
+      );
       return {
-        questions: [...db.sections[level - 1].questions],
+        course: course,
+        questions: questions,
         pageInfo: {
-          hasNextPage: Boolean(level < db.sections.length),
+          hasNextPage: Boolean(level < totalSections),
           hasPreviousPage: false,
         },
       };
