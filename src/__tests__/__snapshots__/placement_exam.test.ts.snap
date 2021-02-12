@@ -1,0 +1,128 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Placement exam gets carreras and isClosed 1`] = `
+Object {
+  "carreras": Array [
+    Object {
+      "name": "Academico",
+    },
+    Object {
+      "name": "Administrativo",
+    },
+    Object {
+      "name": "Abogado",
+    },
+    Object {
+      "name": "Administración de Negocios",
+    },
+    Object {
+      "name": "Agrobiotecnología",
+    },
+    Object {
+      "name": "Agronegocios",
+    },
+    Object {
+      "name": "Carrera en Enfermería (ENFE)",
+    },
+    Object {
+      "name": "Ciencia del Comportamiento con Orientación en Alimentación y Nutrición",
+    },
+    Object {
+      "name": "Ciencia del Comportamiento con orientación en Alimentación y Nutrición",
+    },
+    Object {
+      "name": "Cultura Física y Deportes",
+    },
+    Object {
+      "name": "Derecho",
+    },
+    Object {
+      "name": "Desarrollo Turístico Sustentable",
+    },
+    Object {
+      "name": "Enfermería",
+    },
+    Object {
+      "name": "Enfermería Semiescolarizada",
+    },
+    Object {
+      "name": "Estudios Socioterritoriales",
+    },
+    Object {
+      "name": "Ingeniería en Geofísica",
+    },
+    Object {
+      "name": "Ingeniería en Sistemas Biológicos",
+    },
+    Object {
+      "name": "Ingeniería en Telemática",
+    },
+    Object {
+      "name": "Letras Hispánicas",
+    },
+    Object {
+      "name": "Médico Cirujano y Partero",
+    },
+    Object {
+      "name": "Médico Veterinario y Zootecnista",
+    },
+    Object {
+      "name": "Negocios Internacionales",
+    },
+    Object {
+      "name": "Nivelación en Licenciatura en Enfermería",
+    },
+    Object {
+      "name": "Nutrición",
+    },
+    Object {
+      "name": "Periodismo",
+    },
+    Object {
+      "name": "Protección Civil y Emergencias",
+    },
+    Object {
+      "name": "Psicología",
+    },
+    Object {
+      "name": "Psicología con Orientación en Calidad de Vida y Salud",
+    },
+    Object {
+      "name": "Psicología con Orientación en Calidad de Vida y Salud",
+    },
+    Object {
+      "name": "Salud Pública",
+    },
+    Object {
+      "name": "Seguridad Laboral",
+    },
+    Object {
+      "name": "Tecnologías para el Aprendizaje",
+    },
+    Object {
+      "name": "Trabajo Social",
+    },
+  ],
+  "isClosed": true,
+}
+`;
+
+exports[`Placement exam saves and applicant 1`] = `
+Object {
+  "saveWrittenResults": Object {
+    "id": "w924pj",
+    "meetLink": "meetLink2memory",
+    "message": "successful",
+    "status": 200,
+  },
+}
+`;
+
+exports[`Placement settings gets default settings 1`] = `
+Object {
+  "isClosed": true,
+  "meetLinks": Array [
+    "meetlink1",
+  ],
+}
+`;

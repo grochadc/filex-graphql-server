@@ -12,6 +12,7 @@ export default function testServer(dataSources: any): ApolloServerTestClient {
         require("../modules/placement_settings"),
         require("../modules/registro"),
         require("../modules/workshops"),
+        require("../modules/test_questions"),
       ],
       dataSources,
     })

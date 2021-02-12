@@ -16,7 +16,7 @@
     "start": "node dist/server.js",
     "test": "jest --watchAll",
     "build": "npx typescript@latest",
-    "dev": "nodemon --ext ts,tsx --exec 'ts-node src/server.ts'",
+    "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
     "publish": "git push heroku master && heroku logs --tail"
   },
   "author": "",
