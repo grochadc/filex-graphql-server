@@ -21,8 +21,8 @@ interface Carrera {
 const database: {
   carreras: Carrera[];
   workshops: Workshop[];
-  options: Option[];
-  teachers: Teacher[];
+  options: any[];
+  teachers: any[];
 } = {
   carreras: [
     { name: "Academico" },
@@ -342,4 +342,4 @@ const database: {
   ],
 };
 
-module.exports = database;
+export default database;

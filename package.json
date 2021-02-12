@@ -2,6 +2,12 @@
   "name": "filex-graphql-server",
   "version": "1.0.0",
   "description": "",
+  "jest": {
+    "testPathIgnorePatterns": [
+      "dist",
+      "__data__"
+    ]
+  },
   "engines": {
     "node": "14.x"
   },
@@ -38,6 +44,7 @@
     "@babel/preset-typescript": "^7.12.7",
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3",
+    "mockdate": "^3.0.2",
     "nodemon": "^2.0.4",
     "ts-node": "^9.1.1"
   }

@@ -1,5 +1,10 @@
 const { groupBy } = require("ramda");
-const getById = (obj: any, key: string, id: string, callback: () => void) => {
+export const getById = (
+  obj: any,
+  key: string,
+  id: string,
+  callback: () => void
+) => {
   if (callback) callback();
   const data = obj[key].filter((item) => {
     return item.id === id;
@@ -8,17 +13,15 @@ const getById = (obj: any, key: string, id: string, callback: () => void) => {
   return data[0];
 };
 
-const getByIds = (arr: any[], ids: string[]) => {
+export const getByIds = (arr: any[], ids: string[]) => {
   return arr.filter((item) => ids.indexOf(item.id) > -1);
 };
 
-const generateId = () => {
+export const generateId = () => {
   let str = Math.random().toString(36).substring(7);
   return str;
 };
 
-const createMatrix = (arr) => {
+export const createMatrix = (arr) => {
   return arr.map((item) => Object.values(item));
 };
-
-export = { getById, getByIds, generateId, createMatrix };
