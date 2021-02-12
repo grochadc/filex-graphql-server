@@ -1,4 +1,5 @@
 import { gql } from "apollo-server";
+import * as utils from "../../utils";
 
 const typeDefs = gql`
   extend type Query {
@@ -92,8 +93,8 @@ const resolvers = {
         const addExtraProps = (applicant) => {
           return {
             ...applicant,
-            meetLink: applicant.nivel_escrito > 1 ? meetLink : null,
-            id: generateId(applicant.nivel_escrito),
+            meetLink: applicant.nivel_escrito > 2 ? meetLink : null,
+            id: utils.generateId(),
           };
         };
         return addExtraProps(
@@ -105,7 +106,7 @@ const resolvers = {
         meetLinks[meetLinkCounter(meetLinks.length - 1)]
       );
 
-      context.dataSources.firebaseAPI.addApplicant(applicant);
+      context.dataSources.placementAPI.addApplicant(applicant);
 
       return {
         status: 200,
@@ -137,11 +138,6 @@ const meetLinkCounter = (max) => {
   }
   count = 0;
   return count;
-};
-
-const generateId = (level: number) => {
-  let str = Math.random().toString(36).substring(7);
-  return str.substr(0, 3) + level + str.substr(3);
 };
 
 let isClosed = true;

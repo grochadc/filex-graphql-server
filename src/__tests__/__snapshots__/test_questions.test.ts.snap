@@ -1,0 +1,247 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Integration gets English level 1 questions 1`] = `
+Object {
+  "section": Object {
+    "pageInfo": Object {
+      "hasNextPage": true,
+      "hasPreviousPage": false,
+    },
+    "questions": Array [
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "are",
+          },
+          Object {
+            "correct": false,
+            "text": "be",
+          },
+          Object {
+            "correct": false,
+            "text": "not be",
+          },
+          Object {
+            "correct": true,
+            "text": "is",
+          },
+        ],
+        "title": "Jessica _______ a good dancer.",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "e-book",
+          },
+          Object {
+            "correct": true,
+            "text": "cellphone",
+          },
+          Object {
+            "correct": false,
+            "text": "umbrella",
+          },
+          Object {
+            "correct": false,
+            "text": "watches",
+          },
+        ],
+        "title": "What is it? 
+ It's a____ .",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "am",
+          },
+          Object {
+            "correct": true,
+            "text": "are",
+          },
+          Object {
+            "correct": false,
+            "text": "be",
+          },
+          Object {
+            "correct": false,
+            "text": "is",
+          },
+        ],
+        "title": "A: ______ you Mexican? 
+ B: Yes, I am.",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "Jeniffer",
+          },
+          Object {
+            "correct": false,
+            "text": "Jeniffers",
+          },
+          Object {
+            "correct": true,
+            "text": "Jeniffer's",
+          },
+          Object {
+            "correct": false,
+            "text": "Jeniffers'",
+          },
+        ],
+        "title": "Nathan is _______ husband. ",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "Why",
+          },
+          Object {
+            "correct": false,
+            "text": "When",
+          },
+          Object {
+            "correct": true,
+            "text": "What",
+          },
+          Object {
+            "correct": false,
+            "text": "Who",
+          },
+        ],
+        "title": "____ are you having for breakfast?",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "There are",
+          },
+          Object {
+            "correct": true,
+            "text": "There is",
+          },
+          Object {
+            "correct": false,
+            "text": "Are there",
+          },
+          Object {
+            "correct": false,
+            "text": "Is there",
+          },
+        ],
+        "title": "_____ a lot of food.",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "are they do",
+          },
+          Object {
+            "correct": true,
+            "text": "are they doing",
+          },
+          Object {
+            "correct": false,
+            "text": "does they do",
+          },
+          Object {
+            "correct": false,
+            "text": "is they doing",
+          },
+        ],
+        "title": "What ________ ?",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "always",
+          },
+          Object {
+            "correct": true,
+            "text": "never",
+          },
+          Object {
+            "correct": false,
+            "text": "rarely",
+          },
+          Object {
+            "correct": false,
+            "text": "sometimes",
+          },
+        ],
+        "title": "I ______ work on Mondays, it's my day off.",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "gets",
+          },
+          Object {
+            "correct": false,
+            "text": "goes",
+          },
+          Object {
+            "correct": false,
+            "text": "takes",
+          },
+          Object {
+            "correct": true,
+            "text": "has",
+          },
+        ],
+        "title": "Jenny always ______ toast for breakfast.",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": true,
+            "text": "at",
+          },
+          Object {
+            "correct": false,
+            "text": "in",
+          },
+          Object {
+            "correct": false,
+            "text": "on",
+          },
+          Object {
+            "correct": false,
+            "text": "to",
+          },
+        ],
+        "title": "What do you do _______ 8:00?",
+      },
+      Object {
+        "options": Array [
+          Object {
+            "correct": false,
+            "text": "across",
+          },
+          Object {
+            "correct": false,
+            "text": "between",
+          },
+          Object {
+            "correct": true,
+            "text": "in",
+          },
+          Object {
+            "correct": false,
+            "text": "on",
+          },
+        ],
+        "title": "The movie theatre is ______ the corner of Evergreen St. and Peak St.",
+      },
+    ],
+  },
+}
+`;

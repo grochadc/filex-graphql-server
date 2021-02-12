@@ -13,8 +13,7 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     meetLinks: async (root, args, { dataSources }) => {
-      const data = await dataSources.firebaseClient.get("placement/meetLinks/");
-      console.log(data);
+      const data = await dataSources.placementAPI.getMeetLinks();
       return data;
     },
   },
@@ -22,10 +21,7 @@ const resolvers = {
   Mutation: {
     setMeetLinks: async (root, args, { dataSources }) => {
       try {
-        await dataSources.firebaseClient.post(
-          "placement/meetLinks/",
-          args.links
-        );
+        await dataSources.placementAPI.saveMeetLinks(args.links);
         return 200;
       } catch (e) {
         return 400;
