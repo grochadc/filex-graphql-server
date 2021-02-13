@@ -6,6 +6,7 @@ import {
   ExamAPI,
   WorkshopsAPI,
   StudentsAPI,
+  PlacementAPI,
 } from "./datasources";
 
 const firebaseConfig = {
@@ -31,6 +32,7 @@ const server = new ApolloServer({
       examAPI: new ExamAPI(),
       workshopsAPI: new WorkshopsAPI(),
       studentsAPI: new StudentsAPI(),
+      placementAPI: new PlacementAPI(),
     };
   },
   cors: true,

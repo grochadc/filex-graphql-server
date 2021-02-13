@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`E2E Gets the levels that are registering 1`] = `
+Array [
+  1,
+  4,
+]
+`;
+
+exports[`Integration Correctly registers a student 1`] = `
+Object {
+  "registerStudent": Object {
+    "nombre": "Juan",
+    "schedule": Object {
+      "group": "E4-1",
+      "teacher": "Gonzalo Rocha",
+      "time": null,
+    },
+  },
+}
+`;

@@ -30,7 +30,6 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     section: (_, { course, level }, { dataSources }) => {
-      console.log("Sending section", level);
       const { questions, totalSections } = dataSources.examAPI.getSection(
         course,
         level

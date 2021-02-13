@@ -35,9 +35,9 @@ describe("Placement exam", () => {
       mutation: SAVE_RESULTS_DB,
       variables: applicantInfo,
     });
+    if (res.errors) console.log(res.errors);
     expect(spy).toHaveBeenCalled();
     expect(placementAPI.addApplicant).toHaveBeenCalled();
-    if (res.errors) console.log(res.errors);
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
   });

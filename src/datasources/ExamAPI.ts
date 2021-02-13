@@ -4,7 +4,6 @@ import frenchExam from "./data/exam_questions/fr";
 
 class ExamAPI extends DataSource {
   getSection(course, level) {
-    console.log("Getting questions for course ", course);
     if (course === "en") {
       return {
         totalSections: englishExam.sections.length,

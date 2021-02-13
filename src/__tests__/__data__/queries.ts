@@ -21,6 +21,9 @@ export const GET_RESERVATIONS = gql`
           day
         }
       }
+    }
+  }
+`;
 
 export const SAVE_RESULTS_DB = gql`
   mutation Results(
@@ -59,11 +62,9 @@ export const SAVE_RESULTS_DB = gql`
       message
       id
       meetLink
-
     }
   }
 `;
-
 
 export const GET_SELECTION_INFO = gql`
   query getSelectionInfo($code: ID!) {
@@ -103,6 +104,8 @@ export const SET_RESERVATION = gql`
       url
       zoom_id
     }
+  }
+`;
 
 export const GET_CARRERAS = gql`
   query {

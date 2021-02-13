@@ -137,6 +137,9 @@ describe("Integration", () => {
       variables: inputStudent,
     });
     expect(registroAPI.registerStudent).toHaveBeenCalled();
+    if (res.errors) console.log(res.errors);
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toMatchSnapshot();
   });
 });
 
