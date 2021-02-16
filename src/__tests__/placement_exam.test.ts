@@ -5,7 +5,7 @@ import {
   UPDATE_LINKS,
 } from "./__data__/queries";
 import testServer from "../testUtils/testServer";
-import { PlacementAPI } from "../datasources";
+import { PlacementAPI, SheetsAPI } from "../datasources";
 import * as utils from "../utils";
 
 const applicantInfo = {
@@ -25,18 +25,22 @@ const applicantInfo = {
 };
 
 describe("Placement exam", () => {
-  it("saves and applicant", async () => {
+  it("saves an applicant", async () => {
     const placementAPI = new PlacementAPI();
     placementAPI.addApplicant = jest.fn();
+    const sheetsAPI = new SheetsAPI("somespreadsheetid");
+    sheetsAPI.saveApplicant = jest.fn();
+
     const spy = jest.spyOn(utils, "generateId").mockReturnValueOnce("w924pj");
 
-    const { mutate } = testServer(() => ({ placementAPI }));
+    const { mutate } = testServer(() => ({ placementAPI, sheetsAPI }));
     const res = await mutate({
       mutation: SAVE_RESULTS_DB,
       variables: applicantInfo,
     });
     if (res.errors) console.log(res.errors);
     expect(spy).toHaveBeenCalled();
+    expect(sheetsAPI.saveApplicant).toHaveBeenCalled();
     expect(placementAPI.addApplicant).toHaveBeenCalled();
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();

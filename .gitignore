@@ -2,8 +2,8 @@ dist/
 node_modules/
 .env
 token.json
-credentials.json
 
 data/
 dev/
 .DS_Store
+credentials.json

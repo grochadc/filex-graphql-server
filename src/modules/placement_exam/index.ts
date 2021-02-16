@@ -6,6 +6,7 @@ const typeDefs = gql`
     carrera(id: ID!): Carrera
     carreras: [Carrera]
     isClosed: Boolean!
+    getRows: [[String]]!
   }
 
   type Carrera {
@@ -16,6 +17,7 @@ const typeDefs = gql`
   extend type Mutation {
     saveWrittenResults(input: WrittenResultsInput): MutationResponse
     closeExam: CloseExamResponse
+    setRows(input: WrittenResultsInput): Boolean!
   }
 
   input WrittenResultsInput {
@@ -77,6 +79,9 @@ const resolvers = {
     isClosed: () => {
       return getIsClosed();
     },
+    getRows: async (root, args, { dataSources }) => {
+      return dataSources.sheetsAPI.getRows();
+    },
   },
 
   Mutation: {
@@ -109,6 +114,7 @@ const resolvers = {
       );
 
       context.dataSources.placementAPI.addApplicant(applicant);
+      context.dataSources.sheetsAPI.saveApplicant(applicant);
 
       return {
         status: 200,
@@ -120,6 +126,10 @@ const resolvers = {
     closeExam: (_, args) => {
       toggleIsClosed();
       return { isClosed: getIsClosed() };
+    },
+    setRows: (root, args, { dataSources }) => {
+      dataSources.sheetsAPI.setRows(args.data);
+      return true;
     },
   },
 };

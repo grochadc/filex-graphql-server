@@ -107,7 +107,7 @@ Object {
 }
 `;
 
-exports[`Placement exam saves and applicant 1`] = `
+exports[`Placement exam saves an applicant 1`] = `
 Object {
   "saveWrittenResults": Object {
     "id": "w924pj",

@@ -7,14 +7,8 @@ import {
   WorkshopsAPI,
   StudentsAPI,
   PlacementAPI,
+  SheetsAPI,
 } from "./datasources";
-
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-};
 
 const server = new ApolloServer({
   modules: [
@@ -33,6 +27,7 @@ const server = new ApolloServer({
       workshopsAPI: new WorkshopsAPI(),
       studentsAPI: new StudentsAPI(),
       placementAPI: new PlacementAPI(),
+      sheetsAPI: new SheetsAPI("1IRyA_BEwDSWSKO7_4Cks09ZmRDAq6ZBmvd08cBiEqB0"),
     };
   },
   cors: true,

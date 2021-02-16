@@ -1,4 +1,5 @@
 interface Applicant {
+  id: string;
   codigo: string;
   nombre: string;
   apellido_paterno: string;

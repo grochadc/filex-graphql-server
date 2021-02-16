@@ -1,4 +1,5 @@
 export interface Applicant {
+  id: string;
   codigo: string;
   nombre: string;
   apellido_materno: string;
