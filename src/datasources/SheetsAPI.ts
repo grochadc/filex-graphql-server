@@ -1,24 +1,27 @@
-import { google } from "googleapis";
-import * as fs from "fs";
-import { authorize, CRED_PATH } from "../../sheetsAuth";
 import { DataSource } from "apollo-datasource";
+import { google } from "googleapis";
+require("dotenv").config();
+
+function getJWT() {
+  return new google.auth.JWT(
+    process.env.GOOGLE_CLIENT_EMAIL,
+    null,
+    process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    ["https://www.googleapis.com/auth/spreadsheets"]
+  );
+}
 
 class SheetsAPI extends DataSource {
   sheetID: any;
   api: any;
+  ready: boolean;
   constructor(sheetID) {
     super();
     this.sheetID = sheetID;
-  }
-
-  async init() {
-    authorize(JSON.parse(fs.readFileSync(CRED_PATH, "utf8"))).then((auth) => {
-      this.api = google.sheets({ version: "v4", auth });
-    });
+    this.api = google.sheets({ version: "v4", auth: getJWT() });
   }
 
   async saveApplicant(applicant: Applicant) {
-    await this.init();
     const values = [
       [
         new Date().toUTCString(),
