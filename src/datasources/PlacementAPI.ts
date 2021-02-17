@@ -15,7 +15,7 @@ class PlacementAPI extends RESTDataSource {
   }
 
   async saveMeetLinks(links: string[]) {
-    return this.post(`/meetLinks.json`);
+    return this.put(`/meetLinks.json`, links);
   }
 }
 

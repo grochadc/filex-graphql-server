@@ -24,6 +24,7 @@ const resolvers = {
         await dataSources.placementAPI.saveMeetLinks(args.links);
         return 200;
       } catch (e) {
+        console.log(e.extensions.response.body);
         return 400;
       }
     },
