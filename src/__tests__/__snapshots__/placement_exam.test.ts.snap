@@ -111,7 +111,7 @@ exports[`Placement exam saves an applicant 1`] = `
 Object {
   "saveWrittenResults": Object {
     "id": "w924pj",
-    "meetLink": "meetLink2firebase",
+    "meetLink": "link2",
     "message": "successful",
     "status": 200,
   },
