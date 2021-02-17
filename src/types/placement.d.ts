@@ -11,7 +11,7 @@ interface Applicant {
   carrera: string;
   ciclo: string;
   curso: string;
-  reubicacion: string;
+  reubicacion: boolean;
   nivel_escrito: number;
   meetLink: string;
 }

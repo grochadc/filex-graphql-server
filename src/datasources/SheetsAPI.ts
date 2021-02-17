@@ -42,7 +42,7 @@ class SheetsAPI extends DataSource {
         applicant.nivel_escrito,
       ],
     ];
-    this.api.spreadsheets.values.append({
+    return this.api.spreadsheets.values.append({
       spreadsheetId: this.sheetID,
       range: "Today!A1",
       valueInputOption: "RAW",

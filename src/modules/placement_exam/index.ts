@@ -44,7 +44,7 @@ const typeDefs = gql`
     status: Int!
     message: String
     error: String
-    id: String!
+    id: String
     meetLink: String
   }
 `;
@@ -113,15 +113,32 @@ const resolvers = {
         meetLinks[meetLinkCounter(meetLinks.length - 1)]
       );
 
-      context.dataSources.placementAPI.addApplicant(applicant);
-      context.dataSources.sheetsAPI.saveApplicant(applicant);
-
-      return {
-        status: 200,
-        message: "successful",
-        meetLink: applicant.meetLink,
-        id: applicant.id,
-      };
+      return context.dataSources.sheetsAPI
+        .saveApplicant(applicant)
+        .then(() => {
+          console.log("Saved applicant to sheets successfully");
+          return {
+            status: 200,
+            message: "successful",
+            meetLink: applicant.meetLink,
+            id: applicant.id,
+          };
+        })
+        .catch(({ errors }) => {
+          console.log("There was an error:", errors[0].message);
+          context.dataSources.placementAPI
+            .addApplicant(applicant)
+            .then(() =>
+              console.log(
+                "Saved the applicant in firebase because of a problem with sheets"
+              )
+            );
+          return {
+            status: 400,
+            message: errors[0].message,
+            error: errors[0].reason,
+          };
+        });
     },
     closeExam: (_, args) => {
       toggleIsClosed();

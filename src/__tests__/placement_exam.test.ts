@@ -29,7 +29,7 @@ describe("Placement exam", () => {
     const placementAPI = new PlacementAPI();
     placementAPI.addApplicant = jest.fn();
     const sheetsAPI = new SheetsAPI("somespreadsheetid");
-    sheetsAPI.saveApplicant = jest.fn();
+    sheetsAPI.saveApplicant = jest.fn(() => Promise.resolve());
 
     const spy = jest.spyOn(utils, "generateId").mockReturnValueOnce("w924pj");
 
@@ -38,10 +38,10 @@ describe("Placement exam", () => {
       mutation: SAVE_RESULTS_DB,
       variables: applicantInfo,
     });
-    if (res.errors) console.log(res.errors);
+    if (res.errors) console.log(JSON.stringify(res.errors));
     expect(spy).toHaveBeenCalled();
     expect(sheetsAPI.saveApplicant).toHaveBeenCalled();
-    expect(placementAPI.addApplicant).toHaveBeenCalled();
+    expect(placementAPI.addApplicant).toHaveBeenCalledTimes(0);
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
   });
