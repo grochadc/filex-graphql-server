@@ -3,10 +3,10 @@ import * as utils from "../../utils";
 
 const typeDefs = gql`
   extend type Query {
-    carrera(id: ID!): Carrera
     carreras: [Carrera]
     isClosed: Boolean!
-    getRows: [[String]]!
+    logIn: Int!
+    logOut: Int!
   }
 
   type Carrera {
@@ -67,20 +67,17 @@ interface TestInput {
 
 const resolvers = {
   Query: {
-    carrera: (_, args, context) => {
-      return {
-        id: args.id,
-        name: "Licenciatura en valer madre",
-      };
-    },
     carreras: () => {
       return [...carreras];
     },
     isClosed: () => {
       return getIsClosed();
     },
-    getRows: async (root, args, { dataSources }) => {
-      return dataSources.sheetsAPI.getRows();
+    logIn: (root, args, { dataSources }) => {
+      return dataSources.placementAPI.logInUser();
+    },
+    logOut: (root, args, { dataSources }) => {
+      return dataSources.placementAPI.logOutUser();
     },
   },
 
