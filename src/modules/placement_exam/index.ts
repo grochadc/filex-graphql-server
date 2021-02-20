@@ -206,6 +206,7 @@ const carreras = [
   { name: "Seguridad Laboral" },
   { name: "Tecnologías para el Aprendizaje" },
   { name: "Trabajo Social" },
+{ name: "Cirujano Dentista" },
 ];
 module.exports = {
   typeDefs,
