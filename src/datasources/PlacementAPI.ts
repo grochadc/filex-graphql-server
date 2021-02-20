@@ -21,18 +21,20 @@ class PlacementAPI extends RESTDataSource {
   async logInUser() {
     const online = await this.get(`/online.json`);
     if (online === null) {
-      await this.put(`/online.json`, Number(1).toString());
+      this.put(`/online.json`, Number(1).toString());
       return 1;
     }
     const counter = Number(online) + 1;
-    await this.put(`/online.json`, counter.toString());
+    this.context.dataSources.sheetsAPI.setOnlineUsers(counter);
+    this.put(`/online.json`, counter.toString());
     return counter;
   }
 
   async logOutUser() {
     const online = await this.get(`/online.json`);
     const counter = Number(online) - 1;
-    await this.put(`/online.json`, counter.toString());
+    this.context.dataSources.sheetsAPI.setOnlineUsers(counter);
+    this.put(`/online.json`, counter.toString());
     return counter;
   }
 }

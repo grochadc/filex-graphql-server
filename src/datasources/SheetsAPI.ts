@@ -51,6 +51,17 @@ class SheetsAPI extends DataSource {
       },
     });
   }
+
+  async setOnlineUsers(online: number) {
+    return this.api.spreadsheets.values.update({
+      spreadsheetId: this.sheetID,
+      range: "Today!B1",
+      valueInputOption: "RAW",
+      resource: {
+        values: [[online]],
+      },
+    });
+  }
 }
 
 export { SheetsAPI };
