@@ -198,15 +198,14 @@ const carreras = [
   { name: "Nivelación en Licenciatura en Enfermería" },
   { name: "Nutrición" },
   { name: "Periodismo" },
-  { name: "Protección Civil y Emergencias" },
+  { name: "Seguridad Laboral, Protección Civil y Emergencias" },
   { name: "Psicología" },
   { name: "Psicología con Orientación en Calidad de Vida y Salud" },
   { name: "Psicología con Orientación en Calidad de Vida y Salud" },
   { name: "Salud Pública" },
-  { name: "Seguridad Laboral" },
   { name: "Tecnologías para el Aprendizaje" },
   { name: "Trabajo Social" },
-{ name: "Cirujano Dentista" },
+  { name: "Cirujano Dentista" },
 ];
 module.exports = {
   typeDefs,
