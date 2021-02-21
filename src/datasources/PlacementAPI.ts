@@ -35,7 +35,7 @@ class PlacementAPI extends RESTDataSource {
   async logOutUser() {
     const online = await this.get(`/online.json`);
     const counter = Number(online) - 1;
-    this.context.dataSources.sheetsAPI.setOnlineUsers(counter);
+    this.context.dataSources.placementSheetsAPI.setOnlineUsers(counter);
     this.put(`/online.json`, counter.toString());
     return counter;
   }

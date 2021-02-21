@@ -8,6 +8,7 @@ import {
   StudentsAPI,
   PlacementAPI,
   PlacementSheetsAPI,
+  SheetsAPI,
 } from "./datasources";
 
 const server = new ApolloServer({
@@ -29,6 +30,9 @@ const server = new ApolloServer({
       placementAPI: new PlacementAPI(),
       placementSheetsAPI: new PlacementSheetsAPI(
         "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"
+      ),
+      registroSheetsAPI: new SheetsAPI(
+        "1p7likU0aa7n7EiRxTHtdvfpd-uMg3QM8VY3Kz4ld5og"
       ),
     };
   },

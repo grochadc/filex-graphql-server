@@ -1,57 +1,10 @@
 import { gql } from "apollo-server";
 
-export interface Applicant {
-  codigo: string;
-  nombre: string;
-  apellido_materno: string;
-  apellido_paterno: string;
-  genero: string;
-  carrera: string;
-  ciclo: string;
-  telefono: string;
-  email: string;
-  nivel: string;
-  curso: string;
-  externo: boolean;
-  nuevo_ingreso: boolean;
-}
-export interface Student {
-  codigo: string;
-  nombre: string;
-  apellido_materno: string;
-  apellido_paterno: string;
-  genero: string;
-  carrera: string;
-  ciclo: string;
-  telefono: string;
-  email: string;
-  nivel: string;
-  curso: string;
-  externo: boolean;
-  nuevo_ingreso: boolean;
-  grupo: string;
-}
-
-export interface RegisterResponse extends Student {
-  schedule: {
-    group: string;
-    teacher: string;
-    time?: string;
-    serialized: string;
-  };
-}
-
-export interface Schedule {
-  group: string;
-  teacher: string;
-  time?: string;
-  serialized: string;
-}
-
 export const typeDefs = gql`
   extend type Query {
-    registeringLevel: [Int]!
     applicant(codigo: ID!): Applicant!
+    registeringLevel: [Int]!
+    availableSchedules(level: Int!, maxStudents: Int): [Schedule]!
   }
 
   type Applicant {
@@ -68,7 +21,6 @@ export const typeDefs = gql`
     curso: String!
     externo: Boolean!
     nuevo_ingreso: Boolean!
-    schedules: [Schedule]!
   }
 
   type Schedule {
@@ -93,10 +45,8 @@ export const typeDefs = gql`
     telefono: String!
     email: String!
     nivel: String!
-    curso: String!
-    externo: Boolean!
-    nuevo_ingreso: Boolean!
     grupo: String!
+    externo: Boolean!
   }
 
   type RegisterResponse {
@@ -110,9 +60,6 @@ export const typeDefs = gql`
     telefono: String!
     email: String!
     nivel: String!
-    curso: String!
-    externo: Boolean!
-    nuevo_ingreso: Boolean!
     grupo: String!
     schedule: Schedule!
   }
@@ -121,27 +68,17 @@ export const typeDefs = gql`
 export const resolvers = {
   Query: {
     applicant: async (root, args, { dataSources }) => {
-      const data: Promise<Applicant> = await dataSources.registroAPI.getApplicant(
+      const applicant: Promise<Applicant> = await dataSources.registroAPI.getApplicant(
         args.codigo
       );
-      return data;
+      return applicant;
     },
-    registeringLevel: (root, args, { dataSources }) =>
-      dataSources.registroAPI.getLevelsRegistering(),
-  },
-  RegisterResponse: {
-    schedule: async (root: RegisterResponse, args, { dataSources }) => {
-      const schedule: Schedule = await dataSources.registroAPI.getSchedule(
-        root.nivel,
-        root.grupo
-      );
-      return schedule;
+    registeringLevel: (root, args, { dataSources }) => {
+      return dataSources.registroAPI.getLevelsRegistering();
     },
-  },
-  Applicant: {
     schedules: async (root, args, { dataSources }) => {
-      const currentLevel = root.nivel;
-      const maxStudents = 25;
+      const currentLevel = args.level;
+      const maxStudents = args.maxStudents | 25;
       const unavailable = await dataSources.registroAPI.getUnAvailableGroups(
         currentLevel,
         maxStudents
@@ -154,10 +91,12 @@ export const resolvers = {
         throw new Error("No schedule data for that level exists");
 
       function availableSchedules(
-        allSchedules: Schedule[],
+        schedules: Schedule[],
         unavailable: string[]
       ) {
-        return allSchedules.filter((item) => !unavailable.includes(item.group));
+        return schedules.filter(
+          (schedule) => !unavailable.includes(schedule.group)
+        );
       }
 
       return availableSchedules(allSchedules, unavailable);
@@ -172,6 +111,15 @@ export const resolvers = {
         student.grupo
       );
       return registeredStudent;
+    },
+  },
+  RegisterResponse: {
+    schedule: async (root: RegisterResponse, args, { dataSources }) => {
+      const schedule: Schedule = await dataSources.registroAPI.getSchedule(
+        root.nivel,
+        root.grupo
+      );
+      return schedule;
     },
   },
 };

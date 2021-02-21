@@ -83,7 +83,7 @@ const resolvers = {
 
   Mutation: {
     saveWrittenResults: async (_, args, { dataSources }) => {
-      context.dataSources.placementAPI.logOutUser();
+      dataSources.placementAPI.logOutUser();
       const composeApplicant = (applicant, meetLink) => {
         const makeExterno = (applicant) => {
           return {
