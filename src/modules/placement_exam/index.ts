@@ -82,7 +82,7 @@ const resolvers = {
   },
 
   Mutation: {
-    saveWrittenResults: async (_, args, context) => {
+    saveWrittenResults: async (_, args, { dataSources }) => {
       context.dataSources.placementAPI.logOutUser();
       const composeApplicant = (applicant, meetLink) => {
         const makeExterno = (applicant) => {
@@ -105,13 +105,13 @@ const resolvers = {
         );
       };
 
-      const meetLinks = await context.dataSources.placementAPI.getMeetLinks();
+      const meetLinks = await dataSources.placementAPI.getMeetLinks();
       const applicant = composeApplicant(
         args.input,
         meetLinks[meetLinkCounter(meetLinks.length - 1)]
       );
 
-      return context.dataSources.sheetsAPI
+      return dataSources.placementSheetsAPI
         .saveApplicant(applicant)
         .then(() => {
           console.log("Saved applicant to sheets successfully");
@@ -124,7 +124,7 @@ const resolvers = {
         })
         .catch(({ errors }) => {
           console.log("There was an error:", errors[0].message);
-          context.dataSources.placementAPI
+          dataSources.placementAPI
             .addApplicant(applicant)
             .then(() =>
               console.log(
@@ -143,7 +143,7 @@ const resolvers = {
       return { isClosed: getIsClosed() };
     },
     setRows: (root, args, { dataSources }) => {
-      dataSources.sheetsAPI.setRows(args.data);
+      dataSources.placementSheetsAPI.setRows(args.data);
       return true;
     },
   },

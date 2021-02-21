@@ -7,7 +7,7 @@ import {
   WorkshopsAPI,
   StudentsAPI,
   PlacementAPI,
-  SheetsAPI,
+  PlacementSheetsAPI,
 } from "./datasources";
 
 const server = new ApolloServer({
@@ -27,7 +27,9 @@ const server = new ApolloServer({
       workshopsAPI: new WorkshopsAPI(),
       studentsAPI: new StudentsAPI(),
       placementAPI: new PlacementAPI(),
-      sheetsAPI: new SheetsAPI("1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"),
+      placementSheetsAPI: new PlacementSheetsAPI(
+        "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"
+      ),
     };
   },
   cors: true,

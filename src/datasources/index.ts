@@ -4,7 +4,7 @@ import { ExamAPI } from "./ExamAPI";
 import { WorkshopsAPI } from "./WorkshopsAPI";
 import { StudentsAPI } from "./StudentsAPI";
 import { PlacementAPI } from "./PlacementAPI";
-import { SheetsAPI } from "./SheetsAPI";
+import { PlacementSheetsAPI } from "./PlacementSheetsAPI";
 
 export {
   RegistroAPI,
@@ -13,5 +13,5 @@ export {
   WorkshopsAPI,
   StudentsAPI,
   PlacementAPI,
-  SheetsAPI,
+  PlacementSheetsAPI,
 };

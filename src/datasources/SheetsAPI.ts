@@ -14,37 +14,20 @@ function getJWT() {
 class SheetsAPI extends DataSource {
   sheetID: any;
   api: any;
-  ready: boolean;
-  constructor(sheetID) {
+  constructor(sheetID: string) {
     super();
     this.sheetID = sheetID;
     this.api = google.sheets({ version: "v4", auth: getJWT() });
   }
 
-  async saveApplicant(applicant: Applicant) {
-    const values = [
-      [
-        new Date().toUTCString(),
-        applicant.id,
-        applicant.codigo,
-        applicant.nombre,
-        applicant.apellido_paterno,
-        applicant.apellido_materno,
-        applicant.genero,
-        applicant.ciclo,
-        applicant.carrera,
-        applicant.telefono,
-        applicant.email,
-        applicant.externo,
-        applicant.reubicacion,
-        applicant.curso,
-        applicant.meetLink,
-        applicant.nivel_escrito,
-      ],
-    ];
+  interface() {
+    return [this.api, this.sheetID];
+  }
+
+  async append(values: any[][], range: string) {
     return this.api.spreadsheets.values.append({
       spreadsheetId: this.sheetID,
-      range: "Today!A1",
+      range,
       valueInputOption: "RAW",
       resource: {
         values,
@@ -52,13 +35,13 @@ class SheetsAPI extends DataSource {
     });
   }
 
-  async setOnlineUsers(online: number) {
+  async update(values: any[][], range: string) {
     return this.api.spreadsheets.values.update({
       spreadsheetId: this.sheetID,
-      range: "Today!B1",
+      range,
       valueInputOption: "RAW",
       resource: {
-        values: [[online]],
+        values,
       },
     });
   }
