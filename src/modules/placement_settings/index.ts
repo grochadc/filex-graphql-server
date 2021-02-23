@@ -2,19 +2,28 @@ import { gql } from "apollo-server";
 
 const typeDefs = gql`
   extend type Query {
-    meetLinks: [String]!
+    meetLinks: [meetLink]!
+  }
+
+  type meetLink {
+    teacher: String
+    link: String
   }
 
   extend type Mutation {
-    setMeetLinks(links: [String]!): Int
+    setMeetLinks(links: [MeetLinkInput]!): Int
+  }
+
+  input MeetLinkInput {
+    teacher: String
+    link: String!
   }
 `;
 
 const resolvers = {
   Query: {
     meetLinks: async (root, args, { dataSources }) => {
-      const data = await dataSources.placementAPI.getMeetLinks();
-      return data;
+      return dataSources.placementAPI.getMeetLinks();
     },
   },
 

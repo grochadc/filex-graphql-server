@@ -108,7 +108,7 @@ const resolvers = {
       const meetLinks = await context.dataSources.placementAPI.getMeetLinks();
       const applicant = composeApplicant(
         args.input,
-        meetLinks[meetLinkCounter(meetLinks.length - 1)]
+        meetLinks[meetLinkCounter(meetLinks.length - 1)].link
       );
 
       return context.dataSources.sheetsAPI
