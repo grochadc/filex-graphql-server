@@ -11,8 +11,9 @@ class RegistroAPI extends RESTDataSource {
     return this.get(`system/registeringLevels.json`);
   }
 
-  async setLevelsRegistering(levels: string[]) {
-    return this.put(`system/registeringLevels.json`, levels);
+  async setLevelsRegistering(levels: number[]) {
+    this.put(`system/registeringLevels.json`, levels);
+    return levels;
   }
 
   async getUnAvailableGroups(level: string, maxStudents: number) {

@@ -38,7 +38,6 @@ declare interface RegisterResponse extends Student {
     serialized: string;
   };
 }
-
 declare interface Schedule {
   group: string;
   teacher: string;

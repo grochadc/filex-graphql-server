@@ -2,8 +2,8 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   extend type Query {
+    registeringLevels: [Int]!
     applicant(codigo: ID!): Applicant!
-    registeringLevel: [Int]!
     availableSchedules(level: Int!, maxStudents: Int): [Schedule]!
   }
 
@@ -32,6 +32,7 @@ export const typeDefs = gql`
 
   extend type Mutation {
     registerStudent(input: StudentInput): RegisterResponse!
+    saveRegisteringLevels(levels: [Int]!): [Int]!
   }
 
   input StudentInput {
@@ -73,8 +74,16 @@ export const resolvers = {
       );
       return applicant;
     },
-    registeringLevel: (root, args, { dataSources }) => {
-      return dataSources.registroAPI.getLevelsRegistering();
+    registeringLevels: (root, args, { dataSources }) =>
+      dataSources.registroAPI.getLevelsRegistering(),
+  },
+  RegisterResponse: {
+    schedule: async (root: RegisterResponse, args, { dataSources }) => {
+      const schedule: Schedule = await dataSources.registroAPI.getSchedule(
+        root.nivel,
+        root.grupo
+      );
+      return schedule;
     },
     schedules: async (root, args, { dataSources }) => {
       const currentLevel = args.level;
@@ -111,6 +120,9 @@ export const resolvers = {
         student.grupo
       );
       return registeredStudent;
+    },
+    saveRegisteringLevels: (root, args, { dataSources }) => {
+      return dataSources.registroAPI.setLevelsRegistering(args.levels);
     },
   },
   RegisterResponse: {

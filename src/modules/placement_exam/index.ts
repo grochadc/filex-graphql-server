@@ -105,11 +105,12 @@ const resolvers = {
         );
       };
 
-      const meetLinks = await dataSources.placementAPI.getMeetLinks();
-      const applicant = composeApplicant(
-        args.input,
-        meetLinks[meetLinkCounter(meetLinks.length - 1)]
-      );
+      const meetLinks = await context.dataSources.placementAPI.getMeetLinks();
+      const currentLink =
+        args.input.curso === "fr"
+          ? "http://meet.google.com/fwm-wqdb-ifw"
+          : meetLinks[meetLinkCounter(meetLinks.length - 1)].link;
+      const applicant = composeApplicant(args.input, currentLink);
 
       return dataSources.placementSheetsAPI
         .saveApplicant(applicant)
