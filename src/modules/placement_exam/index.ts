@@ -105,7 +105,7 @@ const resolvers = {
         );
       };
 
-      const meetLinks = await context.dataSources.placementAPI.getMeetLinks();
+      const meetLinks = await dataSources.placementAPI.getMeetLinks();
       const currentLink =
         args.input.curso === "fr"
           ? "http://meet.google.com/fwm-wqdb-ifw"
