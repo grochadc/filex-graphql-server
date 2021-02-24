@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   extend type Query {
-    registeringLevels: [Int]!
+    registeringLevels(course: String!): [Int]!
     applicant(codigo: ID!): Applicant!
     availableSchedules(level: Int!, maxStudents: Int): [Schedule]!
   }
@@ -21,13 +21,20 @@ export const typeDefs = gql`
     curso: String!
     externo: Boolean!
     nuevo_ingreso: Boolean!
+    schedules: [Schedule]!
   }
 
   type Schedule {
     group: String!
     teacher: String!
     time: String
-    serialized: String!
+    serialized(options: SerializedOptions!): String!
+  }
+
+  input SerializedOptions {
+    group: Boolean
+    teacher: Boolean
+    time: Boolean
   }
 
   extend type Mutation {
@@ -48,6 +55,7 @@ export const typeDefs = gql`
     nivel: String!
     grupo: String!
     externo: Boolean!
+    curso: String!
   }
 
   type RegisterResponse {
@@ -75,41 +83,7 @@ export const resolvers = {
       return applicant;
     },
     registeringLevels: (root, args, { dataSources }) =>
-      dataSources.registroAPI.getLevelsRegistering(),
-  },
-  RegisterResponse: {
-    schedule: async (root: RegisterResponse, args, { dataSources }) => {
-      const schedule: Schedule = await dataSources.registroAPI.getSchedule(
-        root.nivel,
-        root.grupo
-      );
-      return schedule;
-    },
-    schedules: async (root, args, { dataSources }) => {
-      const currentLevel = args.level;
-      const maxStudents = args.maxStudents | 25;
-      const unavailable = await dataSources.registroAPI.getUnAvailableGroups(
-        currentLevel,
-        maxStudents
-      );
-      const allSchedules: Schedule[] = await dataSources.registroAPI.getSchedules(
-        currentLevel
-      );
-
-      if (allSchedules === null)
-        throw new Error("No schedule data for that level exists");
-
-      function availableSchedules(
-        schedules: Schedule[],
-        unavailable: string[]
-      ) {
-        return schedules.filter(
-          (schedule) => !unavailable.includes(schedule.group)
-        );
-      }
-
-      return availableSchedules(allSchedules, unavailable);
-    },
+      dataSources.registroAPI.getLevelsRegistering(args.course),
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {
@@ -129,9 +103,55 @@ export const resolvers = {
     schedule: async (root: RegisterResponse, args, { dataSources }) => {
       const schedule: Schedule = await dataSources.registroAPI.getSchedule(
         root.nivel,
-        root.grupo
+        root.grupo,
+        root.curso
       );
       return schedule;
+    },
+  },
+  Applicant: {
+    schedules: async (root, args, { dataSources }) => {
+      const course = root.curso;
+      const currentLevel = root.nivel;
+      const maxStudents = 25;
+      const unavailable = await dataSources.registroAPI.getUnAvailableGroups(
+        currentLevel,
+        maxStudents,
+        course
+      );
+      const allSchedules: Schedule[] = await dataSources.registroAPI.getSchedules(
+        currentLevel,
+        course
+      );
+
+      if (allSchedules === null)
+        throw new Error("No schedule data for that level exists");
+
+      function availableSchedules(
+        schedules: Schedule[],
+        unavailable: string[]
+      ) {
+        return schedules.filter(
+          (schedule) => !unavailable.includes(schedule.group)
+        );
+      }
+
+      return availableSchedules(allSchedules, unavailable);
+    },
+  },
+  Schedule: {
+    serialized: (root, args, context) => {
+      type SerializeOptions = {
+        group?: boolean;
+        teacher?: boolean;
+        time?: boolean;
+      };
+      const serialize = (options: SerializeOptions, source: any) => {
+        return `${options.group ? source.group : ""} ${
+          options.teacher ? source.teacher : ""
+        } ${options.time ? source.time : ""}`;
+      };
+      return serialize(args.options, root);
     },
   },
 };

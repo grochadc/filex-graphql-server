@@ -13,7 +13,7 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async getLevelsRegistering(course: Course) {
-    return this.get(`system/${course}/registeringLevels.json`);
+    return this.get(`system/registeringLevels/${course}.json`);
   }
 
   async setLevelsRegistering(levels: number[], course: Course) {
