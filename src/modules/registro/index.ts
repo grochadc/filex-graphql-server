@@ -127,7 +127,7 @@ export const resolvers = {
       return registeredStudent;
     },
     saveRegisteringLevels: (root, args, { dataSources }) => {
-      dataSources.registroAPI.setLevelsRegistering(args.levels);
+      return dataSources.registroAPI.setLevelsRegistering(args.levels);
     },
   },
 };
