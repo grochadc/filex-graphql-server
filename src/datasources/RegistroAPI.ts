@@ -113,7 +113,10 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async getApplicant(codigo: string) {
-    return this.get(`applicants/${codigo}.json`);
+    const applicant = await this.get(`applicants/${codigo}.json`);
+    if (applicant === null)
+      throw new Error(`No applicant found with code ${codigo}`);
+    return applicant;
   }
 }
 
