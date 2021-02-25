@@ -79,7 +79,7 @@ Object {
       "name": "Periodismo",
     },
     Object {
-      "name": "Protección Civil y Emergencias",
+      "name": "Seguridad Laboral, Protección Civil y Emergencias",
     },
     Object {
       "name": "Psicología",
@@ -94,13 +94,13 @@ Object {
       "name": "Salud Pública",
     },
     Object {
-      "name": "Seguridad Laboral",
-    },
-    Object {
       "name": "Tecnologías para el Aprendizaje",
     },
     Object {
       "name": "Trabajo Social",
+    },
+    Object {
+      "name": "Cirujano Dentista",
     },
   ],
   "isClosed": true,
@@ -122,7 +122,16 @@ exports[`Placement settings gets default settings 1`] = `
 Object {
   "isClosed": true,
   "meetLinks": Array [
-    "meetlink1",
+    Object {
+      "link": "meetlink1",
+      "teacher": "someTeacher",
+    },
   ],
+}
+`;
+
+exports[`Placement settings saves the meetLinks 1`] = `
+Object {
+  "setMeetLinks": 200,
 }
 `;
