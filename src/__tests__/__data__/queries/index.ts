@@ -1,4 +1,10 @@
 import { gql } from "apollo-server";
+import {
+  SAVE_LEVELS_REGISTERING,
+  GET_LEVELS_REGISTERING,
+  GET_APPLICANT,
+  REGISTER_STUDENT,
+} from "./registro";
 
 export const GET_RESERVATIONS = gql`
   query reservationsList($teacher: ID!) {
@@ -134,3 +140,10 @@ export const UPDATE_LINKS = gql`
     setMeetLinks(links: $links)
   }
 `;
+
+export {
+  SAVE_LEVELS_REGISTERING,
+  GET_LEVELS_REGISTERING,
+  GET_APPLICANT,
+  REGISTER_STUDENT,
+};

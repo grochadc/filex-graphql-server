@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   extend type Query {
-    registeringLevels(course: String!): [Int]!
+    registeringLevels(course: String!, course: String!): [Int]!
     applicant(codigo: ID!): Applicant!
     availableSchedules(level: Int!, maxStudents: Int): [Schedule]!
   }
@@ -20,7 +20,7 @@ export const typeDefs = gql`
     nivel: String!
     curso: String!
     externo: Boolean!
-    nuevo_ingreso: Boolean!
+    registering: Boolean!
     schedules: [Schedule]!
   }
 
@@ -39,7 +39,7 @@ export const typeDefs = gql`
 
   extend type Mutation {
     registerStudent(input: StudentInput): RegisterResponse!
-    saveRegisteringLevels(levels: [Int]!): [Int]!
+    saveRegisteringLevels(levels: [Int]!, course: String!): [Int]!
   }
 
   input StudentInput {
@@ -96,7 +96,10 @@ export const resolvers = {
       return registeredStudent;
     },
     saveRegisteringLevels: (root, args, { dataSources }) => {
-      return dataSources.registroAPI.setLevelsRegistering(args.levels);
+      return dataSources.registroAPI.setLevelsRegistering(
+        args.levels,
+        args.course
+      );
     },
   },
   RegisterResponse: {
@@ -110,6 +113,12 @@ export const resolvers = {
     },
   },
   Applicant: {
+    registering: async (root, args, { dataSources }) => {
+      const registeringLevels = await dataSources.registroAPI.getLevelsRegistering(
+        root.curso
+      );
+      return registeringLevels.includes(Number(root.nivel));
+    },
     schedules: async (root, args, { dataSources }) => {
       const course = root.curso;
       const currentLevel = root.nivel;

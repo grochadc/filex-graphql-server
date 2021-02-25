@@ -1,12 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`E2E Gets the levels that are registering 1`] = `
-Array [
-  1,
-  4,
-]
-`;
-
 exports[`Integration Correctly registers a student 1`] = `
 Object {
   "registerStudent": Object {
@@ -16,6 +9,86 @@ Object {
       "teacher": "Gonzalo Rocha",
       "time": null,
     },
+  },
+}
+`;
+
+exports[`Integration Gets and sets registering levels 1`] = `
+Object {
+  "english": Array [
+    1,
+    2,
+  ],
+}
+`;
+
+exports[`Integration Gets and sets registering levels 2`] = `
+Object {
+  "saveRegisteringLevels": Array [
+    1,
+    2,
+  ],
+}
+`;
+
+exports[`Integration Returns an applicant by codigo 1`] = `
+Object {
+  "applicant": Object {
+    "apellido_materno": "Martinez",
+    "apellido_paterno": "Mamarre",
+    "carrera": "Agronegocios",
+    "ciclo": "2021A",
+    "codigo": "1234567890",
+    "curso": "en",
+    "email": "m@marre.com",
+    "externo": true,
+    "genero": "M",
+    "nivel": "4",
+    "nombre": "Iker",
+    "registering": true,
+    "schedules": Array [
+      Object {
+        "group": "E4-1",
+        "serialized": "E4-1 Gonzalo Rocha ",
+        "teacher": "Gonzalo Rocha",
+      },
+      Object {
+        "group": "E4-2",
+        "serialized": "E4-2 Gonzalo Rocha ",
+        "teacher": "Gonzalo Rocha",
+      },
+      Object {
+        "group": "E4-3",
+        "serialized": "E4-3 Gonzalo Rocha ",
+        "teacher": "Gonzalo Rocha",
+      },
+      Object {
+        "group": "E4-4",
+        "serialized": "E4-4 Gonzalo Rocha ",
+        "teacher": "Gonzalo Rocha",
+      },
+      Object {
+        "group": "E4-5",
+        "serialized": "E4-5 Alondra Sanchez ",
+        "teacher": "Alondra Sanchez",
+      },
+      Object {
+        "group": "E4-6",
+        "serialized": "E4-6 Gonzalo Rocha ",
+        "teacher": "Gonzalo Rocha",
+      },
+      Object {
+        "group": "E4-7",
+        "serialized": "E4-7 Gonzalo Rocha ",
+        "teacher": "Gonzalo Rocha",
+      },
+      Object {
+        "group": "E4-8",
+        "serialized": "E4-8 Alondra Sanchez ",
+        "teacher": "Alondra Sanchez",
+      },
+    ],
+    "telefono": "3411234567",
   },
 }
 `;

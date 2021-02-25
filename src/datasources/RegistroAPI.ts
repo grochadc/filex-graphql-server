@@ -13,11 +13,13 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async getLevelsRegistering(course: Course) {
-    return this.get(`system/registeringLevels/${course}.json`);
+    const levels = await this.get(`system/registeringLevels/${course}.json`);
+    if (levels === null) return [];
+    return levels;
   }
 
   async setLevelsRegistering(levels: number[], course: Course) {
-    this.put(`system/${course}/registeringLevels.json`, levels);
+    this.put(`system/registeringLevels/${course}.json`, levels);
     return levels;
   }
 
@@ -56,6 +58,8 @@ class RegistroAPI extends RESTDataSource {
     const schedulesObj = await this.get(
       `system/schedules/${course}/${level}.json`
     );
+    if (schedulesObj === null)
+      throw new Error(`There are no schedules in /${course}/${level}`);
     const objToArray = (obj) => Object.keys(obj).map((key) => obj[key]);
     const data = objToArray(schedulesObj);
     return data;
@@ -93,7 +97,7 @@ class RegistroAPI extends RESTDataSource {
       student.externo,
     ];
     const values = [parsedStudent];
-    const range = `Level ${level}!A1`;
+    const range = `${student.curso.charAt(0).toUpperCase()}${level}!A1`;
     this.context.dataSources.registroSheetsAPI
       .append(values, range)
       .then(() => "Saved student to sheets successfully!");

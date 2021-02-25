@@ -1,5 +1,4 @@
 export interface Applicant {
-  id: string;
   codigo: string;
   nombre: string;
   apellido_materno: string;
@@ -12,7 +11,6 @@ export interface Applicant {
   nivel: string;
   curso: string;
   externo: boolean;
-  nuevo_ingreso: boolean;
 }
 export interface Student {
   codigo: string;
@@ -27,7 +25,6 @@ export interface Student {
   nivel: string;
   curso: string;
   externo: boolean;
-  nuevo_ingreso: boolean;
   grupo: string;
 }
 
