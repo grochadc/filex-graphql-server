@@ -1,5 +1,6 @@
 import testServer from "../testUtils/testServer";
 const { RegistroAPI } = require("../datasources/registroAPI");
+const { SheetsAPI } = require("../datasources/SheetsAPI");
 import { Student, Applicant } from "../types";
 import {
   SAVE_LEVELS_REGISTERING,
@@ -24,9 +25,9 @@ describe("Integration", () => {
     curso: "en",
   };
 
-  it("Returns an applicant by codigo", async () => {
+  it("returns an applicant by codigo", async () => {
     const registroAPI = new RegistroAPI();
-    registroAPI.getApplicant = jest.fn(() => applicant);
+    registroAPI.getApplicant = jest.fn(() => Promise.resolve(applicant));
     const { query } = testServer(() => ({ registroAPI }));
     const res = await query({
       query: GET_APPLICANT,
@@ -35,6 +36,36 @@ describe("Integration", () => {
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
     expect(registroAPI.getApplicant).toHaveBeenCalledWith("1234567890");
+  });
+
+  it("throws an error when an applicant is not found", async () => {
+    const registroAPI = new RegistroAPI();
+    registroAPI.get = jest.fn(() => Promise.resolve(null));
+    const { query } = testServer(() => ({ registroAPI }));
+    const res = await query({
+      query: GET_APPLICANT,
+      variables: { codigo: "1234509876" },
+    });
+    expect(registroAPI.get).toHaveBeenCalledTimes(2);
+    expect(registroAPI.get).toHaveBeenCalledWith("applicants/1234509876.json");
+    expect(res.errors).toHaveLength(1);
+    expect(res.errors[0].extensions.code).toBe("APPLICANT_NOT_FOUND");
+  });
+
+  it("throws an error when applicant is already registered", async () => {
+    const registroAPI = new RegistroAPI();
+    registroAPI.get = jest.fn((url) => Promise.resolve("E4-1"));
+    const { query } = testServer(() => ({ registroAPI }));
+    const res = await query({
+      query: GET_APPLICANT,
+      variables: { codigo: "1234567890" },
+    });
+    expect(registroAPI.get).toHaveBeenCalledTimes(1);
+    expect(registroAPI.get).toHaveBeenCalledWith(
+      "system/alreadyRegistered/1234567890.json"
+    );
+    expect(res.errors).toHaveLength(1);
+    expect(res.errors[0].extensions.code).toBe("ALREADY_REGISTERED");
   });
 
   const inputStudent: Student = {
@@ -62,30 +93,38 @@ describe("Integration", () => {
     },
   };
 
-  it("Correctly registers a student", async () => {
+  it("correctly registers a student", async () => {
     const registroAPI = new RegistroAPI();
-    registroAPI.registerStudent = jest.fn(
-      (student: Student, nivel: string, grupo: string) => student
+    const spy = jest.spyOn(registroAPI, "registerStudent");
+    registroAPI.post = jest.fn(() => Promise.resolve());
+    registroAPI.getSchedule = jest.fn(() =>
+      Promise.resolve({ group: "E4-1", teacher: "Gonzalo Rocha" })
     );
-    const { mutate } = testServer(() => ({ registroAPI }));
+
+    const registroSheetsAPI = new SheetsAPI("someid");
+    registroSheetsAPI.append = jest.fn(() => Promise.resolve());
+
+    const { mutate } = testServer(() => ({ registroAPI, registroSheetsAPI }));
     const res = await mutate({
       mutation: REGISTER_STUDENT,
       variables: inputStudent,
     });
-    if (res.errors) console.log(res.errors);
+    expect(spy).toHaveBeenCalledWith(inputStudent, inputStudent.curso);
+    expect(registroAPI.post).toHaveBeenCalledWith(
+      `system/availableGroups/${inputStudent.curso}/${inputStudent.nivel}/${inputStudent.grupo}.json`,
+      "1"
+    );
+    expect(registroSheetsAPI.append).toHaveBeenCalled();
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
-    expect(registroAPI.registerStudent).toHaveBeenCalledWith(
-      inputStudent,
-      inputStudent.nivel,
-      inputStudent.grupo
-    );
   });
 
-  it("Gets and sets registering levels", async () => {
+  it("gets and sets registering levels", async () => {
     const registroAPI = new RegistroAPI();
-    registroAPI.getLevelsRegistering = jest.fn(() => [1, 2]);
-    registroAPI.setLevelsRegistering = jest.fn((levels) => levels);
+    registroAPI.getLevelsRegistering = jest.fn(() => Promise.resolve([1, 2]));
+    registroAPI.setLevelsRegistering = jest.fn((levels) =>
+      Promise.resolve(levels)
+    );
     const { query, mutate } = testServer(() => ({ registroAPI }));
     const queryRes = await query({
       query: GET_LEVELS_REGISTERING,

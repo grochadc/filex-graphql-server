@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Integration Correctly registers a student 1`] = `
+exports[`Integration correctly registers a student 1`] = `
 Object {
   "registerStudent": Object {
     "nombre": "Juan",
@@ -13,7 +13,7 @@ Object {
 }
 `;
 
-exports[`Integration Gets and sets registering levels 1`] = `
+exports[`Integration gets and sets registering levels 1`] = `
 Object {
   "english": Array [
     1,
@@ -22,7 +22,7 @@ Object {
 }
 `;
 
-exports[`Integration Gets and sets registering levels 2`] = `
+exports[`Integration gets and sets registering levels 2`] = `
 Object {
   "saveRegisteringLevels": Array [
     1,
@@ -31,7 +31,7 @@ Object {
 }
 `;
 
-exports[`Integration Returns an applicant by codigo 1`] = `
+exports[`Integration returns an applicant by codigo 1`] = `
 Object {
   "applicant": Object {
     "apellido_materno": "Martinez",

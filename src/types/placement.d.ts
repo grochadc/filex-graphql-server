@@ -1,4 +1,4 @@
-interface Applicant {
+export declare interface Applicant {
   id: string;
   codigo: string;
   nombre: string;

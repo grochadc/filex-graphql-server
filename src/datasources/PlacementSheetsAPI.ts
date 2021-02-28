@@ -1,4 +1,5 @@
 import { SheetsAPI } from "./SheetsAPI";
+import { Applicant } from "../types/placement.d";
 
 class PlacementSheetsAPI extends SheetsAPI {
   constructor(sheetID: string) {
@@ -20,10 +21,8 @@ class PlacementSheetsAPI extends SheetsAPI {
         applicant.telefono,
         applicant.email,
         applicant.externo,
-        applicant.reubicacion,
         applicant.curso,
         applicant.meetLink,
-        applicant.nivel_escrito,
       ],
     ];
     return this.append(values, "Today!A1");

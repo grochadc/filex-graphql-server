@@ -1,4 +1,5 @@
 import { RESTDataSource } from "apollo-datasource-rest";
+import { ApolloError } from "apollo-server";
 import * as R from "ramda";
 
 enum Course {
@@ -66,19 +67,22 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async getSchedule(level: string, group: string, course: Course) {
-    return this.get(`system/schedules/${course}/${level}/${group}.json`);
+    const schedule = await this.get(
+      `system/schedules/${course}/${level}/${group}.json`
+    );
+    if (schedule === null)
+      throw new Error(
+        `We couldn't find a schedule in /${course}/${level}/${group}.json`
+      );
+    return schedule;
   }
 
-  async registerStudent(
-    student: Student,
-    level: string,
-    group: string,
-    course: Course
-  ) {
-    if (group === undefined) throw new Error("Group was not provided.");
-    if (level === undefined) throw new Error("Level was not provided.");
-    await this.post(
-      `system/availableGroups/${course}/${level}/${group}.json`,
+  async registerStudent(student: Student, course: Course) {
+    if (student.grupo === undefined) throw new Error("Group was not provided.");
+    if (student.nivel === undefined) throw new Error("Level was not provided.");
+    if (student.curso === undefined) throw new Error("Course was not provided");
+    this.post(
+      `system/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
       "1"
     );
 
@@ -97,12 +101,16 @@ class RegistroAPI extends RESTDataSource {
       student.externo,
     ];
     const values = [parsedStudent];
-    const range = `${student.curso.charAt(0).toUpperCase()}${level}!A1`;
+    const range = `${student.curso.charAt(0).toUpperCase()}${student.nivel}!A1`;
     this.context.dataSources.registroSheetsAPI
       .append(values, range)
       .then(() => "Saved student to sheets successfully!");
 
-    const schedule = await this.getSchedule(level, group, course);
+    const schedule = await this.getSchedule(
+      student.nivel,
+      student.grupo,
+      course
+    );
     const composedStudent = { ...student, schedule };
 
     return composedStudent;
@@ -113,9 +121,22 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async getApplicant(codigo: string) {
+    const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
+    const ALREADY_REGISTERED = "ALREADY_REGISTERED";
+    const registeredGroup = await this.get(
+      `system/alreadyRegistered/${codigo}.json`
+    );
+    if (registeredGroup)
+      throw new ApolloError(
+        `Ya estás inscrito en el grupo ${registeredGroup}`,
+        ALREADY_REGISTERED
+      );
     const applicant = await this.get(`applicants/${codigo}.json`);
     if (applicant === null)
-      throw new Error(`No applicant found with code ${codigo}`);
+      throw new ApolloError(
+        `No applicant found with code ${codigo}`,
+        APPLICANT_NOT_FOUND
+      );
     return applicant;
   }
 }

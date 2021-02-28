@@ -90,8 +90,7 @@ export const resolvers = {
       const student: Student = args.input;
       const registeredStudent: Promise<Student> = await dataSources.registroAPI.registerStudent(
         student,
-        student.nivel,
-        student.grupo
+        student.curso
       );
       return registeredStudent;
     },
