@@ -28,6 +28,11 @@ describe("Integration", () => {
   it("returns an applicant by codigo", async () => {
     const registroAPI = new RegistroAPI();
     registroAPI.getApplicant = jest.fn(() => Promise.resolve(applicant));
+    registroAPI.getLevelsRegistering = jest.fn(() => Promise.resolve([4]));
+    registroAPI.getUnAvailableGroups = jest.fn(() => Promise.resolve([]));
+    registroAPI.getSchedules = jest.fn(() =>
+      Promise.resolve([{ group: "E4-2", teacher: "Gonzalo Rocha" }])
+    );
     const { query } = testServer(() => ({ registroAPI }));
     const res = await query({
       query: GET_APPLICANT,
@@ -97,8 +102,15 @@ describe("Integration", () => {
     const registroAPI = new RegistroAPI();
     const spy = jest.spyOn(registroAPI, "registerStudent");
     registroAPI.post = jest.fn(() => Promise.resolve());
+    registroAPI.put = jest.fn(() => Promise.resolve());
     registroAPI.getSchedule = jest.fn(() =>
-      Promise.resolve({ group: "E4-1", teacher: "Gonzalo Rocha" })
+      Promise.resolve({
+        group: "E4-1",
+        teacher: "Gonzalo Rocha",
+        chat: "somechatlink",
+        classroom: "someclassroomlink",
+        sesiones: "somesesioneslink",
+      })
     );
 
     const registroSheetsAPI = new SheetsAPI("someid");

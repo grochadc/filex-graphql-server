@@ -27,7 +27,9 @@ export const typeDefs = gql`
   type Schedule {
     group: String!
     teacher: String!
-    time: String
+    chat: String
+    classroom: String
+    sesiones: String
     serialized(options: SerializedOptions!): String!
   }
 
@@ -152,12 +154,11 @@ export const resolvers = {
       type SerializeOptions = {
         group?: boolean;
         teacher?: boolean;
-        time?: boolean;
       };
       const serialize = (options: SerializeOptions, source: any) => {
         return `${options.group ? source.group : ""} ${
           options.teacher ? source.teacher : ""
-        } ${options.time ? source.time : ""}`;
+        }`;
       };
       return serialize(args.options, root);
     },

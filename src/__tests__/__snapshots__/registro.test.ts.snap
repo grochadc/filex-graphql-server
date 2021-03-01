@@ -5,9 +5,11 @@ Object {
   "registerStudent": Object {
     "nombre": "Juan",
     "schedule": Object {
+      "chat": "somechatlink",
+      "classroom": "someclassroomlink",
       "group": "E4-1",
+      "sesiones": "somesesioneslink",
       "teacher": "Gonzalo Rocha",
-      "time": null,
     },
   },
 }
@@ -48,44 +50,9 @@ Object {
     "registering": true,
     "schedules": Array [
       Object {
-        "group": "E4-1",
-        "serialized": "E4-1 Gonzalo Rocha ",
-        "teacher": "Gonzalo Rocha",
-      },
-      Object {
         "group": "E4-2",
-        "serialized": "E4-2 Gonzalo Rocha ",
+        "serialized": "E4-2 Gonzalo Rocha",
         "teacher": "Gonzalo Rocha",
-      },
-      Object {
-        "group": "E4-3",
-        "serialized": "E4-3 Gonzalo Rocha ",
-        "teacher": "Gonzalo Rocha",
-      },
-      Object {
-        "group": "E4-4",
-        "serialized": "E4-4 Gonzalo Rocha ",
-        "teacher": "Gonzalo Rocha",
-      },
-      Object {
-        "group": "E4-5",
-        "serialized": "E4-5 Alondra Sanchez ",
-        "teacher": "Alondra Sanchez",
-      },
-      Object {
-        "group": "E4-6",
-        "serialized": "E4-6 Gonzalo Rocha ",
-        "teacher": "Gonzalo Rocha",
-      },
-      Object {
-        "group": "E4-7",
-        "serialized": "E4-7 Gonzalo Rocha ",
-        "teacher": "Gonzalo Rocha",
-      },
-      Object {
-        "group": "E4-8",
-        "serialized": "E4-8 Alondra Sanchez ",
-        "teacher": "Alondra Sanchez",
       },
     ],
     "telefono": "3411234567",

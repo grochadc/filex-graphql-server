@@ -85,6 +85,12 @@ class RegistroAPI extends RESTDataSource {
       `system/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
       "1"
     );
+    this.put(
+      `system/alreadyRegistered/${student.codigo}.json`,
+      JSON.stringify(student.grupo)
+    ).catch((e) =>
+      console.log("Put already registered", e.extensions.response)
+    );
 
     const parsedStudent = [
       student.codigo,
