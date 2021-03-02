@@ -7,6 +7,8 @@ enum Course {
   fr = "fr",
 }
 
+const ALREADY_REGISTERED = "ALREADY_REGISTERED";
+
 class RegistroAPI extends RESTDataSource {
   constructor() {
     super();
@@ -81,6 +83,14 @@ class RegistroAPI extends RESTDataSource {
     if (student.grupo === undefined) throw new Error("Group was not provided.");
     if (student.nivel === undefined) throw new Error("Level was not provided.");
     if (student.curso === undefined) throw new Error("Course was not provided");
+    const registeredGroup = await this.get(
+      `system/alreadyRegistered/${student.codigo}.json`
+    );
+    if (registeredGroup)
+      throw new ApolloError(
+        `Ya estás inscrito en el grupo ${registeredGroup}`,
+        ALREADY_REGISTERED
+      );
     this.post(
       `system/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
       "1"
@@ -128,7 +138,6 @@ class RegistroAPI extends RESTDataSource {
 
   async getApplicant(codigo: string) {
     const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
-    const ALREADY_REGISTERED = "ALREADY_REGISTERED";
     const registeredGroup = await this.get(
       `system/alreadyRegistered/${codigo}.json`
     );
