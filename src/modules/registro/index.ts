@@ -4,7 +4,7 @@ export const typeDefs = gql`
   extend type Query {
     registeringLevels(course: String!, course: String!): [Int]!
     applicant(codigo: ID!): Applicant!
-    availableSchedules(level: Int!, maxStudents: Int): [Schedule]!
+    schedule(id: String!): Schedule!
   }
 
   type Applicant {
@@ -86,6 +86,12 @@ export const resolvers = {
     },
     registeringLevels: (root, args, { dataSources }) =>
       dataSources.registroAPI.getLevelsRegistering(args.course),
+    schedule: (root, args, { dataSources }) => {
+      const group = args.id;
+      const course = group.substr(0, 1) === "E" ? "en" : "fr";
+      const level = group.substr(1, 1);
+      return dataSources.registroAPI.getSchedule(level, group, course);
+    },
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {

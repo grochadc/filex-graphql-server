@@ -87,10 +87,7 @@ class RegistroAPI extends RESTDataSource {
       `system/alreadyRegistered/${student.codigo}.json`
     );
     if (registeredGroup)
-      throw new ApolloError(
-        `Ya estás inscrito en el grupo ${registeredGroup}`,
-        ALREADY_REGISTERED
-      );
+      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
     this.post(
       `system/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
       "1"
@@ -142,10 +139,7 @@ class RegistroAPI extends RESTDataSource {
       `system/alreadyRegistered/${codigo}.json`
     );
     if (registeredGroup)
-      throw new ApolloError(
-        `Ya estás inscrito en el grupo ${registeredGroup}`,
-        ALREADY_REGISTERED
-      );
+      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
     const applicant = await this.get(`applicants/${codigo}.json`);
     if (applicant === null)
       throw new ApolloError(
