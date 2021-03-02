@@ -123,7 +123,7 @@ export const resolvers = {
     schedules: async (root, args, { dataSources }) => {
       const course = root.curso;
       const currentLevel = root.nivel;
-      const maxStudents = 30;
+      const maxStudents = 35;
       const unavailable = await dataSources.registroAPI.getUnAvailableGroups(
         currentLevel,
         maxStudents,
