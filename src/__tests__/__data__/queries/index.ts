@@ -69,7 +69,7 @@ export const GET_SELECTION_INFO = gql`
 
 export const SET_RESERVATION = gql`
   mutation setReservation($codigo: ID!, $option_id: ID!) {
-    makeReservation(input: { codigo: $codigo, option_id: $option_id }) {
+    makeWorkshopReservation(input: { codigo: $codigo, option_id: $option_id }) {
       id
       timestamp
       codigo

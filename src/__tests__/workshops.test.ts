@@ -9,31 +9,32 @@ import {
   reservations,
   options,
   student,
-  workshops,
   workshopOption,
 } from "./__data__/mocks";
+import db from "../datasources/db";
 import MockDate from "mockdate";
 import * as utils from "../utils";
+
+const { workshops } = db;
 
 test("serves reservations and teacher info", async () => {
   const workshopsAPI = new WorkshopsAPI();
   workshopsAPI.getReservations = jest.fn((teacher_id: string) => {
     return Promise.resolve(reservations);
   });
-  workshopsAPI.getOptionsByTeacherId = jest.fn((teacher_id: string) => options);
+  //workshopsAPI.getOptionsByTeacherId = jest.fn((teacher_id: string) => options);
 
   const { query } = testServer(() => ({ workshopsAPI }));
   const res = await query({
     query: GET_RESERVATIONS,
-    variables: { teacher: "alondra" },
+    variables: { teacher: "sergio" },
   });
-
   if (res.errors) console.log(res.errors);
-
-  expect(workshopsAPI.getReservations).toHaveBeenCalledWith("alondra");
-  expect(workshopsAPI.getOptionsByTeacherId).toHaveBeenCalledWith("alondra");
   expect(res.errors).toBe(undefined);
   expect(res.data).toMatchSnapshot();
+
+  expect(workshopsAPI.getReservations).toHaveBeenCalledWith("sergio");
+  expect(workshopsAPI.getOptionsByTeacherId).toHaveBeenCalledWith("sergio");
 });
 
 test("serves info for selection page", async () => {
@@ -48,13 +49,12 @@ test("serves info for selection page", async () => {
     query: GET_SELECTION_INFO,
     variables: { code: "1234567890" },
   });
-
   if (res.errors) console.log(res.errors);
+  expect(res.errors).toBe(undefined);
+  expect(res.data).toMatchSnapshot();
 
   expect(studentsAPI.getStudent).toHaveBeenCalledWith("1234567890");
   expect(workshopsAPI.getWorkshops).toHaveBeenCalled();
-  expect(res.errors).toBe(undefined);
-  expect(res.data).toMatchSnapshot();
 });
 
 test("saves a reservation", async () => {
@@ -74,6 +74,8 @@ test("saves a reservation", async () => {
   });
 
   if (res.errors) console.log(res.errors);
+  expect(res.errors).toBe(undefined);
+  expect(res.data).toMatchSnapshot();
 
   expect(spy).toHaveBeenCalled();
   expect(studentsAPI.getStudent).toHaveBeenCalledWith("1234567890");

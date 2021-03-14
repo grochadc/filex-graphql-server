@@ -25,3 +25,42 @@ export const generateId = () => {
 export const createMatrix = (arr) => {
   return arr.map((item) => Object.values(item));
 };
+
+type WorkshopId =
+  | "conversation"
+  | "toeflpreparation"
+  | "basicreading"
+  | "basicadvancedlistening"
+  | "advancedreading"
+  | "tutoring";
+
+interface WorkshopOption {
+  id: WorkshopId;
+  name: string;
+  description: string;
+  levels: number[];
+  option_ids: string[];
+}
+export const mapOptionIds = (options: WorkshopOption[], option_ids: string[]) =>
+  option_ids.map((id) => options.filter((option) => option.id === id)[0]);
+
+interface Option {
+  id: string;
+  teacher_id: string;
+  time: string;
+  day: string;
+  workshop_id: string;
+  url: string;
+}
+
+interface Teacher {
+  id: string;
+  name: string;
+  options: string[];
+}
+
+export const mapOptionsTeacher = (options: Option[], teachers: Teacher[]) =>
+  options.map(
+    (option) =>
+      teachers.filter((teacher) => teacher.id === option.teacher_id)[0]
+  );

@@ -34,6 +34,9 @@ const server = new ApolloServer({
       registroSheetsAPI: new SheetsAPI(
         "1p7likU0aa7n7EiRxTHtdvfpd-uMg3QM8VY3Kz4ld5og"
       ),
+      workshopsSheetsAPI: new SheetsAPI(
+        "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
+      ),
     };
   },
   cors: true,

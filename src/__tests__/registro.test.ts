@@ -1,7 +1,7 @@
 import testServer from "../testUtils/testServer";
 const { RegistroAPI } = require("../datasources/registroAPI");
 const { SheetsAPI } = require("../datasources/SheetsAPI");
-import { Student, Applicant } from "../types";
+import { Student, Applicant } from "../types.d";
 import {
   SAVE_LEVELS_REGISTERING,
   GET_LEVELS_REGISTERING,
@@ -101,6 +101,13 @@ describe("Integration", () => {
   it("correctly registers a student", async () => {
     const registroAPI = new RegistroAPI();
     const spy = jest.spyOn(registroAPI, "registerStudent");
+    registroAPI.get = jest.fn((url) => {
+      if (url.includes("alreadyRegistered")) {
+        return Promise.resolve(null);
+      } else {
+        return Promise.resolve();
+      }
+    });
     registroAPI.post = jest.fn(() => Promise.resolve());
     registroAPI.put = jest.fn(() => Promise.resolve());
     registroAPI.getSchedule = jest.fn(() =>
@@ -122,13 +129,53 @@ describe("Integration", () => {
       variables: inputStudent,
     });
     expect(spy).toHaveBeenCalledWith(inputStudent, inputStudent.curso);
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toMatchSnapshot();
     expect(registroAPI.post).toHaveBeenCalledWith(
       `system/availableGroups/${inputStudent.curso}/${inputStudent.nivel}/${inputStudent.grupo}.json`,
       "1"
     );
     expect(registroSheetsAPI.append).toHaveBeenCalled();
-    expect(res.errors).toBe(undefined);
+  });
+
+  it("throws an error when an already registered student tries to register again", async () => {
+    const registroAPI = new RegistroAPI();
+    const spy = jest.spyOn(registroAPI, "registerStudent");
+    registroAPI.get = jest.fn((url) => {
+      if (url.includes("alreadyRegistered")) {
+        return Promise.resolve("E3-1");
+      } else {
+        return Promise.resolve();
+      }
+    });
+    registroAPI.post = jest.fn(() => Promise.resolve());
+    registroAPI.put = jest.fn(() => Promise.resolve());
+    registroAPI.getSchedule = jest.fn(() =>
+      Promise.resolve({
+        group: "E4-1",
+        teacher: "Gonzalo Rocha",
+        chat: "somechatlink",
+        classroom: "someclassroomlink",
+        sesiones: "somesesioneslink",
+      })
+    );
+
+    const registroSheetsAPI = new SheetsAPI("someid");
+    registroSheetsAPI.append = jest.fn(() => Promise.resolve());
+
+    const { mutate } = testServer(() => ({ registroAPI, registroSheetsAPI }));
+    const res = await mutate({
+      mutation: REGISTER_STUDENT,
+      variables: inputStudent,
+    });
+    expect(spy).toHaveBeenCalledWith(inputStudent, inputStudent.curso);
+    expect(res.errors).toBe("[[GraphQLError: E3-1]]");
     expect(res.data).toMatchSnapshot();
+    expect(registroAPI.post).toHaveBeenCalledWith(
+      `system/availableGroups/${inputStudent.curso}/${inputStudent.nivel}/${inputStudent.grupo}.json`,
+      "1"
+    );
+    expect(registroSheetsAPI.append).toHaveBeenCalled();
   });
 
   it("gets and sets registering levels", async () => {

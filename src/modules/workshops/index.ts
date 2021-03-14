@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
-const utils = require("../../utils");
+import * as utils from "../../utils";
+import db from "../../datasources/db";
 
 export const typeDefs = gql`
   extend type Query {
@@ -23,12 +24,12 @@ export const typeDefs = gql`
 
   type Reservation {
     id: ID!
-    code: String!
-    name: String!
-    first_last_name: String!
-    second_last_name: String!
-    level: Int!
-    group: String!
+    codigo: String!
+    nombre: String!
+    apellido_paterno: String!
+    apellido_materno: String!
+    nivel: Int!
+    grupo: String!
     timestamp: String!
     option: ReservationOption!
     option_id: String!
@@ -67,6 +68,7 @@ export const typeDefs = gql`
     name: String!
     description: String!
     levels: [String!]
+    option_ids: [String!]
     options: [Option!]
   }
 
@@ -82,7 +84,10 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    makeReservation(input: ReservationInput!): ReturnedReservation!
+    makeWorkshopReservation(input: ReservationInput!): ReturnedReservation!
+    saveWorkshopsAttendance(
+      input: [AttendingStudent!]
+    ): saveWorkshopsAttendanceResponse!
   }
 
   input ReservationInput {
@@ -98,6 +103,21 @@ export const typeDefs = gql`
     url: String!
     zoom_id: String
   }
+  input AttendingStudent {
+    code: String!
+    name: String!
+    first_last_name: String!
+    second_last_name: String
+    level: Int!
+    group: String!
+    workshop: String!
+    teacher: String!
+    attended: Boolean!
+  }
+
+  type saveWorkshopsAttendanceResponse {
+    success: Boolean!
+  }
 `;
 
 export const resolvers = {
@@ -111,8 +131,29 @@ export const resolvers = {
   },
   Reservation: {
     option: (root, args, { dataSources }) => {
-      return dataSources.workshopsAPI.getOption(root.option_id);
+      return dataSources.workshopsAPI.getOption(root.option.id);
     },
+  },
+  Workshop: {
+    options: async (root, args, { dataSources }) => {
+      const optionsWithoutTeacherName = await dataSources.workshopsAPI.mapOptionIds(
+        root.option_ids
+      );
+      const options = optionsWithoutTeacherName.map((option) => {
+        return {
+          ...option,
+          teacher: utils.getById(db, "teachers", option.teacher_id, null).name,
+        };
+      });
+      return options;
+    },
+  },
+  Option: {
+    workshop: (root, args, context) => {
+      return utils.getById(db, "workshops", root.workshop_id, null).name;
+    },
+    available: (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.getRegistering(root.id),
   },
   Query: {
     teacher: (root, args, { dataSources }) => {
@@ -126,18 +167,29 @@ export const resolvers = {
     },
   },
   Mutation: {
-    makeReservation: async (root, { input }, { dataSources }) => {
+    makeWorkshopReservation: async (root, { input }, { dataSources }) => {
       const date = new Date();
       const student = await dataSources.studentsAPI.getStudent(input.codigo);
       const option = dataSources.workshopsAPI.getOptionById(input.option_id);
+      const generatedID = utils.generateId();
+      const timestamp = date.toJSON();
+      await dataSources.workshopsAPI.makeReservation(
+        option.teacher_id,
+        option.id,
+        { id: generatedID, ...student, timestamp, option }
+      );
       return {
-        id: utils.generateId(),
-        timestamp: date.toJSON(),
+        id: generatedID,
+        timestamp,
         codigo: student.codigo,
         nombre: student.nombre,
         url: option.url,
         zoom_id: option.zoom_id ? option.zoom_id : null,
       };
+    },
+    saveWorkshopsAttendance: (root, { input }, { dataSources }) => {
+      dataSources.workshopsAPI.saveAttendance(input);
+      return { success: true };
     },
   },
 };
