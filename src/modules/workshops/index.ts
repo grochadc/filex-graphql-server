@@ -104,12 +104,12 @@ export const typeDefs = gql`
     zoom_id: String
   }
   input AttendingStudent {
-    code: String!
-    name: String!
-    first_last_name: String!
-    second_last_name: String
-    level: Int!
-    group: String!
+    codigo: String!
+    nombre: String!
+    apellido_paterno: String!
+    apellido_materno: String
+    nivel: Int!
+    grupo: String!
     workshop: String!
     teacher: String!
     attended: Boolean!

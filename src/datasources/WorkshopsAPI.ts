@@ -51,7 +51,7 @@ class WorkshopsAPI extends RESTDataSource {
 
   makeReservation(teacher_id: string, option_id: string, reservation: any) {
     this.post(`reservations/${teacher_id}/${option_id}.json`, reservation);
-    this.post(`available/${option_id}.json`);
+    this.post(`available/${option_id}/registered.json`, "1");
   }
 
   getTeacher(id: string) {
@@ -75,7 +75,7 @@ class WorkshopsAPI extends RESTDataSource {
     if (registeredObj === null) return true;
 
     const registered = Object.keys(registeredObj).length;
-    return Boolean(registered > 15);
+    return Boolean(registered < 15);
   }
 
   saveAttendance(attendance: AttendingStudent[]) {
