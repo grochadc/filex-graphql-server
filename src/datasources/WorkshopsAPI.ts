@@ -18,7 +18,10 @@ interface AttendingStudent {
 class WorkshopsAPI extends RESTDataSource {
   constructor() {
     super();
-    this.baseURL = "https://filex-5726c.firebaseio.com/workshops";
+    this.baseURL =
+      process.env.NODE_ENV === "production"
+        ? "https://filex-5726c.firebaseio.com/workshops"
+        : "https://filex-5726c.firebaseio.com/dev/workshops";
   }
 
   getWorkshops() {
