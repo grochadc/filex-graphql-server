@@ -17,9 +17,11 @@ export const typeDefs = gql`
   }
 
   type WorkshopOption {
+    id: ID!
     time: String!
     day: String!
     workshop: String!
+    teacher_id: String!
   }
 
   type Reservation {
