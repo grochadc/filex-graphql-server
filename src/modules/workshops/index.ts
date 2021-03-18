@@ -181,15 +181,15 @@ export const resolvers = {
       const generatedID = utils.generateId();
       const timestamp = date.toJSON();
       const alreadyRegistered = await dataSources.workshopsAPI.getAlreadyRegistered(
-        student.code,
+        student.codigo,
         option.teacher_id,
         option.id
       );
       const partialResponse = {
         id: generatedID,
         timestamp,
-        codigo: student.code,
-        nombre: student.name,
+        codigo: student.codigo,
+        nombre: student.nombre,
         url: option.url,
         zoom_id: option.zoom_id ? option.zoom_id : null,
       };

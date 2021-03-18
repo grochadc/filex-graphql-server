@@ -115,7 +115,7 @@ class WorkshopsAPI extends RESTDataSource {
     if (reservationsObj === null) return false;
     const reservations = Object.values(reservationsObj);
     const filteredReservations = reservations.filter(
-      (reservation: any) => reservation.code === code
+      (reservation: any) => reservation.codigo === code
     );
     const answer = filteredReservations.length > 0;
     return answer;
