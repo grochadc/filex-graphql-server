@@ -87,7 +87,13 @@ export const typeDefs = gql`
     makeWorkshopReservation(input: ReservationInput!): ReturnedReservation!
     saveWorkshopsAttendance(
       input: [AttendingStudent!]
+      workshop: SavedAttendanceWorkshopInfo!
     ): saveWorkshopsAttendanceResponse!
+  }
+
+  input SavedAttendanceWorkshopInfo {
+    teacher: String!
+    option_id: String!
   }
 
   input ReservationInput {
@@ -204,7 +210,11 @@ export const resolvers = {
         alreadyRegistered: false,
       };
     },
-    saveWorkshopsAttendance: (root, { input }, { dataSources }) => {
+    saveWorkshopsAttendance: (root, { input, workshop }, { dataSources }) => {
+      dataSources.workshopsAPI.deleteReservations(
+        workshop.teacher,
+        workshop.option_id
+      );
       dataSources.workshopsAPI.saveAttendance(input);
       return { success: true };
     },
