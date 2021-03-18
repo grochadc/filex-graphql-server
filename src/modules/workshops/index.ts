@@ -102,6 +102,7 @@ export const typeDefs = gql`
     nombre: String!
     url: String!
     zoom_id: String
+    alreadyRegistered: Boolean!
   }
   input AttendingStudent {
     codigo: String!
@@ -173,18 +174,34 @@ export const resolvers = {
       const option = dataSources.workshopsAPI.getOptionById(input.option_id);
       const generatedID = utils.generateId();
       const timestamp = date.toJSON();
+      const alreadyRegistered = await dataSources.workshopsAPI.getAlreadyRegistered(
+        student.code,
+        option.teacher_id,
+        option.id
+      );
+      const partialResponse = {
+        id: generatedID,
+        timestamp,
+        codigo: student.code,
+        nombre: student.name,
+        url: option.url,
+        zoom_id: option.zoom_id ? option.zoom_id : null,
+      };
+
+      if (alreadyRegistered)
+        return {
+          ...partialResponse,
+          alreadyRegistered: true,
+        };
+      console.log("first time registering");
       await dataSources.workshopsAPI.makeReservation(
         option.teacher_id,
         option.id,
         { id: generatedID, ...student, timestamp, option }
       );
       return {
-        id: generatedID,
-        timestamp,
-        codigo: student.codigo,
-        nombre: student.nombre,
-        url: option.url,
-        zoom_id: option.zoom_id ? option.zoom_id : null,
+        ...partialResponse,
+        alreadyRegistered: false,
       };
     },
     saveWorkshopsAttendance: (root, { input }, { dataSources }) => {

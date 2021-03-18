@@ -96,6 +96,23 @@ class WorkshopsAPI extends RESTDataSource {
 
     return this.context.dataSources.workshopsSheetsAPI.append(values, range);
   }
+
+  async getAlreadyRegistered(
+    code: string,
+    teacher: string,
+    option_id: string
+  ): Promise<boolean> {
+    const reservationsObj = await this.get(
+      `/reservations/${teacher}/${option_id}.json`
+    );
+    if (reservationsObj === null) return false;
+    const reservations = Object.values(reservationsObj);
+    const filteredReservations = reservations.filter(
+      (reservation: any) => reservation.code === code
+    );
+    const answer = filteredReservations.length > 0;
+    return answer;
+  }
 }
 
 export { WorkshopsAPI };
