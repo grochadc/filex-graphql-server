@@ -100,6 +100,10 @@ class WorkshopsAPI extends RESTDataSource {
     return this.context.dataSources.workshopsSheetsAPI.append(values, range);
   }
 
+  deleteReservations(teacher: string, option_id: string) {
+    this.delete(`/reservations/${teacher}/${option_id}.json`);
+  }
+
   async getAlreadyRegistered(
     code: string,
     teacher: string,
