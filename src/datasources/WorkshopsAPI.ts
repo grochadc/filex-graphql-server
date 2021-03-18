@@ -82,8 +82,10 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   saveAttendance(attendance: AttendingStudent[]) {
+    const date = new Date();
     const values = attendance.map((student) => {
       return [
+        `=date(${date.getFullYear()},${date.getMonth() + 1},${date.getDate()})`,
         student.codigo,
         student.nombre,
         student.apellido_paterno,

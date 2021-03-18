@@ -28,7 +28,7 @@ class SheetsAPI extends DataSource {
     return this.api.spreadsheets.values.append({
       spreadsheetId: this.sheetID,
       range,
-      valueInputOption: "RAW",
+      valueInputOption: "USER_ENTERED",
       resource: {
         values,
       },
