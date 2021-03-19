@@ -7,6 +7,7 @@ export const typeDefs = gql`
     teacher(id: ID!): Teacher!
     student(codigo: ID!): Student!
     workshops: [Workshop]!
+    getWorkshopsByCategory(category: String!): Workshop!
   }
 
   type Teacher {
@@ -175,6 +176,8 @@ export const resolvers = {
     workshops: (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getWorkshops();
     },
+    getWorkshopsByCategory: (root, { category }, { dataSources }) =>
+      dataSources.workshopsAPI.getWorkshopsByCategory(category),
   },
   Mutation: {
     makeWorkshopReservation: async (root, { input }, { dataSources }) => {

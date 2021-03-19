@@ -128,6 +128,10 @@ class WorkshopsAPI extends RESTDataSource {
     this.delete("/available.json");
     return true;
   }
+
+  getWorkshopsByCategory(category: string) {
+    return utils.getById(database, "workshops", category, null);
+  }
 }
 
 export { WorkshopsAPI };
