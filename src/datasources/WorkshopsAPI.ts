@@ -122,6 +122,12 @@ class WorkshopsAPI extends RESTDataSource {
     const answer = filteredReservations.length > 0;
     return answer;
   }
+
+  async resetReservations() {
+    this.delete("/reservations.json");
+    this.delete("/available.json");
+    return true;
+  }
 }
 
 export { WorkshopsAPI };

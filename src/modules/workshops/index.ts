@@ -91,6 +91,7 @@ export const typeDefs = gql`
       input: [AttendingStudent!]
       workshop: SavedAttendanceWorkshopInfo!
     ): saveWorkshopsAttendanceResponse!
+    resetReservations: Boolean!
   }
 
   input SavedAttendanceWorkshopInfo {
@@ -220,5 +221,7 @@ export const resolvers = {
       dataSources.workshopsAPI.saveAttendance(input);
       return { success: true };
     },
+    resetReservations: (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.resetReservations(),
   },
 };
