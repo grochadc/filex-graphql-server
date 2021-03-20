@@ -23,6 +23,7 @@ export const typeDefs = gql`
     day: String!
     workshop: String!
     teacher_id: String!
+    url: String
   }
 
   type Reservation {
@@ -93,6 +94,11 @@ export const typeDefs = gql`
       workshop: SavedAttendanceWorkshopInfo!
     ): saveWorkshopsAttendanceResponse!
     resetReservations: Boolean!
+    setWorkshopLink(
+      option_id: String!
+      teacher_id: String!
+      link: String!
+    ): Boolean!
   }
 
   input SavedAttendanceWorkshopInfo {
@@ -136,9 +142,8 @@ export const resolvers = {
     reservations: (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getReservations(root.id);
     },
-    options: (root, args, { dataSources }) => {
-      return dataSources.workshopsAPI.getOptionsByTeacherId(root.id);
-    },
+    options: async (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.getOptionsByTeacherId(root.id),
   },
   Reservation: {
     option: (root, args, { dataSources }) => {
@@ -226,5 +231,7 @@ export const resolvers = {
     },
     resetReservations: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.resetReservations(),
+    setWorkshopLink: (root, { option_id, teacher_id, link }, { dataSources }) =>
+      dataSources.workshopsAPI.setWorkshopLink(option_id, teacher_id, link),
   },
 };

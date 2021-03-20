@@ -36,20 +36,33 @@ class WorkshopsAPI extends RESTDataSource {
     return utils.getById(database, "options", id, () => null);
   }
 
-  getOptionsByTeacherId(teacher_id) {
-    return database.options
-      .filter((option) => option.teacher_id === teacher_id)
-      .map((option) => {
-        return {
-          ...option,
-          workshop: utils.getById(
-            database,
-            "workshops",
-            option.workshop_id,
-            () => null
-          ).id,
-        };
-      });
+  async getOptionsByTeacherId(teacher_id) {
+    let linksObj = await this.getWorkshopLinks(teacher_id);
+    const options = database.options.filter(
+      (option) => option.teacher_id === teacher_id
+    );
+    if (linksObj === null) {
+      //We couldn't find any link on firebase
+      const option_ids = options.map((option) => option.id);
+
+      //Create an object with all the option ids as keys and empty strings as values
+      linksObj = option_ids.reduce((acc, curr) => {
+        acc[curr] = "";
+        return acc;
+      }, {});
+    }
+    return options.map((option) => {
+      return {
+        ...option,
+        workshop: utils.getById(
+          database,
+          "workshops",
+          option.workshop_id,
+          () => null
+        ).id,
+        url: linksObj[option.id],
+      };
+    });
   }
 
   makeReservation(teacher_id: string, option_id: string, reservation: any) {
@@ -131,6 +144,18 @@ class WorkshopsAPI extends RESTDataSource {
 
   getWorkshopsByCategory(category: string) {
     return utils.getById(database, "workshops", category, null);
+  }
+
+  setWorkshopLink(option_id: string, teacher_id: string, link: string) {
+    this.put(
+      `/system/links/${teacher_id}/${option_id}.json`,
+      JSON.stringify(link)
+    );
+    return true;
+  }
+
+  getWorkshopLinks(teacher_id: string) {
+    return this.get(`/system/links/${teacher_id}.json`);
   }
 }
 
