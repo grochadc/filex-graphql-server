@@ -196,12 +196,16 @@ export const resolvers = {
         option.teacher_id,
         option.id
       );
+      const workshopLink = await dataSources.workshopsAPI.getSingleWorkshopLink(
+        option.teacher_id,
+        option.id
+      );
       const partialResponse = {
         id: generatedID,
         timestamp,
         codigo: student.codigo,
         nombre: student.nombre,
-        url: option.url,
+        url: workshopLink,
         zoom_id: option.zoom_id ? option.zoom_id : null,
       };
 

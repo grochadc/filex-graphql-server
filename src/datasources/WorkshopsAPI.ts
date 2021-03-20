@@ -157,6 +157,10 @@ class WorkshopsAPI extends RESTDataSource {
   getWorkshopLinks(teacher_id: string) {
     return this.get(`/system/links/${teacher_id}.json`);
   }
+
+  getSingleWorkshopLink(teacher_id: string, option_id: string) {
+    return this.get(`/system/links/${teacher_id}/${option_id}.json`);
+  }
 }
 
 export { WorkshopsAPI };
