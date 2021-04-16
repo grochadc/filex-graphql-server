@@ -283,7 +283,7 @@ const database: {
     {
       id: "gonzalojueves",
       teacher_id: "gonzalo",
-      time: "14:00 - 15:00",
+      time: "15:00 - 16:00",
       day: "jueves",
       workshop_id: "conversation",
       url: "http://meet.google.com/lookup/gonzaloconversation",
