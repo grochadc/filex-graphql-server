@@ -19,6 +19,7 @@ const server = new ApolloServer({
     require("./modules/firebase_api"),
     require("./modules/registro"),
     require("./modules/workshops"),
+    require("./modules/grades"),
   ],
   dataSources: () => {
     return {
