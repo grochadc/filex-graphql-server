@@ -12,7 +12,7 @@ class PlacementAPI extends RESTDataSource {
 
   async getMeetLinks() {
     const links = await this.get(`meetLinks.json`);
-    if (links) return links;
+    if (links) return links.filter((link) => link.active);
     return [];
   }
 
