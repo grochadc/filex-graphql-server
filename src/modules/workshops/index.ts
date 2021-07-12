@@ -1,6 +1,7 @@
 import { gql } from "apollo-server";
 import * as utils from "../../utils";
 import db from "../../datasources/db";
+import {GetStudentFn} from "../../datasources/StudentsAPI";
 
 export const typeDefs = gql`
   extend type Query {
@@ -175,8 +176,8 @@ export const resolvers = {
     teacher: (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getTeacher(args.id);
     },
-    student: (root, args, { dataSources }) => {
-      return dataSources.studentsAPI.getStudent(args.codigo);
+    student: (root, args, { dataSources, enviroment }) => {
+      return dataSources.studentsAPI.getStudent(args.codigo, enviroment);
     },
     workshops: (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getWorkshops();
@@ -185,9 +186,9 @@ export const resolvers = {
       dataSources.workshopsAPI.getWorkshopsByCategory(category),
   },
   Mutation: {
-    makeWorkshopReservation: async (root, { input }, { dataSources }) => {
+    makeWorkshopReservation: async (root, { input }, { dataSources, enviroment }) => {
       const date = new Date();
-      const student = await dataSources.studentsAPI.getStudent(input.codigo);
+      const student = await dataSources.studentsAPI.getStudent(input.codigo, enviroment);
       const option = dataSources.workshopsAPI.getOptionById(input.option_id);
       const generatedID = utils.generateId();
       const timestamp = date.toJSON();

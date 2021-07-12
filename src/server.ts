@@ -42,6 +42,10 @@ const server = new ApolloServer({
   cors: true,
   introspection: true,
   playground: true,
+  context: ({req}) => {
+    const clientEnviroment = req.headers['client-enviroment']
+    return {enviroment: clientEnviroment};
+  },
 });
 
 server.listen(process.env.PORT || 5000).then(({ url }) => {
