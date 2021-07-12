@@ -6,8 +6,9 @@ const typeDefs = gql`
   }
 
   type meetLink {
-    teacher: String
-    link: String
+    teacher: String!
+    link: String!
+    active: Boolean!
   }
 
   extend type Mutation {
@@ -15,8 +16,9 @@ const typeDefs = gql`
   }
 
   input MeetLinkInput {
-    teacher: String
+    teacher: String!
     link: String!
+    active: Boolean!
   }
 `;
 
