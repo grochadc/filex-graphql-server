@@ -1,20 +1,58 @@
-export declare interface Applicant {
-  id: string;
-  codigo: string;
-  nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  genero: string;
-  telefono: string;
-  email: string;
-  externo: boolean;
-  carrera: string;
-  ciclo: string;
-  curso: string;
-  reubicacion: boolean;
-  nivel_escrito: number;
-  meetLink: string;
+export type BasicStudent = {
+  codigo: string,
+  nombre: string,
+  apellido_paterno: string,
+  apellido_materno: string,
+  telefono: string,
+  email: string,
+  genero: "F" | "M",
+  externo: boolean,
+  ciclo: string,
+  carrera: string,
 }
+
+type Nivel = "1" | "2" | "3" | "4" | "5" | "6";
+type URL = string;
+type MeetLink = {
+  link: URL,
+  teacher: string,
+}
+
+export type Applicant = BasicStudent & {
+  id: string,
+  reubicacion: boolean,
+  curso: "en" | "fr",
+  nivel_escrito: Nivel,
+  meetLink: MeetLink,
+};
+
+
+
+export interface PlacementDataBase {
+  applications: {
+    applicationID: Applicant,
+  },
+  meetLinks: MeetLink[],
+  online: number,
+}
+
+
+type Schedule = {
+  group: string, //enum "E1-1" | "E1-2" etc.
+  teacher: string, //Name Lastname
+  time: string, // "14:00 - 15:00"
+  registered: number,
+}
+export interface SchedulesDataBase {
+  level1: Schedule[],
+  level2: Schedule[],
+  level3: Schedule[],
+  level4: Schedule[],
+  level5: Schedule[],
+  level6: Schedule[],
+}
+
+
 
 interface Student {
   code: string;
