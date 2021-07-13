@@ -1,3 +1,13 @@
+export type Option = {
+  id: string,
+  teacher_id: string,
+  time: string,
+  day: string,
+  workshop_id: string,
+  url: string,
+  zoom_id?: string
+}
+
 type WorkshopId =
   | "conversation"
   | "toeflpreparation"
@@ -21,7 +31,7 @@ interface Carrera {
 const database: {
   carreras: Carrera[];
   workshops: Workshop[];
-  options: any[];
+  options: Option[];
   teachers: any[];
 } = {
   carreras: [

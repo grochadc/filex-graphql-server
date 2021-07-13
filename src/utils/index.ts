@@ -1,4 +1,5 @@
 const { groupBy } = require("ramda");
+const {Option} = require("../datasources/db");
 export const getById = (
   obj: any,
   key: string,
@@ -39,9 +40,8 @@ interface WorkshopOption {
   name: string;
   description: string;
   levels: number[];
-  option_ids: string[];
 }
-export const mapOptionIds = (options: WorkshopOption[], option_ids: string[]) =>
+export const mapOptionIds = (options: Option[], option_ids: string[]) =>
   option_ids.map((id) => options.filter((option) => option.id === id)[0]);
 
 interface Option {

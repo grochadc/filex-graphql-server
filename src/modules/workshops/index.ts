@@ -1,7 +1,6 @@
 import { gql } from "apollo-server";
 import * as utils from "../../utils";
-import db from "../../datasources/db";
-import {GetStudentFn} from "../../datasources/StudentsAPI";
+import db, {Option} from "../../datasources/db";
 
 export const typeDefs = gql`
   extend type Query {
@@ -9,6 +8,18 @@ export const typeDefs = gql`
     student(codigo: ID!): Student!
     workshops: [Workshop]!
     getWorkshopsByCategory(category: String!): Workshop!
+    studentReservation(codigo: ID!): StudentReservation
+  }
+
+  type StudentReservation {
+    id: ID!,
+    teacher_id: ID!,
+    time: String,
+    day: String,
+    workshopName: String!,
+    teacher: String!,
+    url: String!,
+    zoom_id: String,
   }
 
   type Teacher {
@@ -184,12 +195,15 @@ export const resolvers = {
     },
     getWorkshopsByCategory: (root, { category }, { dataSources }) =>
       dataSources.workshopsAPI.getWorkshopsByCategory(category),
+      studentReservation: (root, args, {dataSources, enviroment}) => dataSources.workshopsAPI.getStudentReservation(args.codigo, enviroment),
   },
   Mutation: {
     makeWorkshopReservation: async (root, { input }, { dataSources, enviroment }) => {
+      console.log('Looking for student',input.codigo)
       const date = new Date();
       const student = await dataSources.studentsAPI.getStudent(input.codigo, enviroment);
-      const option = dataSources.workshopsAPI.getOptionById(input.option_id);
+      console.log('Found student', student)
+      const option: Option = dataSources.workshopsAPI.getOptionById(input.option_id);
       const generatedID = utils.generateId();
       const timestamp = date.toJSON();
       const alreadyRegistered = await dataSources.workshopsAPI.getAlreadyRegistered(
@@ -219,7 +233,8 @@ export const resolvers = {
       await dataSources.workshopsAPI.makeReservation(
         option.teacher_id,
         option.id,
-        { id: generatedID, ...student, timestamp, option }
+        { id: generatedID, ...student, timestamp, option },
+        enviroment,
       );
       return {
         ...partialResponse,

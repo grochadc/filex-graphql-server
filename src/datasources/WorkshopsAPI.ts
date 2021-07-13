@@ -1,7 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import * as R from "ramda";
 import * as utils from "../utils";
-import database from "./db";
+import database, {Option} from "./db";
 
 interface AttendingStudent {
   codigo: string;
@@ -18,10 +18,7 @@ interface AttendingStudent {
 class WorkshopsAPI extends RESTDataSource {
   constructor() {
     super();
-    this.baseURL =
-      process.env.NODE_ENV === "production"
-        ? "https://filex-5726c.firebaseio.com/workshops"
-        : "https://filex-5726c.firebaseio.com/dev/workshops";
+    this.baseURL = "https://filex-5726c.firebaseio.com/workshops";
   }
 
   getWorkshops() {
@@ -65,9 +62,11 @@ class WorkshopsAPI extends RESTDataSource {
     });
   }
 
-  makeReservation(teacher_id: string, option_id: string, reservation: any) {
+  makeReservation(teacher_id: string, option_id: string, reservation: any, env?: "dev" | "prod") {
+    const {option}: {option: Option} = reservation;
     this.post(`reservations/${teacher_id}/${option_id}.json`, reservation);
     this.post(`available/${option_id}/registered.json`, "1");
+    this.put(`/${env}/studentReservations/${reservation.codigo}.json`,{...option, teacher: option.teacher_id, workshopName: option.workshop_id });
   }
 
   getTeacher(id: string) {
@@ -161,6 +160,10 @@ class WorkshopsAPI extends RESTDataSource {
   getSingleWorkshopLink(teacher_id: string, option_id: string) {
     return this.get(`/system/links/${teacher_id}/${option_id}.json`);
   }
+  getStudentReservation(codigo: string, env: "dev" | "prod"){
+    return this.get(`/${env}/studentReservations/${codigo}.json`);
+  }
+
 }
 
 export { WorkshopsAPI };
