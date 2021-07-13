@@ -128,6 +128,9 @@ export const typeDefs = gql`
     timestamp: String!
     codigo: ID!
     nombre: String!
+    teacher: String!
+    time: String!
+    day: String!
     url: String!
     zoom_id: String
     alreadyRegistered: Boolean!
@@ -220,6 +223,9 @@ export const resolvers = {
         timestamp,
         codigo: student.codigo,
         nombre: student.nombre,
+        teacher: option.teacher_id,
+        time: option.time,
+        day: option.day,
         url: workshopLink,
         zoom_id: option.zoom_id ? option.zoom_id : null,
       };
