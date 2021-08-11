@@ -82,8 +82,13 @@ const resolvers = {
   },
 
   Mutation: {
-    saveWrittenResults: async (_, args, { dataSources }) => {
+    saveWrittenResults: async (_, args, { dataSources, carousel }) => {
+      const context = {
+        carousel,
+      };
+
       dataSources.placementAPI.logOutUser();
+
       const composeApplicant = (applicant, meetLink) => {
         const makeExterno = (applicant) => {
           return {
@@ -105,14 +110,24 @@ const resolvers = {
         );
       };
 
-      const meetLinks = (await dataSources.placementAPI.getMeetLinks()).filter(
-        (link) => link.active
-      );
+      const meetLinksUnfiltered = await dataSources.placementAPI.getMeetLinks();
+      const meetLinks = meetLinksUnfiltered.filter((link) => link.active);
+
+      function getCurrentLink(meetLinks: any[], carousel: any) {
+        const lastIndex = meetLinks.length - 1;
+
+        if (carousel.limit !== lastIndex) carousel.setNewLimit(lastIndex);
+
+        const currentIndex = carousel.getNextIndex();
+
+        return meetLinks[currentIndex].link;
+      }
 
       const currentLink =
         args.input.curso === "fr"
           ? "http://meet.google.com/fwm-wqdb-ifw"
-          : meetLinks[meetLinkCounter(meetLinks.length - 1)].link;
+          : getCurrentLink(meetLinks, context.carousel);
+
       const applicant = composeApplicant(args.input, currentLink);
 
       return dataSources.placementSheetsAPI
@@ -151,16 +166,6 @@ const resolvers = {
       return true;
     },
   },
-};
-
-let count = 0;
-const meetLinkCounter = (max) => {
-  if (count < max) {
-    count++;
-    return count;
-  }
-  count = 0;
-  return count;
 };
 
 let isClosed = true;

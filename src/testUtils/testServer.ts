@@ -4,7 +4,10 @@ import {
 } from "apollo-server-testing";
 import { ApolloServer } from "apollo-server";
 
-export default function testServer(dataSources: any): ApolloServerTestClient {
+export default function testServer(
+  dataSources: () => any,
+  context?: () => any
+): ApolloServerTestClient {
   return createTestClient(
     new ApolloServer({
       modules: [
@@ -15,6 +18,7 @@ export default function testServer(dataSources: any): ApolloServerTestClient {
         require("../modules/test_questions"),
       ],
       dataSources,
+      context,
     })
   );
 }

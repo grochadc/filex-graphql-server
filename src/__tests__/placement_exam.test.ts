@@ -7,6 +7,7 @@ import {
 import testServer from "../testUtils/testServer";
 import { PlacementAPI, PlacementSheetsAPI } from "../datasources";
 import * as utils from "../utils";
+import Carousel from "../utils/Carousel";
 
 const applicantInfo = {
   code: "",
@@ -24,30 +25,36 @@ const applicantInfo = {
   curso: "en",
 };
 
+const meetLinks = [
+  { teacher: "someTeacher", link: "link2", active: true },
+  { teacher: "someTeacher", link: "link3", active: true },
+];
+
 describe("Placement exam", () => {
   it("saves an applicant", async () => {
     const placementAPI = new PlacementAPI();
     placementAPI.logOutUser = jest.fn(() => Promise.resolve(1));
-    placementAPI.getMeetLinks = jest.fn(() =>
-      Promise.resolve([{ teacher: "someTeacher", link: "link2" }])
-    );
+    placementAPI.getMeetLinks = jest.fn(() => Promise.resolve(meetLinks));
     placementAPI.addApplicant = jest.fn(() => Promise.resolve());
     const placementSheetsAPI = new PlacementSheetsAPI("somespreadsheetid");
     placementSheetsAPI.saveApplicant = jest.fn(() => Promise.resolve());
 
     const spy = jest.spyOn(utils, "generateId").mockReturnValueOnce("w924pj");
 
-    const { mutate } = testServer(() => ({ placementAPI, placementSheetsAPI }));
+    const { mutate } = testServer(
+      () => ({ placementAPI, placementSheetsAPI }),
+      () => ({ carousel: new Carousel() })
+    );
     const res = await mutate({
       mutation: SAVE_RESULTS_DB,
       variables: applicantInfo,
     });
-    expect(spy).toHaveBeenCalled();
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
     expect(placementSheetsAPI.saveApplicant).toHaveBeenCalled();
     //make sure sheets completed successfully and applicant wasn´t saved on firebase
     expect(placementAPI.addApplicant).toHaveBeenCalledTimes(0);
+    expect(spy).toHaveBeenCalled();
   });
 
   it("gets carreras and isClosed", async () => {

@@ -10,6 +10,10 @@ import {
   PlacementSheetsAPI,
   SheetsAPI,
 } from "./datasources";
+import Carousel from "./utils/Carousel";
+
+//carousel has to be constructed here because context rebuilds on every request
+const carousel = new Carousel();
 
 const server = new ApolloServer({
   modules: [
@@ -43,9 +47,9 @@ const server = new ApolloServer({
   cors: true,
   introspection: true,
   playground: true,
-  context: ({req}) => {
-    const clientEnviroment = req.headers['client-enviroment']
-    return {enviroment: clientEnviroment};
+  context: ({ req }) => {
+    const clientEnviroment = req.headers["client-enviroment"];
+    return { enviroment: clientEnviroment, carousel };
   },
 });
 
