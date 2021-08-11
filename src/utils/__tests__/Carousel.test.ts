@@ -38,18 +38,16 @@ describe("Carousel", () => {
   });
 
   test("returns default index if current is out of bounds", () => {
-    const arr = [0, 1, 2];
     const carousel = new Carousel();
 
-    carousel.enqueue(); //limit = 3; count = 0; head = { data: 0, next: null }; count++; count = 1
-    carousel.enqueue(); //limit = 3; count = 1; head = { data: 0, next: { data: 1, next: null } }; count++; count = 2;
-    carousel.enqueue(); //limit = 3; head = { data: 0, next: { data: 1, next: { data: 2, next: null } } } }
-    carousel.enqueue(); //limit = 3; head = { data: 0, next: { data: 1, next: { data: 2, next: { data: 3, next: null } } } } }
-    carousel.dequeue(); //limit = 3; head = { data: 1, next: { data: 2, next: { data: 3, next: null } } } }; return 0;
+    carousel.enqueue();
+    carousel.enqueue();
+    carousel.enqueue();
+    carousel.enqueue();
 
-    carousel.setNewLimit(2); //limit = 2; head = { data: 1, next: { data: 2, next: { data: 3, next: null } } } };
-    carousel.enqueue(); //limit = 2; head = { data: 1, next: { data: 2, next: { data: 3, next: null } } } };
+    expect(carousel.dequeue()).toBe(2);
 
-    expect(arr[3]).toBeUndefined();
+    carousel.setNewLimit(2);
+    expect(carousel.getNextIndex()).toBe(0);
   });
 });

@@ -13,6 +13,11 @@ class Carousel {
   count: number = 0;
   limit: number = 3;
 
+  peek(): QueueNode | null {
+    if (this.head) return this.head;
+    return null;
+  }
+
   enqueue(): void {
     const node = new QueueNode(this.count);
     this.countUp();
@@ -29,6 +34,7 @@ class Carousel {
     if (this.head) {
       const temp = this.head;
       this.head = this.head.next;
+      if (temp.data > this.limit) return 0;
       return temp.data;
     } else {
       console.log("No item on head");
