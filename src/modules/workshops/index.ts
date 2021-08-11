@@ -1,6 +1,7 @@
 import { gql } from "apollo-server";
+import { ApolloError } from "apollo-server-errors";
 import * as utils from "../../utils";
-import db, {Option} from "../../datasources/db";
+import db, { Option } from "../../datasources/db";
 
 export const typeDefs = gql`
   extend type Query {
@@ -12,14 +13,14 @@ export const typeDefs = gql`
   }
 
   type StudentReservation {
-    id: ID!,
-    teacher_id: ID!,
-    time: String,
-    day: String,
-    workshopName: String!,
-    teacher: String!,
-    url: String!,
-    zoom_id: String,
+    id: ID!
+    teacher_id: ID!
+    time: String
+    day: String
+    workshopName: String!
+    teacher: String!
+    url: String!
+    zoom_id: String
   }
 
   type Teacher {
@@ -190,23 +191,39 @@ export const resolvers = {
     teacher: (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getTeacher(args.id);
     },
-    student: (root, args, { dataSources, enviroment }) => {
-      return dataSources.studentsAPI.getStudent(args.codigo, enviroment);
+    student: async (root, args, { dataSources }) => {
+      const student = await dataSources.studentsAPI.getStudent(args.codigo);
+      if (student === null)
+        throw new ApolloError(
+          "No se encontró ese codigo de alumno en la base de datos.",
+          "STUDENT_NOT_FOUND"
+        );
+      return student;
     },
     workshops: (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getWorkshops();
     },
     getWorkshopsByCategory: (root, { category }, { dataSources }) =>
       dataSources.workshopsAPI.getWorkshopsByCategory(category),
-      studentReservation: (root, args, {dataSources, enviroment}) => dataSources.workshopsAPI.getStudentReservation(args.codigo, enviroment),
+    studentReservation: (root, args, { dataSources, enviroment }) =>
+      dataSources.workshopsAPI.getStudentReservation(args.codigo, enviroment),
   },
   Mutation: {
-    makeWorkshopReservation: async (root, { input }, { dataSources, enviroment }) => {
-      console.log('Looking for student',input.codigo)
+    makeWorkshopReservation: async (
+      root,
+      { input },
+      { dataSources, enviroment }
+    ) => {
+      console.log("Looking for student", input.codigo);
       const date = new Date();
-      const student = await dataSources.studentsAPI.getStudent(input.codigo, enviroment);
-      console.log('Found student', student)
-      const option: Option = dataSources.workshopsAPI.getOptionById(input.option_id);
+      const student = await dataSources.studentsAPI.getStudent(
+        input.codigo,
+        enviroment
+      );
+      console.log("Found student", student);
+      const option: Option = dataSources.workshopsAPI.getOptionById(
+        input.option_id
+      );
       const generatedID = utils.generateId();
       const timestamp = date.toJSON();
       const alreadyRegistered = await dataSources.workshopsAPI.getAlreadyRegistered(
@@ -240,7 +257,7 @@ export const resolvers = {
         option.teacher_id,
         option.id,
         { id: generatedID, ...student, timestamp, option },
-        enviroment,
+        enviroment
       );
       return {
         ...partialResponse,
