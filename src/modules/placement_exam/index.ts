@@ -74,7 +74,7 @@ const resolvers = {
       return getIsClosed();
     },
     logIn: (root, args, { dataSources }) => {
-      return dataSources.placementAPI.logInUser();
+      return 0;
     },
     logOut: (root, args, { dataSources }) => {
       return dataSources.placementAPI.logOutUser();
