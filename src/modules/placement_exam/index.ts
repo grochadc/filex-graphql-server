@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import * as utils from "../../utils";
+import { MeetLink } from "../../types/index";
 
 const typeDefs = gql`
   extend type Query {
@@ -82,12 +83,14 @@ const resolvers = {
   },
 
   Mutation: {
-    saveWrittenResults: async (_, args, { dataSources, carousel }) => {
+    saveWrittenResults: async (
+      _,
+      args,
+      { dataSources, carousel, enviroment }
+    ) => {
       const context = {
         carousel,
       };
-
-      dataSources.placementAPI.logOutUser();
 
       const composeApplicant = (applicant, meetLink) => {
         const makeExterno = (applicant) => {
@@ -110,7 +113,9 @@ const resolvers = {
         );
       };
 
-      const meetLinksUnfiltered = await dataSources.placementAPI.getMeetLinks();
+      const meetLinksUnfiltered: MeetLink[] = await dataSources.placementAPI.getMeetLinks(
+        enviroment
+      );
       const meetLinks = meetLinksUnfiltered.filter((link) => link.active);
 
       function getCurrentLink(meetLinks: any[], carousel: any) {

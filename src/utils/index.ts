@@ -1,5 +1,7 @@
 const { groupBy } = require("ramda");
-const {Option} = require("../datasources/db");
+const { Option } = require("../datasources/db");
+type MatcherFn = (iteration: any, actual: any) => boolean;
+
 export const getById = (
   obj: any,
   key: string,
@@ -64,3 +66,15 @@ export const mapOptionsTeacher = (options: Option[], teachers: Teacher[]) =>
     (option) =>
       teachers.filter((teacher) => teacher.id === option.teacher_id)[0]
   );
+
+export function getIndexToModify(
+  item: any,
+  array: any[],
+  matcher: MatcherFn = (iteration, actual) => iteration === actual
+): number {
+  const reducedIndex = array.reduce(
+    (acc, curr, index) => (matcher(curr, item) ? index : acc + 0),
+    -1
+  );
+  return reducedIndex > -1 ? reducedIndex : array.length;
+}
