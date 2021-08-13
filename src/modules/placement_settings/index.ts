@@ -20,7 +20,7 @@ const typeDefs = gql`
   }
 
   input MeetLinkInput {
-    id: ID!
+    id: ID
     teacher: String!
     link: String!
     active: Boolean!
