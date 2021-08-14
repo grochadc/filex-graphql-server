@@ -1,6 +1,6 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { MeetLink } from "../types/index";
-import { getIndexToModify } from "../utils";
+import { getIndexToModify, addIDsToLinks } from "../utils";
 
 class PlacementAPI extends RESTDataSource {
   constructor() {
@@ -16,8 +16,8 @@ class PlacementAPI extends RESTDataSource {
     const defaultLinksUrl =
       env === "dev" ? `/${env}/meetLinks.json` : `/meetLinks.json`;
     const links = await this.get(defaultLinksUrl);
-    if (links) return links;
-    return [];
+    const result = links ? addIDsToLinks(links) : [];
+    return result;
   }
 
   async saveMeetLinks(links: { teacher: string; link: string }[]) {
@@ -33,8 +33,6 @@ class PlacementAPI extends RESTDataSource {
       meetLinks,
       (i, a) => i.id === a.id
     );
-    console.log("inserting at index", insertAtIndex);
-    console.log("modifiying db at", env);
     return this.put(
       `/${env}/meetLinks/${insertAtIndex.toString()}.json`,
       JSON.stringify(link)

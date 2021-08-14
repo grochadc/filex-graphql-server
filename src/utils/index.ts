@@ -1,6 +1,7 @@
 const { groupBy } = require("ramda");
 const { Option } = require("../datasources/db");
 type MatcherFn = (iteration: any, actual: any) => boolean;
+import { MeetLink } from "../types/index";
 
 export const getById = (
   obj: any,
@@ -77,4 +78,14 @@ export function getIndexToModify(
     -1
   );
   return reducedIndex > -1 ? reducedIndex : array.length;
+}
+
+export function addIDsToLinks(links: MeetLink[]): MeetLink[] {
+  const anyUndefined = links.some((link) => link.id === undefined);
+  if (anyUndefined) {
+    return links.map((link) =>
+      link.id === undefined ? { ...link, id: generateId() } : link
+    );
+  }
+  return links;
 }

@@ -1,5 +1,4 @@
 import { gql } from "apollo-server";
-
 import { MeetLink } from "../../types/index";
 
 const typeDefs = gql`
@@ -16,11 +15,18 @@ const typeDefs = gql`
 
   extend type Mutation {
     setMeetLinks(links: [MeetLinkInput]!): Int
-    setMeetLink(link: MeetLinkInput!): Int
+    setMeetLink(link: MeetLinkInputWithID!): Int
   }
 
   input MeetLinkInput {
     id: ID
+    teacher: String!
+    link: String!
+    active: Boolean!
+  }
+
+  input MeetLinkInputWithID {
+    id: ID!
     teacher: String!
     link: String!
     active: Boolean!
@@ -49,7 +55,6 @@ const resolvers = {
       { link }: { link: MeetLink },
       { dataSources, enviroment }
     ): Promise<number> => {
-      console.log("Got link", link);
       await dataSources.placementAPI.saveSingleMeetLink(link, enviroment);
       return 200;
     },

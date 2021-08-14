@@ -1,3 +1,9 @@
+export type MeetLink = {
+  id: string;
+  teacher: string;
+  link: string;
+  active: string;
+};
 export declare interface Student {
   codigo: string;
   nombre: string;
