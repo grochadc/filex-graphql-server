@@ -44,6 +44,16 @@ class PlacementAPI extends RESTDataSource {
     );
   }
 
+  async removeMeetLink(link: MeetLink, env?: "dev" | "prod") {
+    const defaultMeetLinksLocation =
+      env === "dev" ? `/${env}/meetLinks` : `/meetLinks`;
+    const links: MeetLink[] = await this.get(
+      defaultMeetLinksLocation + ".json"
+    );
+    const result = links.filter((item) => item.id !== link.id);
+    return this.put(`${defaultMeetLinksLocation}.json`, JSON.stringify(result));
+  }
+
   async logInUser() {
     const online = await this.get(`/online.json`);
     if (online === null) {

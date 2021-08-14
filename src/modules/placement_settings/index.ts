@@ -16,6 +16,7 @@ const typeDefs = gql`
   extend type Mutation {
     setMeetLinks(links: [MeetLinkInput]!): Int
     setMeetLink(link: MeetLinkInputWithID!): Int
+    removeMeetLink(link: MeetLinkInputWithID!): Int
   }
 
   input MeetLinkInput {
@@ -56,6 +57,14 @@ const resolvers = {
       { dataSources, enviroment }
     ): Promise<number> => {
       await dataSources.placementAPI.saveSingleMeetLink(link, enviroment);
+      return 200;
+    },
+    removeMeetLink: async (
+      root,
+      { link }: { link: MeetLink },
+      { dataSources, enviroment }
+    ) => {
+      await dataSources.placementAPI.removeMeetLink(link, enviroment);
       return 200;
     },
   },
