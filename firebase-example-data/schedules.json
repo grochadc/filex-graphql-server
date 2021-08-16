@@ -1,0 +1,23 @@
+{
+  "_url": "/system/schedules.json",
+  "en": {
+    "1": {
+      "E1-1": {
+        "chat": null,
+        "classroom": null,
+        "group": "E1-1",
+        "sesiones": "https://meet.google.com/lookup/exampleSesiones",
+        "teacher": "Fulanito",
+        "time": "13:00 - 14:00"
+      },
+      "E1-2": {
+        "chat": "https://whatsapp.com/exampleGroup",
+        "classroom": "https://classroom.google.com/exampleClassroom",
+        "group": "E1-2",
+        "sesiones": "https://meet.google.com/lookup/exampleSesiones",
+        "teacher": "Fulanito",
+        "time": "14:00 - 15:00"
+      }
+    }
+  }
+}

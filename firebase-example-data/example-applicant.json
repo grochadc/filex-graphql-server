@@ -1,0 +1,16 @@
+{
+  "_url": "/system/applicants/:codigo:",
+  "codigo": "1234567890",
+  "nombre": "Benito Antonio",
+  "apellido_materno": "Martinez",
+  "apellido_paterno": "Ocasio",
+  "genero": "M",
+  "carrera": "Abogado",
+  "ciclo": "2021A",
+  "telefono": "1234567890",
+  "email": "bad@bunny.pr",
+  "nivel": "4",
+  "curso": "en",
+  "externo": false,
+  "nuevo_ingreso": false
+}
