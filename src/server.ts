@@ -12,6 +12,25 @@ import {
 } from "./datasources";
 import Carousel from "./utils/Carousel";
 
+//add datasources both here and on server object
+export type DataSourcesType = {
+  firebaseAPI: FirebaseAPI;
+  registroAPI: RegistroAPI;
+  examAPI: ExamAPI;
+  workshopsAPI: WorkshopsAPI;
+  studentsAPI: StudentsAPI;
+  placementAPI: PlacementAPI;
+  placementSheetsAPI: PlacementSheetsAPI;
+  registroSheetsAPI: SheetsAPI;
+  workshopsSheetsAPI: SheetsAPI;
+};
+
+export type ServerContext = {
+  dataSources: DataSourcesType;
+  carousel: Carousel;
+  enviroment: "dev" | "prod";
+};
+
 //carousel has to be constructed here because context rebuilds on every request
 const carousel = new Carousel();
 

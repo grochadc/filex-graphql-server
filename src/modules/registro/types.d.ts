@@ -1,3 +1,6 @@
+// START Grapqhl Codegen Types: https://www.graphql-code-generator.com/
+//END Grapqhl Codegen Types
+
 declare interface Applicant {
   codigo: string;
   nombre: string;
@@ -8,8 +11,8 @@ declare interface Applicant {
   ciclo: string;
   telefono: string;
   email: string;
-  nivel: string;
-  curso: string;
+  nivel: Level;
+  curso: Course;
   externo: boolean;
   nuevo_ingreso: boolean;
 }
@@ -23,24 +26,36 @@ declare interface Student {
   ciclo: string;
   telefono: string;
   email: string;
-  nivel: string;
-  curso: string;
+  nivel: Level;
+  curso: Course;
   externo: boolean;
-  nuevo_ingreso: boolean;
   grupo: string;
 }
 
-declare interface RegisterResponse extends Student {
-  schedule: {
-    group: string;
-    teacher: string;
-    time?: string;
-    serialized: string;
-  };
-}
-declare interface Schedule {
+declare type Schedule = {
+  chat?: string;
+  classroom?: string;
   group: string;
+  sesiones?: string;
   teacher: string;
   time?: string;
-  serialized: string;
+  serialized?: string;
+};
+
+declare interface RegisterResponse extends Student {
+  schedule: Schedule;
 }
+
+declare type LevelsRegistering = Level[];
+
+declare type SerializeOptions = {
+  group?: boolean;
+  teacher?: boolean;
+  time?: boolean;
+};
+
+declare type Course = "en" | "fr";
+
+declare type ClientEnv = "dev" | "prod";
+
+declare type Level = "1" | "2" | "3" | "4" | "5" | "6";

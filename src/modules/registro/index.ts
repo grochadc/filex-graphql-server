@@ -1,10 +1,23 @@
 import { gql } from "apollo-server";
+import { ServerContext } from "../../server";
+import {
+  Applicant,
+  MutationRegisterStudentArgs,
+  MutationSaveRegisteringLevelsArgs,
+  ScheduleSerializedArgs,
+  Schedule,
+} from "./codegen.types";
 
 export const typeDefs = gql`
   extend type Query {
     registeringLevels(course: String!, course: String!): [Int]!
     applicant(codigo: ID!): Applicant!
     schedule(id: String!): Schedule!
+  }
+
+  extend type Mutation {
+    registerStudent(input: StudentInput): RegisterResponse!
+    saveRegisteringLevels(levels: [String]!, course: String!): [String]!
   }
 
   type Applicant {
@@ -30,6 +43,7 @@ export const typeDefs = gql`
     chat: String
     classroom: String
     sesiones: String
+    time: String
     serialized(options: SerializedOptions!): String!
   }
 
@@ -37,11 +51,6 @@ export const typeDefs = gql`
     group: Boolean
     teacher: Boolean
     time: Boolean
-  }
-
-  extend type Mutation {
-    registerStudent(input: StudentInput): RegisterResponse!
-    saveRegisteringLevels(levels: [Int]!, course: String!): [Int]!
   }
 
   input StudentInput {
@@ -78,55 +87,69 @@ export const typeDefs = gql`
 
 export const resolvers = {
   Query: {
-    applicant: async (root, args, { dataSources }) => {
-      const applicant: Promise<Applicant> = await dataSources.registroAPI.getApplicant(
-        args.codigo
-      );
-      return applicant;
-    },
-    registeringLevels: (root, args, { dataSources }) =>
-      dataSources.registroAPI.getLevelsRegistering(args.course),
-    schedule: (root, args, { dataSources }) => {
+    //TODO: type returns string[] but resolver should return Int[] (check in db what is the type for level)
+    registeringLevels: (
+      root,
+      args,
+      { dataSources, enviroment }: ServerContext
+    ) => dataSources.registroAPI.getLevelsRegistering(args.course, enviroment),
+    applicant: (root, args, { dataSources, enviroment }: ServerContext) =>
+      dataSources.registroAPI.getApplicant(args.codigo, enviroment),
+    schedule: (root, args, { dataSources, enviroment }: ServerContext) => {
+      //args.id is a group string eg. E1-1
       const group = args.id;
       const course = group.substr(0, 1) === "E" ? "en" : "fr";
       const level = group.substr(1, 1);
-      return dataSources.registroAPI.getSchedule(level, group, course);
+      return dataSources.registroAPI.getSchedule(
+        level,
+        group,
+        course,
+        enviroment
+      );
     },
   },
   Mutation: {
-    registerStudent: async (root, args, { dataSources }) => {
-      const student: Student = args.input;
-      const registeredStudent: Promise<Student> = await dataSources.registroAPI.registerStudent(
+    registerStudent: async (
+      root,
+      args: MutationRegisterStudentArgs,
+      { dataSources, enviroment }: ServerContext
+    ) => {
+      const student = args.input;
+      const registeredStudent = await dataSources.registroAPI.registerStudent(
         student,
-        student.curso
+        student.curso,
+        enviroment
       );
       return registeredStudent;
     },
-    saveRegisteringLevels: (root, args, { dataSources }) => {
+    saveRegisteringLevels: (
+      root,
+      args: MutationSaveRegisteringLevelsArgs,
+      { dataSources, enviroment }: ServerContext
+    ) => {
       return dataSources.registroAPI.setLevelsRegistering(
         args.levels,
-        args.course
+        args.course,
+        enviroment
       );
-    },
-  },
-  RegisterResponse: {
-    schedule: async (root: RegisterResponse, args, { dataSources }) => {
-      const schedule: Schedule = await dataSources.registroAPI.getSchedule(
-        root.nivel,
-        root.grupo,
-        root.curso
-      );
-      return schedule;
     },
   },
   Applicant: {
-    registering: async (root, args, { dataSources }) => {
+    registering: async (
+      root: Applicant,
+      args,
+      { dataSources }: ServerContext
+    ) => {
       const registeringLevels = await dataSources.registroAPI.getLevelsRegistering(
         root.curso
       );
-      return registeringLevels.includes(Number(root.nivel));
+      return registeringLevels.includes(root.nivel);
     },
-    schedules: async (root, args, { dataSources }) => {
+    schedules: async (
+      root: Applicant,
+      args,
+      { dataSources }: ServerContext
+    ) => {
       const course = root.curso;
       const currentLevel = root.nivel;
       const maxStudents = 35;
@@ -135,7 +158,7 @@ export const resolvers = {
         maxStudents,
         course
       );
-      const allSchedules: Schedule[] = await dataSources.registroAPI.getSchedules(
+      const allSchedules = await dataSources.registroAPI.getSchedules(
         currentLevel,
         course
       );
@@ -156,15 +179,11 @@ export const resolvers = {
     },
   },
   Schedule: {
-    serialized: (root, args, context) => {
-      type SerializeOptions = {
-        group?: boolean;
-        teacher?: boolean;
-      };
+    serialized: (root: Schedule, args: ScheduleSerializedArgs) => {
       const serialize = (options: SerializeOptions, source: any) => {
         return `${options.group ? source.group : ""} ${
           options.teacher ? source.teacher : ""
-        }`;
+        } ${options.time ? source.time : ""}`;
       };
       return serialize(args.options, root);
     },

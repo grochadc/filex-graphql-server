@@ -2,11 +2,6 @@ import { RESTDataSource } from "apollo-datasource-rest";
 import { ApolloError } from "apollo-server";
 import * as R from "ramda";
 
-enum Course {
-  en = "en",
-  fr = "fr",
-}
-
 const ALREADY_REGISTERED = "ALREADY_REGISTERED";
 
 class RegistroAPI extends RESTDataSource {
@@ -15,14 +10,114 @@ class RegistroAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/registro";
   }
 
-  async getLevelsRegistering(course: Course) {
-    const levels = await this.get(`system/registeringLevels/${course}.json`);
+  async getLevelsRegistering(
+    course: Course,
+    env?: ClientEnv
+  ): Promise<LevelsRegistering> {
+    const localUrl = env
+      ? `${env}/system/registeringLevels`
+      : "prod/system/registeringLevels";
+    const levels = await this.get(`${localUrl}/${course}.json`);
     if (levels === null) return [];
     return levels;
   }
 
-  async setLevelsRegistering(levels: number[], course: Course) {
-    this.put(`system/registeringLevels/${course}.json`, levels);
+  async getApplicant(codigo: string, env?: ClientEnv): Promise<Applicant> {
+    const localUrl = env ? `${env}/system` : "prod/system";
+    const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
+    //alreadyRegistered: {"12345678900": "E3-5"}
+    const registeredGroup = await this.get(
+      `${localUrl}/alreadyRegistered/${codigo}.json`
+    );
+    console.log("registeredGroup", registeredGroup);
+    if (registeredGroup)
+      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
+    const applicant: Applicant = await this.get(
+      `${localUrl}/applicants/${codigo}.json`
+    );
+    if (applicant === null)
+      throw new ApolloError(
+        `No applicant found with code ${codigo}`,
+        APPLICANT_NOT_FOUND
+      );
+    return applicant;
+  }
+
+  async getSchedule(
+    level: string,
+    group: string,
+    course: Course,
+    env?: ClientEnv
+  ): Promise<Schedule> {
+    const localUrl = env ? `${env}/system` : "prod/system";
+    const schedule = await this.get(
+      `${localUrl}/schedules/${course}/${level}/${group}.json`
+    );
+    if (schedule === null)
+      throw new Error(
+        `We couldn't find a schedule in /${course}/${level}/${group}.json`
+      );
+    return schedule;
+  }
+
+  async registerStudent(student: Student, course: Course, env?: ClientEnv) {
+    const localUrl = env ? `${env}/system` : "prod/system";
+    //runtime checks
+    if (student.grupo === undefined) throw new Error("Group was not provided.");
+    if (student.nivel === undefined) throw new Error("Level was not provided.");
+    if (student.curso === undefined) throw new Error("Course was not provided");
+
+    const registeredGroup = await this.get(
+      `${localUrl}/alreadyRegistered/${student.codigo}.json`
+    );
+    if (registeredGroup)
+      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
+    this.post(
+      `${localUrl}/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
+      "1"
+    ).catch((e) => console.log("this.post Error", e));
+    this.put(
+      `system/alreadyRegistered/${student.codigo}.json`,
+      JSON.stringify(student.grupo)
+    ).catch((e) =>
+      console.log("Put already registered", e.extensions.response)
+    );
+
+    const parsedStudent = [
+      student.codigo,
+      student.nombre,
+      student.apellido_paterno,
+      student.apellido_materno,
+      student.genero,
+      student.ciclo,
+      student.carrera,
+      student.telefono,
+      student.email,
+      student.nivel,
+      student.grupo,
+      student.externo,
+    ];
+    const values = [parsedStudent];
+    const range = `${student.curso.charAt(0).toUpperCase()}${student.nivel}!A1`;
+    this.context.dataSources.registroSheetsAPI
+      .append(values, range)
+      .then(() => "Saved student to sheets successfully!")
+      .catch((e) => console.log("registriSheets Error", e));
+
+    const schedule = await this.getSchedule(
+      student.nivel,
+      student.grupo,
+      course,
+      env
+    );
+    const composedStudent: RegisterResponse = { ...student, schedule };
+
+    return composedStudent;
+  }
+
+  async setLevelsRegistering(levels: Level[], course: Course, env?: ClientEnv) {
+    const localUrl = env ? `${env}/system` : "prod/system";
+    this.put(`${localUrl}/registeringLevels/${course}.json`, levels);
     return levels;
   }
 
@@ -63,90 +158,12 @@ class RegistroAPI extends RESTDataSource {
     );
     if (schedulesObj === null)
       throw new Error(`There are no schedules in /${course}/${level}`);
-    const objToArray = (obj) => Object.keys(obj).map((key) => obj[key]);
-    const data = objToArray(schedulesObj);
+    const data: Schedule[] = Object.values(schedulesObj);
     return data;
-  }
-
-  async getSchedule(level: string, group: string, course: Course) {
-    const schedule = await this.get(
-      `system/schedules/${course}/${level}/${group}.json`
-    );
-    if (schedule === null)
-      throw new Error(
-        `We couldn't find a schedule in /${course}/${level}/${group}.json`
-      );
-    return schedule;
-  }
-
-  async registerStudent(student: Student, course: Course) {
-    if (student.grupo === undefined) throw new Error("Group was not provided.");
-    if (student.nivel === undefined) throw new Error("Level was not provided.");
-    if (student.curso === undefined) throw new Error("Course was not provided");
-    const registeredGroup = await this.get(
-      `system/alreadyRegistered/${student.codigo}.json`
-    );
-    if (registeredGroup)
-      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
-    this.post(
-      `system/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
-      "1"
-    );
-    this.put(
-      `system/alreadyRegistered/${student.codigo}.json`,
-      JSON.stringify(student.grupo)
-    ).catch((e) =>
-      console.log("Put already registered", e.extensions.response)
-    );
-
-    const parsedStudent = [
-      student.codigo,
-      student.nombre,
-      student.apellido_paterno,
-      student.apellido_materno,
-      student.genero,
-      student.ciclo,
-      student.carrera,
-      student.telefono,
-      student.email,
-      student.nivel,
-      student.grupo,
-      student.externo,
-    ];
-    const values = [parsedStudent];
-    const range = `${student.curso.charAt(0).toUpperCase()}${student.nivel}!A1`;
-    this.context.dataSources.registroSheetsAPI
-      .append(values, range)
-      .then(() => "Saved student to sheets successfully!");
-
-    const schedule = await this.getSchedule(
-      student.nivel,
-      student.grupo,
-      course
-    );
-    const composedStudent = { ...student, schedule };
-
-    return composedStudent;
   }
 
   async getRegistered(level: string, course: Course) {
     return this.get(`students/${course}/${level}.json`);
-  }
-
-  async getApplicant(codigo: string) {
-    const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
-    const registeredGroup = await this.get(
-      `system/alreadyRegistered/${codigo}.json`
-    );
-    if (registeredGroup)
-      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
-    const applicant = await this.get(`applicants/${codigo}.json`);
-    if (applicant === null)
-      throw new ApolloError(
-        `No applicant found with code ${codigo}`,
-        APPLICANT_NOT_FOUND
-      );
-    return applicant;
   }
 }
 
