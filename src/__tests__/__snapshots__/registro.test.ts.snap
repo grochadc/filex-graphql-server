@@ -27,8 +27,8 @@ Object {
 exports[`Integration gets and sets registering levels 2`] = `
 Object {
   "saveRegisteringLevels": Array [
-    1,
-    2,
+    "1",
+    "2",
   ],
 }
 `;
@@ -47,11 +47,11 @@ Object {
     "genero": "M",
     "nivel": "4",
     "nombre": "Iker",
-    "registering": true,
+    "registering": false,
     "schedules": Array [
       Object {
         "group": "E4-2",
-        "serialized": "E4-2 Gonzalo Rocha",
+        "serialized": "E4-2 Gonzalo Rocha ",
         "teacher": "Gonzalo Rocha",
       },
     ],

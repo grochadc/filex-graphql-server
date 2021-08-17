@@ -1,4 +1,4 @@
-env: ClientEnv = "prod"import { RESTDataSource } from "apollo-datasource-rest";
+import { RESTDataSource } from "apollo-datasource-rest";
 import { ApolloError } from "apollo-server";
 import * as R from "ramda";
 
@@ -58,7 +58,11 @@ class RegistroAPI extends RESTDataSource {
     return schedule;
   }
 
-  async registerStudent(student: Student, course: Course, env: ClientEnv = "prod") {
+  async registerStudent(
+    student: Student,
+    course: Course,
+    env: ClientEnv = "prod"
+  ) {
     const localUrl = env;
     //runtime checks
     if (student.grupo === undefined) throw new Error("Group was not provided.");
@@ -113,7 +117,11 @@ class RegistroAPI extends RESTDataSource {
     return composedStudent;
   }
 
-  async setLevelsRegistering(levels: Level[], course: Course, env: ClientEnv = "prod") {
+  async setLevelsRegistering(
+    levels: Level[],
+    course: Course,
+    env: ClientEnv = "prod"
+  ) {
     const localUrl = env;
     this.put(`${localUrl}/registeringLevels/${course}.json`, levels);
     return levels;

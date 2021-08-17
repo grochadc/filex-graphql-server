@@ -1,7 +1,7 @@
 import { gql } from "apollo-server";
 
 export const SAVE_LEVELS_REGISTERING = gql`
-  mutation saveLevels($levels: [Int]!, $course: String!) {
+  mutation saveLevels($levels: [String]!, $course: String!) {
     saveRegisteringLevels(levels: $levels, course: $course)
   }
 `;

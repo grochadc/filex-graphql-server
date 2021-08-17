@@ -33,6 +33,7 @@ describe("Integration", () => {
     registroAPI.getSchedules = jest.fn(() =>
       Promise.resolve([{ group: "E4-2", teacher: "Gonzalo Rocha" }])
     );
+    registroAPI.getApplicant.mockReset();
     const { query } = testServer(() => ({ registroAPI }));
     const res = await query({
       query: GET_APPLICANT,
@@ -40,7 +41,10 @@ describe("Integration", () => {
     });
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
-    expect(registroAPI.getApplicant).toHaveBeenCalledWith("1234567890");
+    expect(registroAPI.getApplicant).toHaveBeenCalledWith(
+      "1234567890",
+      undefined
+    );
   });
 
   it("throws an error when an applicant is not found", async () => {
@@ -52,7 +56,14 @@ describe("Integration", () => {
       variables: { codigo: "1234509876" },
     });
     expect(registroAPI.get).toHaveBeenCalledTimes(2);
-    expect(registroAPI.get).toHaveBeenCalledWith("applicants/1234509876.json");
+    expect(registroAPI.get).toHaveBeenNthCalledWith(
+      1,
+      "prod/system/alreadyRegistered/1234509876.json"
+    );
+    expect(registroAPI.get).toHaveBeenNthCalledWith(
+      2,
+      "prod/system/applicants/1234509876.json"
+    );
     expect(res.errors).toHaveLength(1);
     expect(res.errors[0].extensions.code).toBe("APPLICANT_NOT_FOUND");
   });
@@ -67,7 +78,7 @@ describe("Integration", () => {
     });
     expect(registroAPI.get).toHaveBeenCalledTimes(1);
     expect(registroAPI.get).toHaveBeenCalledWith(
-      "system/alreadyRegistered/1234567890.json"
+      "prod/system/alreadyRegistered/1234567890.json"
     );
     expect(res.errors).toHaveLength(1);
     expect(res.errors[0].extensions.code).toBe("ALREADY_REGISTERED");
@@ -128,11 +139,15 @@ describe("Integration", () => {
       mutation: REGISTER_STUDENT,
       variables: inputStudent,
     });
-    expect(spy).toHaveBeenCalledWith(inputStudent, inputStudent.curso);
+    expect(spy).toHaveBeenCalledWith(
+      inputStudent,
+      inputStudent.curso,
+      undefined
+    );
     expect(res.errors).toBe(undefined);
     expect(res.data).toMatchSnapshot();
     expect(registroAPI.post).toHaveBeenCalledWith(
-      `system/availableGroups/${inputStudent.curso}/${inputStudent.nivel}/${inputStudent.grupo}.json`,
+      `prod/system/availableGroups/${inputStudent.curso}/${inputStudent.nivel}/${inputStudent.grupo}.json`,
       "1"
     );
     expect(registroSheetsAPI.append).toHaveBeenCalled();
@@ -168,7 +183,11 @@ describe("Integration", () => {
       mutation: REGISTER_STUDENT,
       variables: inputStudent,
     });
-    expect(spy).toHaveBeenCalledWith(inputStudent, inputStudent.curso);
+    expect(spy).toHaveBeenCalledWith(
+      inputStudent,
+      inputStudent.curso,
+      undefined
+    );
     expect(res.errors).toBe("[[GraphQLError: E3-1]]");
     expect(res.data).toMatchSnapshot();
     expect(registroAPI.post).toHaveBeenCalledWith(
@@ -190,9 +209,12 @@ describe("Integration", () => {
     });
     expect(queryRes.errors).toBe(undefined);
     expect(queryRes.data).toMatchSnapshot();
-    expect(registroAPI.getLevelsRegistering).toHaveBeenCalledWith("en");
+    expect(registroAPI.getLevelsRegistering).toHaveBeenCalledWith(
+      "en",
+      undefined
+    );
 
-    const levels = [1, 2];
+    const levels = ["1", "2"];
     const course = "en";
     const mutationRes = await mutate({
       mutation: SAVE_LEVELS_REGISTERING,
@@ -203,7 +225,8 @@ describe("Integration", () => {
     expect(mutationRes.data).toMatchSnapshot();
     expect(registroAPI.setLevelsRegistering).toHaveBeenCalledWith(
       levels,
-      course
+      course,
+      undefined
     );
   });
 });
