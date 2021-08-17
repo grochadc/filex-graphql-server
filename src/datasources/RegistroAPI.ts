@@ -77,13 +77,11 @@ class RegistroAPI extends RESTDataSource {
     this.post(
       `${localUrl}/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
       "1"
-    ).catch((e) => console.log("this.post Error", e));
+    ).catch(e => console.log("this.post Error", e));
     this.put(
-      `system/alreadyRegistered/${student.codigo}.json`,
+      `${localUrl}/alreadyRegistered/${student.codigo}.json`,
       JSON.stringify(student.grupo)
-    ).catch((e) =>
-      console.log("Put already registered", e.extensions.response)
-    );
+    ).catch(e => console.log("Put already registered", e.extensions.response));
 
     const parsedStudent = [
       student.codigo,
@@ -97,14 +95,14 @@ class RegistroAPI extends RESTDataSource {
       student.email,
       student.nivel,
       student.grupo,
-      student.externo,
+      student.externo
     ];
     const values = [parsedStudent];
     const range = `${student.curso.charAt(0).toUpperCase()}${student.nivel}!A1`;
     this.context.dataSources.registroSheetsAPI
       .append(values, range)
       .then(() => "Saved student to sheets successfully!")
-      .catch((e) => console.log("registriSheets Error", e));
+      .catch(e => console.log("registriSheets Error", e));
 
     const schedule = await this.getSchedule(
       student.nivel,
@@ -158,9 +156,9 @@ class RegistroAPI extends RESTDataSource {
     );
   }
 
-  async getSchedules(level: string, course: Course) {
+  async getSchedules(level: string, course: Course, env: ClientEnv = "prod") {
     const schedulesObj = await this.get(
-      `system/schedules/${course}/level${level}.json`
+      `${env}/schedules/${course}/level${level}.json`
     );
     if (schedulesObj === null)
       throw new Error(`There are no schedules in /${course}/level${level}`);
