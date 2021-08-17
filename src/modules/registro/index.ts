@@ -5,7 +5,7 @@ import {
   MutationRegisterStudentArgs,
   MutationSaveRegisteringLevelsArgs,
   ScheduleSerializedArgs,
-  Schedule,
+  Schedule
 } from "./codegen.types";
 
 export const typeDefs = gql`
@@ -35,6 +35,7 @@ export const typeDefs = gql`
     externo: Boolean!
     registering: Boolean!
     schedules: [Schedule]!
+    registeredSchedule: Schedule
   }
 
   type Schedule {
@@ -106,7 +107,7 @@ export const resolvers = {
         course,
         enviroment
       );
-    },
+    }
   },
   Mutation: {
     registerStudent: async (
@@ -132,7 +133,7 @@ export const resolvers = {
         args.course,
         enviroment
       );
-    },
+    }
   },
   Applicant: {
     registering: async (
@@ -171,12 +172,28 @@ export const resolvers = {
         unavailable: string[]
       ) {
         return schedules.filter(
-          (schedule) => !unavailable.includes(schedule.group)
+          schedule => !unavailable.includes(schedule.group)
         );
       }
 
       return availableSchedules(allSchedules, unavailable);
     },
+    registeredSchedule: async (
+      root: Applicant,
+      args,
+      { dataSources, enviroment }: ServerContext
+    ): Promise<Schedule | null> => {
+      const registeredGroup = await dataSources.registroAPI.getAlreadyRegistered(
+        root.codigo,
+        enviroment
+      );
+      return dataSources.registroAPI.getSchedule(
+        root.nivel,
+        registeredGroup,
+        root.curso,
+        enviroment
+      );
+    }
   },
   Schedule: {
     serialized: (root: Schedule, args: ScheduleSerializedArgs) => {
@@ -186,6 +203,6 @@ export const resolvers = {
         } ${options.time ? source.time : ""}`;
       };
       return serialize(args.options, root);
-    },
-  },
+    }
+  }
 };

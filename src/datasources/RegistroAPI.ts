@@ -24,12 +24,8 @@ class RegistroAPI extends RESTDataSource {
     const localUrl = env;
     const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
     //alreadyRegistered: {"12345678900": "E3-5"}
-    const registeredGroup = await this.get(
-      `${localUrl}/alreadyRegistered/${codigo}.json`
-    );
+    const registeredGroup = await this.getAlreadyRegistered(codigo, env);
     console.log("registeredGroup", registeredGroup);
-    if (registeredGroup)
-      throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
     const applicant: Applicant = await this.get(
       `${localUrl}/applicants/${codigo}.json`
     );
@@ -69,8 +65,9 @@ class RegistroAPI extends RESTDataSource {
     if (student.nivel === undefined) throw new Error("Level was not provided.");
     if (student.curso === undefined) throw new Error("Course was not provided");
 
-    const registeredGroup = await this.get(
-      `${localUrl}/alreadyRegistered/${student.codigo}.json`
+    const registeredGroup = await this.getAlreadyRegistered(
+      student.codigo,
+      env
     );
     if (registeredGroup)
       throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
@@ -78,10 +75,7 @@ class RegistroAPI extends RESTDataSource {
       `${localUrl}/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
       "1"
     ).catch(e => console.log("this.post Error", e));
-    this.put(
-      `${localUrl}/alreadyRegistered/${student.codigo}.json`,
-      JSON.stringify(student.grupo)
-    ).catch(e => console.log("Put already registered", e.extensions.response));
+    this.setAlreadyRegistered(student.codigo, student.grupo, env);
 
     const parsedStudent = [
       student.codigo,
@@ -166,8 +160,21 @@ class RegistroAPI extends RESTDataSource {
     return data;
   }
 
-  async getRegistered(level: string, course: Course) {
-    return this.get(`students/${course}/level${level}.json`);
+  getRegistered(level: string, course: Course) {
+    this.get(`students/${course}/level${level}.json`);
+  }
+
+  getAlreadyRegistered(
+    codigo: string,
+    env: ClientEnv = "prod"
+  ): Promise<string | null> {
+    return this.get(`${env}/alreadyRegistered/${codigo}.json`);
+  }
+  setAlreadyRegistered(codigo: string, grupo: string, env: ClientEnv = "prod") {
+    this.put(
+      `${env}/alreadyRegistered/${codigo}.json`,
+      JSON.stringify(grupo)
+    ).catch(e => console.log("Put already registered", e.extensions.response));
   }
 }
 

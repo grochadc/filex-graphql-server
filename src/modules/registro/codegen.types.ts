@@ -65,6 +65,7 @@ export type Applicant = {
   externo: Scalars["Boolean"];
   registering: Scalars["Boolean"];
   schedules: Array<Maybe<Schedule>>;
+  registeredSchedule: Maybe<Schedule>;
 };
 
 export type Schedule = {
