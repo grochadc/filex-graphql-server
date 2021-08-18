@@ -187,12 +187,15 @@ export const resolvers = {
         root.codigo,
         enviroment
       );
-      return dataSources.registroAPI.getSchedule(
-        root.nivel,
-        registeredGroup,
-        root.curso,
-        enviroment
-      );
+      if (registeredGroup) {
+        return dataSources.registroAPI.getSchedule(
+          root.nivel,
+          registeredGroup,
+          root.curso,
+          enviroment
+        );
+      }
+      return null;
     }
   },
   Schedule: {
