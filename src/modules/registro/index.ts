@@ -93,45 +93,38 @@ export const resolvers = {
       root,
       args,
       { dataSources, enviroment }: ServerContext
-    ) => dataSources.registroAPI.getLevelsRegistering(args.course, enviroment),
-    applicant: (root, args, { dataSources, enviroment }: ServerContext) =>
-      dataSources.registroAPI.getApplicant(args.codigo, enviroment),
-    schedule: (root, args, { dataSources, enviroment }: ServerContext) => {
+    ) => dataSources.registroAPI.getLevelsRegistering(args.course),
+    applicant: (root, args, { dataSources }: ServerContext) =>
+      dataSources.registroAPI.getApplicant(args.codigo),
+    schedule: (root, args, { dataSources }: ServerContext) => {
       //args.id is a group string eg. E1-1
       const group = args.id;
       const course = group.substr(0, 1) === "E" ? "en" : "fr";
       const level = group.substr(1, 1);
-      return dataSources.registroAPI.getSchedule(
-        level,
-        group,
-        course,
-        enviroment
-      );
+      return dataSources.registroAPI.getSchedule(level, group, course);
     }
   },
   Mutation: {
     registerStudent: async (
       root,
       args: MutationRegisterStudentArgs,
-      { dataSources, enviroment }: ServerContext
+      { dataSources }: ServerContext
     ) => {
       const student = args.input;
       const registeredStudent = await dataSources.registroAPI.registerStudent(
         student,
-        student.curso,
-        enviroment
+        student.curso
       );
       return registeredStudent;
     },
     saveRegisteringLevels: (
       root,
       args: MutationSaveRegisteringLevelsArgs,
-      { dataSources, enviroment }: ServerContext
+      { dataSources }: ServerContext
     ) => {
       return dataSources.registroAPI.setLevelsRegistering(
         args.levels,
-        args.course,
-        enviroment
+        args.course
       );
     }
   },
@@ -181,18 +174,16 @@ export const resolvers = {
     registeredSchedule: async (
       root: Applicant,
       args,
-      { dataSources, enviroment }: ServerContext
+      { dataSources }: ServerContext
     ): Promise<Schedule | null> => {
       const registeredGroup = await dataSources.registroAPI.getAlreadyRegistered(
-        root.codigo,
-        enviroment
+        root.codigo
       );
       if (registeredGroup) {
         return dataSources.registroAPI.getSchedule(
           root.nivel,
           registeredGroup,
-          root.curso,
-          enviroment
+          root.curso
         );
       }
       return null;
