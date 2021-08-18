@@ -1,11 +1,11 @@
 import {
   createTestClient,
-  ApolloServerTestClient,
+  ApolloServerTestClient
 } from "apollo-server-testing";
 import { ApolloServer } from "apollo-server";
 
 export default function testServer(
-  dataSources: () => any,
+  dataSources?: () => any,
   context?: () => any
 ): ApolloServerTestClient {
   return createTestClient(
@@ -15,10 +15,10 @@ export default function testServer(
         require("../modules/placement_settings"),
         require("../modules/registro"),
         require("../modules/workshops"),
-        require("../modules/test_questions"),
+        require("../modules/test_questions")
       ],
       dataSources,
-      context,
+      context
     })
   );
 }

@@ -1,21 +1,72 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Integration correctly registers a student 1`] = `
+exports[`registro gets a schedule 1`] = `
 Object {
-  "registerStudent": Object {
-    "nombre": "Juan",
-    "schedule": Object {
-      "chat": "somechatlink",
-      "classroom": "someclassroomlink",
-      "group": "E4-1",
-      "sesiones": "somesesioneslink",
-      "teacher": "Gonzalo Rocha",
-    },
+  "schedule": Object {
+    "chat": "HTTP://URL_AQUI",
+    "classroom": "HTTP://URL_AQUI",
+    "group": "E1-1",
+    "sesiones": "HTTP://URL_AQUI",
+    "teacher": "GONZALO ROCHA",
   },
 }
 `;
 
-exports[`Integration gets and sets registering levels 1`] = `
+exports[`registro gets an applicant who is already registered 1`] = `
+Object {
+  "applicant": Object {
+    "codigo": "1234567890",
+    "email": "bad@bunny.pr",
+    "nivel": "4",
+    "nombre": "Benito Antonio",
+    "registeredSchedule": Object {
+      "chat": "HTTP://URL_AQUI",
+      "classroom": "HTTP://URL_AQUI",
+      "group": "E4-1",
+      "sesiones": "HTTP://URL_AQUI",
+      "teacher": "GONZALO ROCHA",
+    },
+    "registering": false,
+    "schedules": Array [
+      Object {
+        "group": "E4-1",
+        "serialized": "E4-1 GONZALO ROCHA ",
+        "teacher": "GONZALO ROCHA",
+      },
+    ],
+  },
+}
+`;
+
+exports[`registro gets an applicant who isn't registered 1`] = `
+Object {
+  "applicant": Object {
+    "apellido_materno": "Ocasio",
+    "apellido_paterno": "Martinez",
+    "carrera": "Agronegocios",
+    "ciclo": "2021A",
+    "codigo": "1234567890",
+    "curso": "en",
+    "email": "bad@bunny.pr",
+    "externo": true,
+    "genero": "M",
+    "nivel": "4",
+    "nombre": "Benito Antonio",
+    "registeredSchedule": null,
+    "registering": true,
+    "schedules": Array [
+      Object {
+        "group": "E4-1",
+        "serialized": "E4-1 GONZALO ROCHA ",
+        "teacher": "GONZALO ROCHA",
+      },
+    ],
+    "telefono": "3411234567",
+  },
+}
+`;
+
+exports[`registro gets registering levels 1`] = `
 Object {
   "english": Array [
     1,
@@ -24,38 +75,11 @@ Object {
 }
 `;
 
-exports[`Integration gets and sets registering levels 2`] = `
+exports[`registro saves levels registering 1`] = `
 Object {
   "saveRegisteringLevels": Array [
     "1",
     "2",
   ],
-}
-`;
-
-exports[`Integration returns an applicant by codigo 1`] = `
-Object {
-  "applicant": Object {
-    "apellido_materno": "Martinez",
-    "apellido_paterno": "Mamarre",
-    "carrera": "Agronegocios",
-    "ciclo": "2021A",
-    "codigo": "1234567890",
-    "curso": "en",
-    "email": "m@marre.com",
-    "externo": true,
-    "genero": "M",
-    "nivel": "4",
-    "nombre": "Iker",
-    "registering": false,
-    "schedules": Array [
-      Object {
-        "group": "E4-2",
-        "serialized": "E4-2 Gonzalo Rocha ",
-        "teacher": "Gonzalo Rocha",
-      },
-    ],
-    "telefono": "3411234567",
-  },
 }
 `;
