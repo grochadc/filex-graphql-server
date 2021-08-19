@@ -75,6 +75,21 @@ Object {
 }
 `;
 
+exports[`registro registers a student 1`] = `
+Object {
+  "registerStudent": Object {
+    "nombre": "Benito Antonio",
+    "schedule": Object {
+      "chat": "HTTP://URL_AQUI",
+      "classroom": "HTTP://URL_AQUI",
+      "group": "E4-1",
+      "sesiones": "HTTP://URL_AQUI",
+      "teacher": "GONZALO ROCHA",
+    },
+  },
+}
+`;
+
 exports[`registro saves levels registering 1`] = `
 Object {
   "saveRegisteringLevels": Array [

@@ -2,6 +2,7 @@ import testServer from "../testUtils/testServer";
 import Database from "../testUtils/databaseCreator";
 import { gql } from "apollo-server";
 const { RegistroAPI } = require("../datasources/registroAPI");
+import { SheetsAPI } from "../datasources/SheetsAPI";
 
 describe("registro", () => {
   const registroAPI = new RegistroAPI();
@@ -278,5 +279,114 @@ describe("registro", () => {
     ).toHaveBeenCalledWith("prod/registeringLevels/en.json", ["1", "2"]);
     expect(res.data).toMatchSnapshot();
     expect(res.errors).toBe(undefined);
+  });
+
+  it("registers a student", async () => {
+    const db = {
+      prod: {
+        schedules: {
+          en: {
+            level4: schedulesLevel4
+          }
+        }
+      }
+    };
+    const REGISTER_STUDENT = gql`
+      mutation register(
+        $codigo: ID!
+        $nombre: String!
+        $apellido_materno: String!
+        $apellido_paterno: String!
+        $genero: String!
+        $carrera: String!
+        $ciclo: String!
+        $telefono: String!
+        $email: String!
+        $nivel: String!
+        $curso: String!
+        $externo: Boolean!
+        $schedule: String!
+      ) {
+        registerStudent(
+          input: {
+            codigo: $codigo
+            nombre: $nombre
+            apellido_materno: $apellido_materno
+            apellido_paterno: $apellido_paterno
+            genero: $genero
+            carrera: $carrera
+            ciclo: $ciclo
+            telefono: $telefono
+            email: $email
+            nivel: $nivel
+            curso: $curso
+            externo: $externo
+            grupo: $schedule
+          }
+        ) {
+          nombre
+          schedule {
+            group
+            teacher
+            chat
+            classroom
+            sesiones
+          }
+        }
+      }
+    `;
+    const variables = {
+      codigo: "1234567890",
+      nombre: "Benito Antonio",
+      apellido_materno: "Martinez",
+      apellido_paterno: "Ocasio",
+      genero: "M",
+      carrera: "Abogado",
+      ciclo: "2021A",
+      telefono: "1234567890",
+      email: "bad@bunny.pr",
+      nivel: "4",
+      curso: "en",
+      externo: false,
+      schedule: "E4-1"
+    };
+    const database = new Database(db);
+    const registroAPI = new RegistroAPI();
+    registroAPI.get = jest.fn(url => database.get(url));
+    registroAPI.post = jest.fn((url, data) => Promise.resolve());
+
+    const registroSheetsAPI = new SheetsAPI("id");
+    registroSheetsAPI.append = jest.fn(() => Promise.resolve());
+
+    const dataSources = () => {
+      return {
+        registroAPI: registroAPI,
+        registroSheetsAPI: registroSheetsAPI
+      };
+    };
+
+    const context = () => {
+      return {
+        enviroment: "prod"
+      };
+    };
+    const { query } = testServer(dataSources, context);
+    const res = await query({
+      query: REGISTER_STUDENT,
+      variables
+    });
+
+    function hasUndefined(mockFn: any): boolean {
+      return mockFn.mock.calls[0].some(call => call.includes("undefined"));
+    }
+    if (hasUndefined(registroAPI.get))
+      console.log("get mock calls", registroAPI.get.mock.calls);
+    expect(hasUndefined(registroAPI.get)).toBe(false);
+    if (hasUndefined(registroAPI.post))
+      console.log("post mock calls", registroAPI.post.mock.calls);
+    expect(hasUndefined(registroAPI.post)).toBe(false);
+    if (res.errors) console.log(JSON.stringify(res.errors));
+    expect(res.errors).toBeUndefined();
+    expect(res.data).toMatchSnapshot();
   });
 });
