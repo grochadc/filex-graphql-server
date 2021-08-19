@@ -17,7 +17,8 @@
     "test": "jest --watchAll",
     "build": "npx typescript@latest",
     "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
-    "publish": "git push heroku master && heroku logs --tail"
+    "publish": "git push heroku master",
+    "postpublish": "heroku logs --tail"
   },
   "author": "",
   "license": "ISC",
