@@ -57,6 +57,9 @@ describe("registro", () => {
       query: GET_LEVELS_REGISTERING,
       variables
     });
+    expect(registroAPI.get).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
     expect(registroAPI.get).toHaveBeenCalledTimes(1);
     expect(registroAPI.get).toHaveBeenCalledWith(
       "prod/registeringLevels/en.json"
@@ -194,6 +197,9 @@ describe("registro", () => {
       query: GET_REGISTERED_APPLICANT,
       variables
     });
+    expect(registroAPI.get).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
     expect(res.data.applicant.registering).toBe(false);
     expect(res.data).toMatchSnapshot();
     expect(res.errors).toBe(undefined);
@@ -246,6 +252,9 @@ describe("registro", () => {
       query: GET_SCHEDULE,
       variables
     });
+    expect(registroAPI.get).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
     expect(res.data).toMatchSnapshot();
     expect(res.errors).toBe(undefined);
   });
@@ -274,6 +283,9 @@ describe("registro", () => {
       query: SAVE_LEVELS_REGISTERING,
       variables
     });
+    expect(registroAPI.put).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
     expect(
       registroAPI.put
     ).toHaveBeenCalledWith("prod/registeringLevels/en.json", ["1", "2"]);
@@ -375,16 +387,12 @@ describe("registro", () => {
       query: REGISTER_STUDENT,
       variables
     });
-
-    function hasUndefined(mockFn: any): boolean {
-      return mockFn.mock.calls[0].some(call => call.includes("undefined"));
-    }
-    if (hasUndefined(registroAPI.get))
-      console.log("get mock calls", registroAPI.get.mock.calls);
-    expect(hasUndefined(registroAPI.get)).toBe(false);
-    if (hasUndefined(registroAPI.post))
-      console.log("post mock calls", registroAPI.post.mock.calls);
-    expect(hasUndefined(registroAPI.post)).toBe(false);
+    expect(registroAPI.get).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
+    expect(registroAPI.post).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
     if (res.errors) console.log(JSON.stringify(res.errors));
     expect(res.errors).toBeUndefined();
     expect(res.data).toMatchSnapshot();
