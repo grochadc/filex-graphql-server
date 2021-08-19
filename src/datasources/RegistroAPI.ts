@@ -61,7 +61,7 @@ class RegistroAPI extends RESTDataSource {
     if (registeredGroup)
       throw new ApolloError(`${registeredGroup}`, ALREADY_REGISTERED);
     this.post(
-      `${localUrl}/availableGroups/${student.curso}/${student.nivel}/${student.grupo}.json`,
+      `${localUrl}/availableGroups/${student.curso}/level${student.nivel}/${student.grupo}.json`,
       "1"
     ).catch(e => console.log("this.post Error", e));
     this.setAlreadyRegistered(student.codigo, student.grupo);

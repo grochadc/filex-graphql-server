@@ -393,6 +393,10 @@ describe("registro", () => {
     expect(registroAPI.post).not.toHaveBeenCalledWith(
       expect.stringContaining("undefined")
     );
+    expect(registroAPI.post).toHaveBeenCalledWith(
+      "prod/availableGroups/en/level4/E4-1.json",
+      "1"
+    );
     if (res.errors) console.log(JSON.stringify(res.errors));
     expect(res.errors).toBeUndefined();
     expect(res.data).toMatchSnapshot();
