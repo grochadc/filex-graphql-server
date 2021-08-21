@@ -47,6 +47,7 @@ Object {
     "ciclo": "2021A",
     "codigo": "1234567890",
     "curso": "en",
+    "desertor": false,
     "email": "bad@bunny.pr",
     "externo": true,
     "genero": "M",
@@ -69,8 +70,8 @@ Object {
 exports[`registro gets registering levels 1`] = `
 Object {
   "english": Array [
-    1,
-    2,
+    "1",
+    "2",
   ],
 }
 `;

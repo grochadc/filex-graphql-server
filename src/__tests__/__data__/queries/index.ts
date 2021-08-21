@@ -3,7 +3,7 @@ import {
   SAVE_LEVELS_REGISTERING,
   GET_LEVELS_REGISTERING,
   GET_APPLICANT,
-  REGISTER_STUDENT,
+  REGISTER_STUDENT
 } from "./registro";
 
 import {
@@ -11,7 +11,7 @@ import {
   GET_MEET_LINKS,
   GET_DEFAULT_SETTINGS,
   UPDATE_LINKS,
-  SAVE_RESULTS_DB,
+  SAVE_RESULTS_DB
 } from "./placement";
 
 export const GET_RESERVATIONS = gql`
@@ -24,12 +24,12 @@ export const GET_RESERVATIONS = gql`
         workshop
       }
       reservations {
-        code
-        name
-        first_last_name
-        second_last_name
-        level
-        group
+        codigo
+        nombre
+        apellido_paterno
+        apellido_materno
+        nivel
+        grupo
         timestamp
         option {
           day
@@ -89,5 +89,5 @@ export {
   GET_MEET_LINKS,
   GET_DEFAULT_SETTINGS,
   UPDATE_LINKS,
-  SAVE_RESULTS_DB,
+  SAVE_RESULTS_DB
 };

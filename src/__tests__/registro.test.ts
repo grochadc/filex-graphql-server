@@ -3,10 +3,11 @@ import Database from "../testUtils/databaseCreator";
 import { gql } from "apollo-server";
 const { RegistroAPI } = require("../datasources/registroAPI");
 import { SheetsAPI } from "../datasources/SheetsAPI";
+import { ApplicantModel } from "../modules/registro/models";
 
 describe("registro", () => {
   const registroAPI = new RegistroAPI();
-  const applicant = {
+  const applicant: ApplicantModel = {
     codigo: "1234567890",
     nombre: "Benito Antonio",
     apellido_paterno: "Martinez",
@@ -18,7 +19,8 @@ describe("registro", () => {
     email: "bad@bunny.pr",
     externo: true,
     nivel: "4",
-    curso: "en"
+    curso: "en",
+    desertor: false
   };
   const schedulesLevel4 = {
     "E4-1": {
@@ -97,6 +99,7 @@ describe("registro", () => {
           nivel
           curso
           externo
+          desertor
           registering
           registeredSchedule {
             teacher
