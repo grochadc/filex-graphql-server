@@ -1,0 +1,13 @@
+overwrite: true
+schema: "http://localhost:5000"
+documents: null
+generates:
+  src/generated/graphql.ts:
+    config:
+      contextType: ../server#ServerContext
+      mappers:
+        Applicant: ../modules/registro/models#ApplicantModel
+        Schedule: ../modules/registro/models#ScheduleModel
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"

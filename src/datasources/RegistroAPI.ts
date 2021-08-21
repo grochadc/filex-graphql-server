@@ -1,5 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { ApolloError } from "apollo-server";
+import { ApplicantModel, ScheduleModel } from "../modules/registro/models";
+import { StudentInput } from "../generated/graphql";
 import * as R from "ramda";
 
 const ALREADY_REGISTERED = "ALREADY_REGISTERED";
@@ -10,7 +12,7 @@ class RegistroAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/registro";
   }
 
-  async getLevelsRegistering(course: Course): Promise<LevelsRegistering> {
+  async getLevelsRegistering(course: string): Promise<string[]> {
     const localUrl = `${
       this.context.enviroment ? this.context.enviroment : "prod"
     }/registeringLevels`;
@@ -19,11 +21,11 @@ class RegistroAPI extends RESTDataSource {
     return levels;
   }
 
-  async getApplicant(codigo: string): Promise<Applicant> {
+  async getApplicant(codigo: string): Promise<ApplicantModel> {
     const localUrl = this.context.enviroment;
     const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
     //alreadyRegistered: {"12345678900": "E3-5"}
-    const applicant: Applicant = await this.get(
+    const applicant: ApplicantModel = await this.get(
       `${localUrl}/applicants/${codigo}.json`
     );
     if (applicant === null)
@@ -34,13 +36,9 @@ class RegistroAPI extends RESTDataSource {
     return applicant;
   }
 
-  async getSchedule(
-    level: string,
-    group: string,
-    course: Course
-  ): Promise<Schedule> {
+  async getSchedule(level: string, group: string, course: string) {
     const localUrl = this.context.enviroment;
-    const schedule = await this.get(
+    const schedule: ScheduleModel = await this.get(
       `${localUrl}/schedules/${course}/level${level}/${group}.json`
     );
     if (schedule === null)
@@ -50,7 +48,7 @@ class RegistroAPI extends RESTDataSource {
     return schedule;
   }
 
-  async registerStudent(student: Student, course: Course) {
+  async registerStudent(student: StudentInput, course: string) {
     const localUrl = this.context.enviroment;
     //runtime checks
     if (student.grupo === undefined) throw new Error("Group was not provided.");
@@ -92,12 +90,12 @@ class RegistroAPI extends RESTDataSource {
       student.grupo,
       course
     );
-    const composedStudent: RegisterResponse = { ...student, schedule };
+    const composedStudent = { ...student, schedule };
 
     return composedStudent;
   }
 
-  async setLevelsRegistering(levels: Level[], course: Course) {
+  async setLevelsRegistering(levels: string[], course: string) {
     const localUrl = this.context.enviroment;
     this.put(`${localUrl}/registeringLevels/${course}.json`, levels);
     return levels;
@@ -106,7 +104,7 @@ class RegistroAPI extends RESTDataSource {
   async getUnAvailableGroups(
     level: string,
     maxStudents: number,
-    course: Course
+    course: string
   ) {
     /*
     /availableGroups/4.json
@@ -134,17 +132,17 @@ class RegistroAPI extends RESTDataSource {
     );
   }
 
-  async getSchedules(level: string, course: Course) {
+  async getSchedules(level: string, course: string) {
     const schedulesObj = await this.get(
       `${this.context.enviroment}/schedules/${course}/level${level}.json`
     );
     if (schedulesObj === null)
       throw new Error(`There are no schedules in /${course}/level${level}`);
-    const data: Schedule[] = Object.values(schedulesObj);
+    const data: ScheduleModel[] = Object.values(schedulesObj);
     return data;
   }
 
-  getRegistered(level: string, course: Course) {
+  getRegistered(level: string, course: string) {
     this.get(`students/${course}/level${level}.json`);
   }
 

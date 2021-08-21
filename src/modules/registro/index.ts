@@ -1,16 +1,10 @@
 import { gql } from "apollo-server";
-import { ServerContext } from "../../server";
-import {
-  Applicant,
-  MutationRegisterStudentArgs,
-  MutationSaveRegisteringLevelsArgs,
-  ScheduleSerializedArgs,
-  Schedule
-} from "./codegen.types";
+import { Resolvers } from "../../generated/graphql";
+import { ScheduleModel } from "./models";
 
 export const typeDefs = gql`
   extend type Query {
-    registeringLevels(course: String!, course: String!): [Int]!
+    registeringLevels(course: String!, course: String!): [String]!
     applicant(codigo: ID!): Applicant!
     schedule(id: String!): Schedule!
   }
@@ -33,6 +27,7 @@ export const typeDefs = gql`
     nivel: String!
     curso: String!
     externo: Boolean!
+    desertor: Boolean!
     registering: Boolean!
     schedules: [Schedule]!
     registeredSchedule: Schedule
@@ -86,17 +81,14 @@ export const typeDefs = gql`
   }
 `;
 
-export const resolvers = {
+export const resolvers: Resolvers = {
   Query: {
     //TODO: type returns string[] but resolver should return Int[] (check in db what is the type for level)
-    registeringLevels: (
-      root,
-      args,
-      { dataSources, enviroment }: ServerContext
-    ) => dataSources.registroAPI.getLevelsRegistering(args.course),
-    applicant: (root, args, { dataSources }: ServerContext) =>
+    registeringLevels: (root, args, { dataSources }) =>
+      dataSources.registroAPI.getLevelsRegistering(args.course),
+    applicant: (root, args, { dataSources }) =>
       dataSources.registroAPI.getApplicant(args.codigo),
-    schedule: (root, args, { dataSources }: ServerContext) => {
+    schedule: (root, args, { dataSources }) => {
       //args.id is a group string eg. E1-1
       const group = args.id;
       const course = group.substr(0, 1) === "E" ? "en" : "fr";
@@ -105,11 +97,7 @@ export const resolvers = {
     }
   },
   Mutation: {
-    registerStudent: async (
-      root,
-      args: MutationRegisterStudentArgs,
-      { dataSources }: ServerContext
-    ) => {
+    registerStudent: async (root, args, { dataSources }) => {
       const student = args.input;
       const registeredStudent = await dataSources.registroAPI.registerStudent(
         student,
@@ -117,11 +105,7 @@ export const resolvers = {
       );
       return registeredStudent;
     },
-    saveRegisteringLevels: (
-      root,
-      args: MutationSaveRegisteringLevelsArgs,
-      { dataSources }: ServerContext
-    ) => {
+    saveRegisteringLevels: (root, args, { dataSources }) => {
       return dataSources.registroAPI.setLevelsRegistering(
         args.levels,
         args.course
@@ -129,21 +113,13 @@ export const resolvers = {
     }
   },
   Applicant: {
-    registering: async (
-      root: Applicant,
-      args,
-      { dataSources }: ServerContext
-    ) => {
+    registering: async (root, args, { dataSources }) => {
       const registeringLevels = await dataSources.registroAPI.getLevelsRegistering(
         root.curso
       );
       return registeringLevels.includes(root.nivel);
     },
-    schedules: async (
-      root: Applicant,
-      args,
-      { dataSources }: ServerContext
-    ) => {
+    schedules: async (root, args, { dataSources }) => {
       const course = root.curso;
       const currentLevel = root.nivel;
       const maxStudents = 35;
@@ -161,7 +137,7 @@ export const resolvers = {
         throw new Error("No schedule data for that level exists");
 
       function availableSchedules(
-        schedules: Schedule[],
+        schedules: ScheduleModel[],
         unavailable: string[]
       ) {
         return schedules.filter(
@@ -171,11 +147,7 @@ export const resolvers = {
 
       return availableSchedules(allSchedules, unavailable);
     },
-    registeredSchedule: async (
-      root: Applicant,
-      args,
-      { dataSources }: ServerContext
-    ): Promise<Schedule | null> => {
+    registeredSchedule: async (root, args, { dataSources }) => {
       const registeredGroup = await dataSources.registroAPI.getAlreadyRegistered(
         root.codigo
       );
@@ -190,8 +162,8 @@ export const resolvers = {
     }
   },
   Schedule: {
-    serialized: (root: Schedule, args: ScheduleSerializedArgs) => {
-      const serialize = (options: SerializeOptions, source: any) => {
+    serialized: (root, args) => {
+      const serialize = (options: typeof args.options, source: typeof root) => {
         return `${options.group ? source.group : ""} ${
           options.teacher ? source.teacher : ""
         } ${options.time ? source.time : ""}`;
