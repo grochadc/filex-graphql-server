@@ -1,7 +1,6 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { MeetLink } from "../types/index";
 import { getIndexToModify, addIDsToLinks } from "../utils";
-import { Applicant } from "../modules/registro/types.d";
 
 class PlacementAPI extends RESTDataSource {
   constructor() {
@@ -9,7 +8,7 @@ class PlacementAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/placement";
   }
 
-  async addApplicant(applicant: Applicant) {
+  async addApplicant(applicant) {
     return this.post(`applications.json`, applicant);
   }
 
