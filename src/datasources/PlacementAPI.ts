@@ -1,6 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { MeetLink } from "../types/index";
 import { getIndexToModify, addIDsToLinks } from "../utils";
+import { Applicant } from "../modules/registro/types.d";
 
 class PlacementAPI extends RESTDataSource {
   constructor() {
@@ -50,7 +51,7 @@ class PlacementAPI extends RESTDataSource {
     const links: MeetLink[] = await this.get(
       defaultMeetLinksLocation + ".json"
     );
-    const result = links.filter((item) => item.id !== link.id);
+    const result = links.filter(item => item.id !== link.id);
     return this.put(`${defaultMeetLinksLocation}.json`, JSON.stringify(result));
   }
 
