@@ -7,7 +7,7 @@ Object {
     "id": "w924pj",
     "nombre": "Pedro",
     "timestamp": "2000-11-22T00:00:00.000Z",
-    "url": "https://meet.google.com/wbu-jzfw-hbs",
+    "url": "https://meet.google.com/lookup/gonzaloconversation",
     "zoom_id": null,
   },
 }
@@ -124,7 +124,7 @@ Object {
           "day": "jueves",
           "id": "gonzalojueves",
           "teacher": "Gonzalo",
-          "time": "14:00 - 15:00",
+          "time": "15:00 - 16:00",
           "url": "http://meet.google.com/lookup/gonzaloconversation",
           "workshop": "Conversation",
           "zoom_id": null,
