@@ -1,11 +1,18 @@
 const readline = require("readline");
 
+function assert(obj) {
+  console.log(Object.keys(obj));
+  console.log(Object.entries(obj).map(entry => typeof entry))
+}
+
 function parseCsv(stream) {
   const promise = new Promise((resolve, reject) => {
-    const lineReader = readline.createInterface({ input: stream });
+    const lineReader = readline.createInterface({
+      input: stream
+    });
 
     let headers = [];
-    const students = [];
+    const applicants = {};
     let lineIndex = 0;
 
     lineReader.on("line", (line) => {
@@ -15,32 +22,22 @@ function parseCsv(stream) {
       } else {
         const studentObj = {};
         headers.forEach((header, index) => {
-          if (studentArr[index] === "TRUE") {
+          if (/true/i.test(studentArr[index]) /*studentArr[index] === "TRUE"*/ ) {
             studentObj[header] = true;
-          } else if (studentArr[index] === "FALSE") {
+          } else if (/false/i.test(studentArr[index]) /*studentArr[index] === "FALSE"*/ ) {
             studentObj[header] = false;
-          } else if (header === "level") {
-            studentObj[header] = Number(studentArr[index]);
           } else {
             studentObj[header] = studentArr[index];
           }
-
-          if (header === "code") {
-            if (studentArr[index] === "EXTERNO") {
-              studentObj.code = studentArr[8];
-              console.log(studentObj);
-            }
-          }
         });
-        studentObj.id = studentObj[Object.keys(studentObj)[0]];
-        students.push(studentObj);
+        applicants[studentObj.codigo] = studentObj;
       }
 
       lineIndex++;
     });
 
     lineReader.on("close", () => {
-      resolve(students);
+      resolve(applicants);
     });
   });
   return promise;
