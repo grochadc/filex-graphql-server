@@ -264,7 +264,7 @@ describe("registro", () => {
 
   it("saves levels registering", async () => {
     const SAVE_LEVELS_REGISTERING = gql`
-      mutation saveLevels($levels: [String]!, $course: String!) {
+      mutation saveLevels($levels: [String!]!, $course: String!) {
         saveRegisteringLevels(levels: $levels, course: $course)
       }
     `;
@@ -286,6 +286,7 @@ describe("registro", () => {
       query: SAVE_LEVELS_REGISTERING,
       variables
     });
+    expect(res.errors).toBe(undefined);
     expect(registroAPI.put).not.toHaveBeenCalledWith(
       expect.stringContaining("undefined")
     );
@@ -293,7 +294,6 @@ describe("registro", () => {
       registroAPI.put
     ).toHaveBeenCalledWith("prod/registeringLevels/en.json", ["1", "2"]);
     expect(res.data).toMatchSnapshot();
-    expect(res.errors).toBe(undefined);
   });
 
   it("registers a student", async () => {

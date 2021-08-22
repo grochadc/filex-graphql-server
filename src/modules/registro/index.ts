@@ -4,14 +4,14 @@ import { ScheduleModel } from "./models";
 
 export const typeDefs = gql`
   extend type Query {
-    registeringLevels(course: String!, course: String!): [String]!
+    registeringLevels(course: String!, course: String!): [String!]!
     applicant(codigo: ID!): Applicant!
     schedule(id: String!): Schedule!
   }
 
   extend type Mutation {
-    registerStudent(input: StudentInput): RegisterResponse!
-    saveRegisteringLevels(levels: [String]!, course: String!): [String]!
+    registerStudent(input: StudentInput!): RegisterResponse!
+    saveRegisteringLevels(levels: [String!]!, course: String!): [String!]!
   }
 
   type Applicant {
@@ -29,13 +29,14 @@ export const typeDefs = gql`
     externo: Boolean!
     desertor: Boolean!
     registering: Boolean!
-    schedules: [Schedule]!
+    schedules: [Schedule!]!
     registeredSchedule: Schedule
   }
 
   type Schedule {
     group: String!
     teacher: String!
+    entry: String!
     chat: String
     classroom: String
     sesiones: String
