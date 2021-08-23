@@ -511,7 +511,7 @@ describe("registro", () => {
       expect.stringContaining("undefined")
     );
     expect(registroAPI.put).toHaveBeenCalledWith(
-      `prod/applicants/${variables.codigo}`,
+      `prod/applicants/${variables.codigo}.json`,
       variables.applicant
     );
     expect(res.data).toMatchSnapshot();

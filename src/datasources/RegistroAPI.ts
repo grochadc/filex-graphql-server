@@ -41,7 +41,7 @@ class RegistroAPI extends RESTDataSource {
     applicant: ApplicantInput
   ): Promise<ApplicantModel> {
     await this.put(
-      `${this.context.enviroment}/applicants/${codigo}`,
+      `${this.context.enviroment}/applicants/${codigo}.json`,
       applicant
     );
     return applicant as ApplicantModel;
