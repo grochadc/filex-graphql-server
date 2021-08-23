@@ -29,6 +29,13 @@ describe("registro", () => {
       sesiones: "HTTP://URL_AQUI",
       chat: "HTTP://URL_AQUI",
       classroom: "HTTP://URL_AQUI"
+    },
+    "E4-2": {
+      teacher: "OTRO GONZALO",
+      group: "E4-2",
+      sesiones: "HTTP://URL_AQUI",
+      chat: "HTTP://URL_AQUI",
+      classroom: "HTTP://URL_AQUI"
     }
   };
 
@@ -206,6 +213,57 @@ describe("registro", () => {
     expect(res.data.applicant.registering).toBe(false);
     expect(res.data).toMatchSnapshot();
     expect(res.errors).toBe(undefined);
+  });
+
+  it("returns only schedules not full", async () => {
+    const db = {
+      prod: {
+        applicants: {
+          "1234567890": applicant
+        },
+        registeringLevels: { en: ["4"] },
+        schedules: {
+          en: {
+            level4: schedulesLevel4
+          }
+        },
+        availableGroups: { en: { level4: { "E4-1": availableGroupsEnLevel4 } } }
+      }
+    };
+    const GET_APPLICANT = gql`
+      query info($codigo: ID!) {
+        applicant(codigo: $codigo) {
+          nivel
+          curso
+          schedules {
+            teacher
+            group
+            serialized(options: { teacher: true, group: true })
+          }
+        }
+      }
+    `;
+    const variables = {
+      codigo: "1234567890"
+    };
+    const database = new Database(db);
+    registroAPI.get = jest.fn(url => database.get(url));
+    const dataSources = () => {
+      return { registroAPI };
+    };
+    const context = () => {
+      return { enviroment: "prod" };
+    };
+    const { query } = testServer(dataSources, context);
+    const res = await query({
+      query: GET_APPLICANT,
+      variables
+    });
+    expect(res.errors).toBe(undefined);
+    expect(res.data).toMatchSnapshot();
+    expect(registroAPI.get).not.toHaveBeenCalledWith(
+      expect.stringMatching("undefined")
+    );
   });
 
   it("gets a schedule", async () => {
@@ -404,4 +462,96 @@ describe("registro", () => {
     expect(res.errors).toBeUndefined();
     expect(res.data).toMatchSnapshot();
   });
+
+  it("modifies an applicants data", async () => {
+    const MODIFY_APPLICANT = gql`
+      mutation modifyApplicant($codigo: String!, $applicant: ApplicantInput!) {
+        saveApplicant(codigo: $codigo, input: $applicant) {
+          codigo
+          nombre
+          nivel
+          curso
+        }
+      }
+    `;
+
+    const variables = {
+      codigo: "1234567890",
+      applicant: {
+        codigo: "1234567890",
+        nombre: "Benito Antonio",
+        apellido_paterno: "Martinez",
+        apellido_materno: "Ocasio",
+        genero: "M",
+        carrera: "Abogado",
+        ciclo: "2021A",
+        telefono: "1234567890",
+        email: "bad@bunny.pr",
+        nivel: "4",
+        curso: "fr",
+        externo: false,
+        desertor: false
+      }
+    };
+    registroAPI.put = jest.fn();
+
+    const dataSources = () => {
+      return { registroAPI };
+    };
+    const context = () => {
+      return { enviroment: "prod" };
+    };
+    const { query } = testServer(dataSources, context);
+    const res = await query({
+      query: MODIFY_APPLICANT,
+      variables
+    });
+    expect(res.errors).toBe(undefined);
+    expect(registroAPI.put).not.toHaveBeenCalledWith(
+      expect.stringContaining("undefined")
+    );
+    expect(registroAPI.put).toHaveBeenCalledWith(
+      `prod/applicants/${variables.codigo}`,
+      variables.applicant
+    );
+    expect(res.data).toMatchSnapshot();
+  });
 });
+
+const availableGroupsEnLevel4 = {
+  n1: 1,
+  n2: 1,
+  n3: 1,
+  n4: 1,
+  n5: 1,
+  n6: 1,
+  n7: 1,
+  n8: 1,
+  n9: 1,
+  n10: 1,
+  n11: 1,
+  n12: 1,
+  n13: 1,
+  n14: 1,
+  n15: 1,
+  n16: 1,
+  n17: 1,
+  n18: 1,
+  n19: 1,
+  n20: 1,
+  n21: 1,
+  n22: 1,
+  n23: 1,
+  n24: 1,
+  n25: 1,
+  n26: 1,
+  n27: 1,
+  n28: 1,
+  n29: 1,
+  n30: 1,
+  n31: 1,
+  n32: 1,
+  n33: 1,
+  n34: 1,
+  n35: 1
+};

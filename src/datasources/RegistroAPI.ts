@@ -1,7 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { ApolloError } from "apollo-server";
 import { ApplicantModel, ScheduleModel } from "../modules/registro/models";
-import { StudentInput } from "../generated/graphql";
+import { StudentInput, ApplicantInput } from "../generated/graphql";
 import * as R from "ramda";
 
 const ALREADY_REGISTERED = "ALREADY_REGISTERED";
@@ -34,6 +34,17 @@ class RegistroAPI extends RESTDataSource {
         APPLICANT_NOT_FOUND
       );
     return applicant;
+  }
+
+  async saveApplicant(
+    codigo: string,
+    applicant: ApplicantInput
+  ): Promise<ApplicantModel> {
+    await this.put(
+      `${this.context.enviroment}/applicants/${codigo}`,
+      applicant
+    );
+    return applicant as ApplicantModel;
   }
 
   async getSchedule(level: string, group: string, course: string) {

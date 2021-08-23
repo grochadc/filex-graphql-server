@@ -12,6 +12,7 @@ export const typeDefs = gql`
   extend type Mutation {
     registerStudent(input: StudentInput!): RegisterResponse!
     saveRegisteringLevels(levels: [String!]!, course: String!): [String!]!
+    saveApplicant(codigo: String!, input: ApplicantInput!): ApplicantResponse!
   }
 
   type Applicant {
@@ -31,6 +32,38 @@ export const typeDefs = gql`
     registering: Boolean!
     schedules: [Schedule!]!
     registeredSchedule: Schedule
+  }
+
+  input ApplicantInput {
+    codigo: ID!
+    nombre: String!
+    apellido_materno: String!
+    apellido_paterno: String!
+    genero: String!
+    carrera: String!
+    ciclo: String!
+    telefono: String!
+    email: String!
+    nivel: String!
+    curso: String!
+    externo: Boolean!
+    desertor: Boolean!
+  }
+
+  type ApplicantResponse {
+    codigo: ID!
+    nombre: String!
+    apellido_materno: String!
+    apellido_paterno: String!
+    genero: String!
+    carrera: String!
+    ciclo: String!
+    telefono: String!
+    email: String!
+    nivel: String!
+    curso: String!
+    externo: Boolean!
+    desertor: Boolean!
   }
 
   type Schedule {
@@ -111,7 +144,9 @@ export const resolvers: Resolvers = {
         args.levels,
         args.course
       );
-    }
+    },
+    saveApplicant: (root, args, { dataSources }) =>
+      dataSources.registroAPI.saveApplicant(args.codigo, args.input)
   },
   Applicant: {
     registering: async (root, args, { dataSources }) => {

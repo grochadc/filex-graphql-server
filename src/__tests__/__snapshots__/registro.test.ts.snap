@@ -33,6 +33,11 @@ Object {
         "serialized": "E4-1 GONZALO ROCHA ",
         "teacher": "GONZALO ROCHA",
       },
+      Object {
+        "group": "E4-2",
+        "serialized": "E4-2 OTRO GONZALO ",
+        "teacher": "OTRO GONZALO",
+      },
     ],
   },
 }
@@ -61,6 +66,11 @@ Object {
         "serialized": "E4-1 GONZALO ROCHA ",
         "teacher": "GONZALO ROCHA",
       },
+      Object {
+        "group": "E4-2",
+        "serialized": "E4-2 OTRO GONZALO ",
+        "teacher": "OTRO GONZALO",
+      },
     ],
     "telefono": "3411234567",
   },
@@ -76,6 +86,17 @@ Object {
 }
 `;
 
+exports[`registro modifies an applicants data 1`] = `
+Object {
+  "saveApplicant": Object {
+    "codigo": "1234567890",
+    "curso": "fr",
+    "nivel": "4",
+    "nombre": "Benito Antonio",
+  },
+}
+`;
+
 exports[`registro registers a student 1`] = `
 Object {
   "registerStudent": Object {
@@ -87,6 +108,22 @@ Object {
       "sesiones": "HTTP://URL_AQUI",
       "teacher": "GONZALO ROCHA",
     },
+  },
+}
+`;
+
+exports[`registro returns only schedules not full 1`] = `
+Object {
+  "applicant": Object {
+    "curso": "en",
+    "nivel": "4",
+    "schedules": Array [
+      Object {
+        "group": "E4-2",
+        "serialized": "E4-2 OTRO GONZALO ",
+        "teacher": "OTRO GONZALO",
+      },
+    ],
   },
 }
 `;
