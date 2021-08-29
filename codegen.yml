@@ -8,6 +8,9 @@ generates:
       mappers:
         Applicant: ../modules/registro/models#ApplicantModel
         Schedule: ../modules/registro/models#ScheduleModel
+        Student: ../modules/workshops/models#StudentModel
+        Teacher: ../modules/workshops/models#TeacherModel
+        StudentReservation: ../modules/workshops/models#StudentReservationModel
     plugins:
       - "typescript"
       - "typescript-resolvers"
