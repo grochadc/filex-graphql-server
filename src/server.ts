@@ -8,7 +8,7 @@ import {
   StudentsAPI,
   PlacementAPI,
   PlacementSheetsAPI,
-  SheetsAPI,
+  SheetsAPI
 } from "./datasources";
 import Carousel from "./utils/Carousel";
 
@@ -42,7 +42,7 @@ const server = new ApolloServer({
     require("./modules/firebase_api"),
     require("./modules/registro"),
     require("./modules/workshops"),
-    require("./modules/grades"),
+    require("./modules/grades")
   ],
   dataSources: () => {
     return {
@@ -60,7 +60,7 @@ const server = new ApolloServer({
       ),
       workshopsSheetsAPI: new SheetsAPI(
         "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
-      ),
+      )
     };
   },
   cors: true,
@@ -69,7 +69,7 @@ const server = new ApolloServer({
   context: ({ req }) => {
     const clientEnviroment = req.headers["client-enviroment"];
     return { enviroment: clientEnviroment, carousel };
-  },
+  }
 });
 
 server.listen(process.env.PORT || 5000).then(({ url }) => {

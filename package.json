@@ -17,6 +17,7 @@
     "test": "jest --watchAll",
     "build": "npx typescript@latest",
     "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
+    "codegenserver": "nodemon --ext ts,tsx --exec 'ts-node -T --files src/server.ts'",
     "publish": "git push heroku master",
     "postpublish": "heroku logs --tail",
     "codegen": "graphql-codegen --config codegen.yml"

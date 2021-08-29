@@ -1,6 +1,6 @@
 import { RESTDataSource } from "apollo-datasource-rest";
-
-export type GetStudentFn = (codigo: string, env?: 'dev'|'prod') => Promise<any>;
+import { StudentModel } from "../modules/workshops/models";
+import { ApolloError } from "apollo-server-errors";
 
 class StudentsAPI extends RESTDataSource {
   constructor() {
@@ -8,13 +8,14 @@ class StudentsAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/students";
   }
 
-  async _get(url: string, env:string|undefined) {
-    const finalUrl = env ? '/'+env+url : '/prod'+url;
-    return this.get(finalUrl);
-  }
-
-  async getStudent(...[codigo, env]: Parameters<GetStudentFn>) {
-    return this.get(`/${env}/${codigo}.json`);
+  async getStudent(codigo: string): Promise<StudentModel> {
+    const student = await this.get(`${this.context.enviroment}/${codigo}.json`);
+    if (student === null)
+      throw new ApolloError(
+        "No se encontró ese codigo de alumno en la base de datos.",
+        "STUDENT_NOT_FOUND"
+      );
+    return student;
   }
 }
 

@@ -22,8 +22,3 @@ test("works!", () => {
     another: { level: "4" }
   });
 });
-
-function recursive(arr: any[]) {
-  if (arr.length > 0) {
-  }
-}

@@ -1,7 +1,18 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import * as R from "ramda";
 import * as utils from "../utils";
-import database, {Option} from "./db";
+import database, { Option } from "./db";
+import { Workshop } from "../generated/graphql";
+import {
+  WorkshopModel,
+  TeacherModel,
+  OptionModel,
+  StudentReservationModel,
+  TeacherReservationModel,
+  DatabaseModel
+} from "../modules/workshops/models";
+
+type Maybe<T> = T | null;
 
 interface AttendingStudent {
   codigo: string;
@@ -21,81 +32,98 @@ class WorkshopsAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/workshops";
   }
 
-  getWorkshops() {
-    return database.workshops;
+  async getWorkshops(): Promise<WorkshopModel[]> {
+    const workshops = (await this.get(
+      `${this.context.enviroment}/workshops.json`
+    )) as DatabaseModel["workshops"];
+    return Object.values(workshops);
   }
 
-  mapOptionIds(option_ids: string[]) {
-    return utils.mapOptionIds(database.options, option_ids);
+  async getOptions(): Promise<DatabaseModel["options"]> {
+    return (await this.get(
+      `${this.context.enviroment}/options.json`
+    )) as DatabaseModel["options"];
   }
 
-  getOptionById(id: string) {
-    return utils.getById(database, "options", id, () => null);
+  getAvailableOptions(): Promise<Maybe<DatabaseModel["availableOptions"]>> {
+    return this.get(
+      `${this.context.enviroment}/availableOptions.json`
+    ) as Promise<Maybe<DatabaseModel["availableOptions"]>>;
   }
 
-  async getOptionsByTeacherId(teacher_id) {
-    let linksObj = await this.getWorkshopLinks(teacher_id);
-    const options = database.options.filter(
-      (option) => option.teacher_id === teacher_id
+  getTeacher(id: string): Promise<TeacherModel> {
+    return this.get(`${this.context.enviroment}/teachers/${id}.json`);
+  }
+
+  getStudentReservation(codigo: string): Promise<StudentReservationModel> {
+    return this.get(
+      `/${this.context.enviroment}/studentsReservations/${codigo}.json`
     );
-    if (linksObj === null) {
-      //We couldn't find any link on firebase
-      const option_ids = options.map((option) => option.id);
+  }
 
-      //Create an object with all the option ids as keys and empty strings as values
-      linksObj = option_ids.reduce((acc, curr) => {
-        acc[curr] = "";
-        return acc;
-      }, {});
-    }
-    return options.map((option) => {
-      return {
-        ...option,
-        workshop: utils.getById(
-          database,
-          "workshops",
-          option.workshop_id,
-          () => null
-        ).id,
-        url: linksObj[option.id],
-      };
+  async makeReservation(codigo: string, teacher_id: string, option_id: string) {
+    const option = await this.getOptionById(option_id);
+    const student = await this.context.dataSources.studentsAPI.getStudent(
+      codigo
+    );
+    const {
+      nombre,
+      apellido_paterno,
+      apellido_materno,
+      nivel,
+      grupo
+    } = student;
+    const teacherReservation: TeacherReservationModel = {
+      codigo: student.codigo,
+      nombre,
+      apellido_paterno,
+      apellido_materno,
+      nivel,
+      grupo,
+      option_id: option.id,
+      option_name: "why? option_name from makeReservation dataSource",
+      workshop_id: option.workshop_id,
+      workshop_name: option.workshop_name
+    };
+    this.post(
+      `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`,
+      teacherReservation
+    );
+    this.put(`${this.context.enviroment}/studentsReservations/${codigo}.json`, {
+      option_id: option_id
     });
-  }
 
-  makeReservation(teacher_id: string, option_id: string, reservation: any, env?: "dev" | "prod") {
-    const {option}: {option: Option} = reservation;
-    this.post(`reservations/${teacher_id}/${option_id}.json`, reservation);
-    this.post(`available/${option_id}/registered.json`, "1");
-    this.put(`/${env}/studentReservations/${reservation.codigo}.json`,{...option, teacher: option.teacher_id, workshopName: option.workshop_id });
-  }
-
-  getTeacher(id: string) {
-    return utils.getById(database, "teachers", id, () => null);
-  }
-
-  async getReservations(teacher_id: String) {
-    const data = await this.get(`reservations/${teacher_id}.json`);
-    const parse = R.compose(R.flatten, R.map(R.values), R.values);
-    return parse(data);
-  }
-
-  getOption(id: string) {
-    return utils.getById(database, "options", id, () => null);
-  }
-
-  async getRegistering(option_id: string): Promise<boolean> {
-    const registeredObj: any = await this.get(
-      `/available/${option_id}/registered.json`
+    //enqueue
+    const availableNumber = await this.get(
+      `${this.context.enviroment}/availableOptions/${option_id}.json`
     );
-    if (registeredObj === null) return true;
+    this.put(
+      `${this.context.enviroment}/availableOptions/${option_id}.json`,
+      availableNumber + 1
+    );
 
-    const registered = Object.keys(registeredObj).length;
-    return Boolean(registered < 15);
+    return { ...option, option_id: option.id };
   }
 
-  saveAttendance(attendance: AttendingStudent[]) {
+  deleteReservations(teacher_id: string, option_id: string) {
+    return this.delete(
+      `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`
+    );
+  }
+
+  async resetReservations() {
+    await this.delete(`${this.context.enviroment}/studentsReservations.json`);
+    await this.delete(`${this.context.enviroment}/availableOptions.json`);
+    return true;
+  }
+
+  getOptionById(id: string): Promise<OptionModel> {
+    return this.get(`${this.context.enviroment}/options/${id}.json`);
+  }
+
+  async saveAttendance(attendance: AttendingStudent[]) {
     const date = new Date();
-    const values = attendance.map((student) => {
+    const values = attendance.map(student => {
       return [
         `=date(${date.getFullYear()},${date.getMonth() + 1},${date.getDate()})`,
         student.codigo,
@@ -106,64 +134,23 @@ class WorkshopsAPI extends RESTDataSource {
         student.grupo,
         student.workshop,
         student.teacher,
-        student.attended,
+        student.attended
       ];
     });
     const range = "Attendance!A1";
 
-    return this.context.dataSources.workshopsSheetsAPI.append(values, range);
-  }
-
-  deleteReservations(teacher: string, option_id: string) {
-    this.delete(`/reservations/${teacher}/${option_id}.json`);
-  }
-
-  async getAlreadyRegistered(
-    code: string,
-    teacher: string,
-    option_id: string
-  ): Promise<boolean> {
-    const reservationsObj = await this.get(
-      `/reservations/${teacher}/${option_id}.json`
-    );
-    if (reservationsObj === null) return false;
-    const reservations = Object.values(reservationsObj);
-    const filteredReservations = reservations.filter(
-      (reservation: any) => reservation.codigo === code
-    );
-    const answer = filteredReservations.length > 0;
-    return answer;
-  }
-
-  async resetReservations() {
-    this.delete("/reservations.json");
-    this.delete("/available.json");
+    try {
+      await this.context.dataSources.workshopsSheetsAPI.append(values, range);
+    } catch (e) {
+      console.error(e);
+    }
     return true;
   }
 
-  getWorkshopsByCategory(category: string) {
-    return utils.getById(database, "workshops", category, null);
-  }
-
-  setWorkshopLink(option_id: string, teacher_id: string, link: string) {
-    this.put(
-      `/system/links/${teacher_id}/${option_id}.json`,
-      JSON.stringify(link)
-    );
+  setWorkshopLink(option_id: string, url: string) {
+    this.put(`${this.context.enviroment}/options/${option_id}/url.json`, url);
     return true;
   }
-
-  getWorkshopLinks(teacher_id: string) {
-    return this.get(`/system/links/${teacher_id}.json`);
-  }
-
-  getSingleWorkshopLink(teacher_id: string, option_id: string) {
-    return this.get(`/system/links/${teacher_id}/${option_id}.json`);
-  }
-  getStudentReservation(codigo: string, env: "dev" | "prod"){
-    return this.get(`/${env}/studentReservations/${codigo}.json`);
-  }
-
 }
 
 export { WorkshopsAPI };

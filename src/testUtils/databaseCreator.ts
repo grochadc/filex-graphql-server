@@ -1,7 +1,21 @@
 class Database {
   db: any;
-  constructor(db) {
+  verbose: boolean;
+  constructor(db, verbose?: boolean) {
     this.db = db;
+    this.verbose = verbose ? verbose : false;
+  }
+  post(url, data) {
+    if (this.verbose) console.log("post request", url, data);
+    return Promise.resolve(null);
+  }
+  put(url, data) {
+    if (this.verbose) console.log("put request", url, data);
+    return Promise.resolve(null);
+  }
+  delete(url) {
+    if (this.verbose) console.log("delete request", url);
+    return Promise.resolve();
   }
   get(endpoint: string) {
     if (endpoint.endsWith("/"))
@@ -24,7 +38,7 @@ class Database {
           currentEndpoint.indexOf(".")
         );
         //console.log("found.json");
-        return obj[trimmed];
+        return obj[trimmed] === undefined ? null : obj[trimmed];
       }
       if (obj.hasOwnProperty(currentEndpoint)) {
         //console.log("next");
@@ -35,7 +49,7 @@ class Database {
       }
     } else {
       //console.log("obj not hasOwnProperty");
-      return obj;
+      return obj === undefined ? null : obj;
     }
   }
 }
