@@ -29,13 +29,17 @@ interface AttendingStudent {
 class WorkshopsAPI extends RESTDataSource {
   constructor() {
     super();
-    this.baseURL = "https://filex-5726c.firebaseio.com/workshops";
+    this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
   }
 
   async getWorkshops(): Promise<WorkshopModel[]> {
-    const workshops = (await this.get(
+    const workshops = await this.get(
       `${this.context.enviroment}/workshops.json`
-    )) as DatabaseModel["workshops"];
+    );
+    if (workshops === null)
+      throw new Error(
+        `${this.context.enviroment}/workshops.json returned null`
+      );
     return Object.values(workshops);
   }
 
@@ -61,8 +65,15 @@ class WorkshopsAPI extends RESTDataSource {
     );
   }
 
-  async makeReservation(codigo: string, teacher_id: string, option_id: string) {
+  async makeReservation(
+    codigo: string,
+    teacher_id: string,
+    option_id: string,
+    tutorial_reason?: string
+  ) {
     const option = await this.getOptionById(option_id);
+    if (option === null)
+      throw new Error("option with id " + option_id + " returned null");
     const student = await this.context.dataSources.studentsAPI.getStudent(
       codigo
     );
@@ -83,7 +94,8 @@ class WorkshopsAPI extends RESTDataSource {
       option_id: option.id,
       option_name: "why? option_name from makeReservation dataSource",
       workshop_id: option.workshop_id,
-      workshop_name: option.workshop_name
+      workshop_name: option.workshop_name,
+      tutorial_reason: tutorial_reason ? tutorial_reason : null
     };
     this.post(
       `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`,

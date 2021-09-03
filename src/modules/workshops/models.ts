@@ -8,11 +8,8 @@ export type DatabaseModel = {
   teachers: {
     [teacher_id: string]: TeacherModel;
   };
-  studentsReservations: {
+  studentsReservations?: {
     [codigo: string]: StudentReservationModel;
-  };
-  students: {
-    [codigo: string]: StudentModel;
   };
   availableOptions?: {
     [option_id: string]: number;
@@ -24,6 +21,7 @@ export type StudentsDBModel = {
 };
 
 export type WorkshopModel = {
+  id: string;
   name: string;
   description: string;
   levels: string[];
@@ -38,6 +36,7 @@ export interface OptionModel {
   teacher_name: string;
   workshop_id: string;
   workshop_name: string;
+  isTutorial: boolean;
   url: string;
 }
 
@@ -63,6 +62,7 @@ export type TeacherReservationModel = {
   workshop_name: string;
   option_id: string;
   option_name: string;
+  tutorial_reason?: string;
 };
 
 export type StudentReservationModel = {

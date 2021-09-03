@@ -7,8 +7,11 @@ import { SheetsAPI } from "../datasources/SheetsAPI";
 //import { StudentsAPI } from "../datasources/StudentsAPI";
 import { DatabaseModel, StudentsDBModel } from "../modules/workshops/models";
 import { MutationSaveWorkshopsAttendanceArgs } from "../generated/graphql";
+import prodDb from "../modules/workshops/db.workshops.prod";
 
 type OptionalDatabaseModel = Partial<DatabaseModel>;
+
+const dbA = { prod: prodDb };
 
 const db: { prod: OptionalDatabaseModel } = {
   prod: {
@@ -176,21 +179,26 @@ test("gets all workshops", async () => {
   const res = await query({
     query: GET_WORKSHOPS
   });
-
-  expect(res.errors).toBeUndefined();
   expect(workshopsAPI.get).not.toHaveBeenCalledWith(
     expect.stringContaining("undefined")
   );
+  expect(res.errors).toBeUndefined();
   expect(res.data).toMatchSnapshot();
 });
 
-test("makes a reservation", async () => {
+describe("reservations", () => {
   const MAKE_RESERVATION = gql`
-    mutation makeReservation($codigo: ID!, $option_id: ID!, $teacher_id: ID!) {
+    mutation makeReservation(
+      $codigo: ID!
+      $option_id: ID!
+      $teacher_id: ID!
+      $tutorial_reason: String
+    ) {
       makeWorkshopReservation(
         codigo: $codigo
         teacher_id: $teacher_id
         option_id: $option_id
+        tutorial_reason: $tutorial_reason
       ) {
         day
         time
@@ -203,29 +211,44 @@ test("makes a reservation", async () => {
       }
     }
   `;
-  const variables = {
-    codigo: "1234567890",
-    option_id: "option_id1",
-    teacher_id: "teacher_id1"
-  };
-  const res = await query({ query: MAKE_RESERVATION, variables });
-  expect(res.errors).toBeUndefined();
-  expect(workshopsAPI.put).toHaveBeenNthCalledWith(
-    1,
-    "prod/studentsReservations/1234567890.json",
-    {
-      option_id: "option_id1"
-    }
-  );
-  expect(workshopsAPI.put).toHaveBeenNthCalledWith(
-    2,
-    "prod/availableOptions/option_id1.json",
-    11
-  );
-  expect(workshopsAPI.post.mock.calls[0][0]).toBe(
-    "prod/teachers/teacher_id1/raw_reservations/option_id1.json"
-  );
-  expect(workshopsAPI.post.mock.calls[0][1]).toMatchSnapshot();
+  test("makes a reservation", async () => {
+    const variables = {
+      codigo: "1234567890",
+      option_id: "option_id1",
+      teacher_id: "teacher_id1"
+    };
+    const res = await query({ query: MAKE_RESERVATION, variables });
+    if (res.errors) console.log(JSON.stringify(res.errors[0]));
+    expect(res.errors).toBeUndefined();
+    expect(workshopsAPI.put).toHaveBeenNthCalledWith(
+      1,
+      `prod/studentsReservations/${variables.codigo}.json`,
+      {
+        option_id: variables.option_id
+      }
+    );
+    expect(workshopsAPI.put).toHaveBeenNthCalledWith(
+      2,
+      `prod/availableOptions/${variables.option_id}.json`,
+      11
+    );
+    expect(workshopsAPI.post.mock.calls[0][0]).toBe(
+      `prod/teachers/${variables.teacher_id}/raw_reservations/${variables.option_id}.json`
+    );
+    expect(workshopsAPI.post.mock.calls[0][1]).toMatchSnapshot();
+  });
+
+  test("makes a tutorials reservation", async () => {
+    const variables = {
+      codigo: "1234567890",
+      option_id: "option_id1",
+      teacher_id: "teacher_id1",
+      tutorial_reason: "negative questions"
+    };
+    const res = await query({ query: MAKE_RESERVATION, variables });
+    expect(res.errors).toBeUndefined();
+    expect(workshopsAPI.post.mock.calls[0][1]).toMatchSnapshot();
+  });
 });
 
 describe("student data", () => {
@@ -292,7 +315,9 @@ describe("teacher dashboard", () => {
   `;
 
   test("normal", async () => {
-    const variables = { teacher_id: "teacher_id1" };
+    const variables = {
+      teacher_id: "teacher_id1"
+    };
     const res = await query({ query: GET_TEACHER_DASHBOARD, variables });
     expect(res.errors).toBeUndefined();
     expect(workshopsAPI.get).not.toHaveBeenCalledWith(
@@ -321,8 +346,8 @@ describe("teacher dashboard", () => {
     expect(res.errors).toBeUndefined();
     expect(res.data.setWorkshopLink).toBe(true);
     expect(workshopsAPI.put).toHaveBeenCalledWith(
-      "prod/options/option_id1/url.json",
-      "https://newurl"
+      `prod/options/${variables.option_id}/url.json`,
+      variables.url
     );
   });
   test("saves workshop attendance", async () => {
@@ -362,7 +387,7 @@ describe("teacher dashboard", () => {
 
     expect(res.errors).toBeUndefined();
     expect(workshopsAPI.delete).toHaveBeenCalledWith(
-      "prod/teachers/teacher_id1/raw_reservations/option_id1.json"
+      `prod/teachers/${variables.teacher_id}/raw_reservations/${variables.option_id}.json`
     );
     expect(workshopsSheetsAPI.append).toHaveBeenCalled();
     expect(res.data.saveWorkshopsAttendance).toBe(true);

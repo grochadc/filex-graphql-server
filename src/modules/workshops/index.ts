@@ -26,6 +26,7 @@ export const typeDefs = gql`
     workshop_id: String!
     url: String!
     zoom_id: String
+    isTutorial: Boolean!
     available: Boolean!
   }
 
@@ -95,6 +96,7 @@ export const typeDefs = gql`
       codigo: ID!
       option_id: ID!
       teacher_id: ID!
+      tutorial_reason: String
     ): StudentReservation!
     saveWorkshopsAttendance(
       input: [AttendingStudent!]!
@@ -131,10 +133,9 @@ export const resolvers: Resolvers = {
           options: workshop.option_ids.map(option_id => {
             return {
               ...options[option_id],
-              available:
-                availableOptions[option_id] === undefined
-                  ? true
-                  : Boolean(availableOptions[option_id] < maxStudents)
+              available: availableOptions?.hasOwnProperty(option_id)
+                ? Boolean(availableOptions[option_id] < maxStudents)
+                : true
             };
           })
         };
@@ -185,7 +186,8 @@ export const resolvers: Resolvers = {
       return dataSources.workshopsAPI.makeReservation(
         args.codigo,
         args.teacher_id,
-        args.option_id
+        args.option_id,
+        args.tutorial_reason
       );
     },
     saveWorkshopsAttendance: (

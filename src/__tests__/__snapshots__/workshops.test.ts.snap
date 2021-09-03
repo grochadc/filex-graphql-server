@@ -41,7 +41,7 @@ Object {
 }
 `;
 
-exports[`makes a reservation 1`] = `
+exports[`reservations makes a reservation 1`] = `
 Object {
   "apellido_materno": "Ocasio",
   "apellido_paterno": "Martinez",
@@ -51,6 +51,23 @@ Object {
   "nombre": "Benito Antonio",
   "option_id": "id1",
   "option_name": "why? option_name from makeReservation dataSource",
+  "tutorial_reason": null,
+  "workshop_id": "workshop_id1",
+  "workshop_name": "Conversation",
+}
+`;
+
+exports[`reservations makes a tutorials reservation 1`] = `
+Object {
+  "apellido_materno": "Ocasio",
+  "apellido_paterno": "Martinez",
+  "codigo": "1234567890",
+  "grupo": "E4-1",
+  "nivel": "4",
+  "nombre": "Benito Antonio",
+  "option_id": "id1",
+  "option_name": "why? option_name from makeReservation dataSource",
+  "tutorial_reason": "negative questions",
   "workshop_id": "workshop_id1",
   "workshop_name": "Conversation",
 }

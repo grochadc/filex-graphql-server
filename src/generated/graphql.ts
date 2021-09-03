@@ -203,6 +203,7 @@ export type MutationMakeWorkshopReservationArgs = {
   codigo: Scalars['ID'];
   option_id: Scalars['ID'];
   teacher_id: Scalars['ID'];
+  tutorial_reason?: Maybe<Scalars['String']>;
 };
 
 
@@ -238,6 +239,7 @@ export type Option = {
   workshop_id: Scalars['String'];
   url: Scalars['String'];
   zoom_id?: Maybe<Scalars['String']>;
+  isTutorial: Scalars['Boolean'];
   available: Scalars['Boolean'];
 };
 
@@ -736,6 +738,7 @@ export type OptionResolvers<ContextType = ServerContext, ParentType extends Reso
   workshop_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   zoom_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isTutorial?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   available?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
