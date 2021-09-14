@@ -1,4 +1,5 @@
 import { ApolloServer } from "apollo-server";
+import db from "./datasources/database";
 require("dotenv").config();
 import {
   FirebaseAPI,
@@ -8,7 +9,8 @@ import {
   StudentsAPI,
   PlacementAPI,
   PlacementSheetsAPI,
-  SheetsAPI
+  SheetsAPI,
+  DatabaseAPI
 } from "./datasources";
 import Carousel from "./utils/Carousel";
 
@@ -23,6 +25,7 @@ export type DataSourcesType = {
   placementSheetsAPI: PlacementSheetsAPI;
   registroSheetsAPI: SheetsAPI;
   workshopsSheetsAPI: SheetsAPI;
+  databaseAPI: DatabaseAPI;
 };
 
 export type ServerContext = {
@@ -60,7 +63,8 @@ const server = new ApolloServer({
       ),
       workshopsSheetsAPI: new SheetsAPI(
         "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
-      )
+      ),
+      databaseAPI: new DatabaseAPI(db)
     };
   },
   cors: true,

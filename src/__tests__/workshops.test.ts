@@ -8,6 +8,11 @@ import { SheetsAPI } from "../datasources/SheetsAPI";
 import { DatabaseModel, StudentsDBModel } from "../modules/workshops/models";
 import { MutationSaveWorkshopsAttendanceArgs } from "../generated/graphql";
 import prodDb from "../modules/workshops/db.workshops.prod";
+import {
+  OptionModel,
+  StudentModel,
+  DatabaseAPI
+} from "../datasources/DatabaseAPI";
 
 type OptionalDatabaseModel = Partial<DatabaseModel>;
 
@@ -15,8 +20,12 @@ const dbA = { prod: prodDb };
 
 const db: { prod: OptionalDatabaseModel } = {
   prod: {
+    system: {
+      max_reservations: 30
+    },
     workshops: {
       workshop_id1: {
+        id: "workshop_id1",
         name: "Conversation",
         description: "This is the conversation workshop description.",
         levels: ["1", "2", "3", "4", "5", "6"],
@@ -60,7 +69,8 @@ const db: { prod: OptionalDatabaseModel } = {
         teacher_name: "Fulanito",
         workshop_id: "workshop_id1",
         workshop_name: "Conversation",
-        url: "http://url1"
+        url: "http://url1",
+        isTutorial: false
       },
       option_id2: {
         id: "id2",
@@ -70,7 +80,8 @@ const db: { prod: OptionalDatabaseModel } = {
         teacher_name: "Fulanito",
         workshop_id: "workshop_id1",
         workshop_name: "Conversation",
-        url: "http://url2"
+        url: "http://url2",
+        isTutorial: false
       }
     },
     availableOptions: {
@@ -119,6 +130,122 @@ const studentsDB: { prod: StudentsDBModel } = {
   }
 };
 
+const sqlOptionsResponse: OptionModel[] = [
+  {
+    id: 1,
+    workshop_name: "Conversation",
+    day: "Lunes",
+    time: "1300 - 14:00",
+    teacher_name: "Fulanito",
+    url: "http://url1",
+    teacher_id: 1,
+    workshop_id: 1,
+    workshop_description: "This is the conversation workshop description.",
+    workshop_levels: [1, 2, 3, 4, 5, 6],
+    reservations: 0
+  },
+  {
+    id: 2,
+    workshop_name: "Conversation",
+    day: "Martes",
+    time: "13:00 - 14:00",
+    teacher_name: "Fulanito",
+    url: "http://url2",
+    teacher_id: 1,
+    workshop_id: 1,
+    workshop_description: "This is the conversation workshop description.",
+    workshop_levels: [1, 2, 3, 4, 5, 6],
+    reservations: 0
+  }
+];
+
+const sqlStudentsResponse: StudentModel[] = [
+  {
+    id: 1,
+    codigo: "1234567890",
+    nombre: "Benito Antonio",
+    apellido_paterno: "Martinez",
+    apellido_materno: "Ocasio",
+    genero: "M",
+    carrera: "Abogado",
+    ciclo: "2021A",
+    telefono: "1234567890",
+    email: "bad@bunny.pr",
+    nivel: "4",
+    curso: "en",
+    grupo: "E4-1",
+    externo: false
+  },
+  {
+    id: 2,
+    codigo: "1234509876",
+    nombre: "Juan",
+    apellido_materno: "Preciado",
+    apellido_paterno: "Paramo",
+    genero: "M",
+    carrera: "Abogado",
+    ciclo: "2021A",
+    telefono: "1234567890",
+    email: "juan@lamedialuna.com",
+    nivel: "5",
+    curso: "en",
+    grupo: "E5-1",
+    externo: false
+  }
+];
+
+const sqlReservationsResponse = [
+  {
+    id: 1,
+    student_id: 2,
+    option_id: 2,
+    day: "Lunes",
+    time: "1300 - 14:00",
+    teacher_id: "teacher_id1",
+    teacher_name: "Fulanito",
+    workshop_id: "workshop_id1",
+    workshop_name: "Conversation",
+    url: "http://url1"
+  }
+];
+
+class sqlMockDatabase {
+  table: any[];
+  constructor(table: any[]) {
+    this.table = table;
+  }
+  getAll(): any[] {
+    return this.table;
+  }
+  getBy(column: string, value: string | number): any[] {
+    const result = this.table.filter(record => record[column] === value);
+    return result;
+  }
+}
+
+const mockStudentsDatabase = new sqlMockDatabase(sqlStudentsResponse);
+const mockOptionsDatabase = new sqlMockDatabase(sqlOptionsResponse);
+const mockReservationsDatabase = new sqlMockDatabase(sqlReservationsResponse);
+const databaseAPI = new DatabaseAPI({});
+databaseAPI._getOptionsSql = jest.fn(() =>
+  Promise.resolve(mockOptionsDatabase.getAll())
+);
+databaseAPI._getStudentSql = jest.fn((query, values) => {
+  return Promise.resolve(mockStudentsDatabase.getBy("codigo", values[0]));
+});
+databaseAPI._makeReservation = jest.fn(() => {
+  return Promise.resolve([{ id: 1 }]);
+});
+databaseAPI._newReservation = jest.fn(id => {
+  return Promise.resolve(mockReservationsDatabase.getBy("id", id));
+});
+databaseAPI._resetReservations = jest.fn(() => Promise.resolve());
+
+databaseAPI._getStudentReservationSql = jest.fn((query, values) => {
+  return Promise.resolve(
+    mockReservationsDatabase.getBy("student_id", values[0])
+  );
+});
 const database = new Database(db);
 const workshopsAPI = new WorkshopsAPI();
 workshopsAPI.get = jest.fn(url => database.get(url));
@@ -137,7 +264,8 @@ const dataSources = () => {
   return {
     workshopsAPI: workshopsAPI,
     studentsAPI: studentsAPI,
-    workshopsSheetsAPI: workshopsSheetsAPI
+    workshopsSheetsAPI: workshopsSheetsAPI,
+    databaseAPI: databaseAPI
   };
 };
 
@@ -154,6 +282,10 @@ afterEach(() => {
   workshopsAPI.put.mockClear();
   workshopsAPI.delete.mockClear();
   studentsAPI.get.mockClear();
+  databaseAPI._getStudentSql.mockClear();
+  databaseAPI._getOptionsSql.mockClear();
+  databaseAPI._makeReservation.mockClear();
+  //databaseAPI._getStudentReservationSql.mockClear();
 });
 
 test("gets all workshops", async () => {
@@ -189,17 +321,16 @@ test("gets all workshops", async () => {
 describe("reservations", () => {
   const MAKE_RESERVATION = gql`
     mutation makeReservation(
-      $codigo: ID!
+      $student_id: ID!
       $option_id: ID!
-      $teacher_id: ID!
       $tutorial_reason: String
     ) {
       makeWorkshopReservation(
-        codigo: $codigo
-        teacher_id: $teacher_id
+        student_id: $student_id
         option_id: $option_id
         tutorial_reason: $tutorial_reason
       ) {
+        id
         day
         time
         teacher_id
@@ -213,41 +344,37 @@ describe("reservations", () => {
   `;
   test("makes a reservation", async () => {
     const variables = {
-      codigo: "1234567890",
-      option_id: "option_id1",
-      teacher_id: "teacher_id1"
+      student_id: "1",
+      option_id: "1"
     };
     const res = await query({ query: MAKE_RESERVATION, variables });
-    if (res.errors) console.log(JSON.stringify(res.errors[0]));
+    expect(databaseAPI._makeReservation).toHaveBeenCalled();
+    expect(databaseAPI._makeReservation.mock.calls[0][1]).toMatchSnapshot();
     expect(res.errors).toBeUndefined();
-    expect(workshopsAPI.put).toHaveBeenNthCalledWith(
-      1,
-      `prod/studentsReservations/${variables.codigo}.json`,
-      {
-        option_id: variables.option_id
-      }
-    );
-    expect(workshopsAPI.put).toHaveBeenNthCalledWith(
-      2,
-      `prod/availableOptions/${variables.option_id}.json`,
-      11
-    );
-    expect(workshopsAPI.post.mock.calls[0][0]).toBe(
-      `prod/teachers/${variables.teacher_id}/raw_reservations/${variables.option_id}.json`
-    );
-    expect(workshopsAPI.post.mock.calls[0][1]).toMatchSnapshot();
+    expect(res.data).toMatchSnapshot();
   });
 
   test("makes a tutorials reservation", async () => {
     const variables = {
-      codigo: "1234567890",
-      option_id: "option_id1",
-      teacher_id: "teacher_id1",
+      student_id: "1",
+      option_id: "1",
       tutorial_reason: "negative questions"
     };
     const res = await query({ query: MAKE_RESERVATION, variables });
     expect(res.errors).toBeUndefined();
-    expect(workshopsAPI.post.mock.calls[0][1]).toMatchSnapshot();
+    expect(databaseAPI._makeReservation.mock.calls[0][1]).toMatchSnapshot();
+    expect(res.data).toMatchSnapshot();
+  });
+
+  test("resets reservations", async () => {
+    const RESET_RESERVATIONS = gql`
+      mutation reset {
+        resetReservations
+      }
+    `;
+    const res = await query({ query: RESET_RESERVATIONS });
+    expect(res.errors).toBeUndefined();
+    expect(res.data.resetReservations).toBe(true);
   });
 });
 
@@ -270,6 +397,7 @@ describe("student data", () => {
   test("normal not registered", async () => {
     const variables = { codigo: "1234567890" };
     const res = await query({ query: GET_STUDENT, variables });
+    if (res.errors) console.log(JSON.stringify(res.errors));
     expect(res.errors).toBeUndefined();
     expect(res.data.student.reservation).toBeNull();
     expect(res.data).toMatchSnapshot();
@@ -284,9 +412,7 @@ describe("student data", () => {
   test("not found", async () => {
     const variables = { codigo: "0987654321" };
     const res = await query({ query: GET_STUDENT, variables });
-    expect(res.errors[0].message).toBe(
-      "No se encontró ese codigo de alumno en la base de datos."
-    );
+    expect(res.errors[0].message).toBe("404: Alumno inexistente");
   });
 });
 
@@ -392,21 +518,4 @@ describe("teacher dashboard", () => {
     expect(workshopsSheetsAPI.append).toHaveBeenCalled();
     expect(res.data.saveWorkshopsAttendance).toBe(true);
   });
-});
-
-test("resets reservations", async () => {
-  const RESET_RESERVATIONS = gql`
-    mutation reset {
-      resetReservations
-    }
-  `;
-  const res = await query({ query: RESET_RESERVATIONS });
-  expect(res.errors).toBeUndefined();
-  expect(res.data.resetReservations).toBe(true);
-  expect(workshopsAPI.delete).toHaveBeenCalledWith(
-    "prod/studentsReservations.json"
-  );
-  expect(workshopsAPI.delete).toHaveBeenCalledWith(
-    "prod/availableOptions.json"
-  );
 });

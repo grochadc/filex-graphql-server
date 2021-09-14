@@ -14,6 +14,9 @@ export type DatabaseModel = {
   availableOptions?: {
     [option_id: string]: number;
   };
+  system: {
+    max_reservations: number;
+  };
 };
 
 export type StudentsDBModel = {
@@ -70,6 +73,7 @@ export type StudentReservationModel = {
 };
 
 export type StudentModel = {
+  id: number;
   codigo: string;
   nombre: string;
   apellido_paterno: string;
