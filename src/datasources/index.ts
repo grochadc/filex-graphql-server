@@ -6,7 +6,7 @@ import { StudentsAPI } from "./StudentsAPI";
 import { PlacementAPI } from "./PlacementAPI";
 import { PlacementSheetsAPI } from "./PlacementSheetsAPI";
 import { SheetsAPI } from "./SheetsAPI";
-import { DatabaseAPI } from "./DatabaseAPI";
+import DatabaseAPI from "./DatabaseAPI";
 
 export {
   RegistroAPI,

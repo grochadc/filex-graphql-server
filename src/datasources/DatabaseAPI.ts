@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server";
 import { DataSource } from "apollo-datasource";
-import { Workshop } from "../generated/graphql";
+import { Workshop, Teacher, TeacherOption } from "../generated/graphql";
 import { ParameterizedQuery as PQ } from "pg-promise";
 
 export interface OptionModel {
@@ -45,7 +45,64 @@ type Option = Omit<
   available: boolean;
 };
 
-const SELECT_TEACHER_INFO = `
+export const SELECT_STUDENT = `SELECT * FROM student WHERE codigo=$1`;
+
+export const SELECT_STUDENT_RESERVATION = `
+SELECT
+  r.*,
+  o.day,
+  o.time,
+  o.url,
+  o.teacher_id,
+  t.name as teacher_name,
+  o.workshop_id,
+  w.name as workshop_name
+FROM reservation r
+INNER JOIN option o ON o.id=r.option_id
+INNER JOIN teacher t ON t.id=o.teacher_id
+INNER JOIN workshop w ON w.id=o.workshop_id
+WHERE r.student_id=$1
+`;
+
+export const SELECT_NEW_RESERVATION = `
+SELECT
+  r.id,
+  o.day,
+  o.time,
+  t.name as teacher_name,
+  t.id as teacher_id,
+  w.name as workshop_name,
+  w.id as workshop_id,
+  o.url
+FROM reservation r
+INNER JOIN option o ON r.option_id=o.id
+INNER JOIN teacher t ON o.teacher_id=t.id
+INNER JOIN workshop w ON o.workshop_id=w.id
+WHERE r.id=$1
+`;
+
+export const SELECT_OPTIONS = `
+SELECT
+  Option.id,
+  Workshop.name as workshop_name,
+  Option.day,
+  Option.time,
+  Teacher.name as teacher_name,
+  Option.url,
+  Workshop.description as workshop_description,
+  Workshop.levels as workshop_levels,
+  Teacher.id as teacher_id,
+  Workshop.id as workshop_id,
+  COUNT(Reservation.id) as reservations
+FROM Option
+INNER JOIN Teacher ON Option.teacher_id=Teacher.id
+INNER JOIN Workshop on Option.workshop_id=Workshop.id
+LEFT JOIN Reservation ON Option.id=Reservation.option_id
+GROUP BY Option.id, Workshop.id, Teacher.id
+ORDER BY Option.id;
+`;
+
+export const SELECT_TEACHER_INFO = `
 SELECT
   id,
   name,
@@ -58,13 +115,54 @@ SELECT
         WHERE r.option_id=any(teacher.option_ids)
         GROUP BY r.option_id
         )
-  ) as options FROM teacher Where id=2 GROUP BY teacher.id;
+  ) as options FROM teacher Where id=$1 GROUP BY teacher.id;
+`;
+
+export type TeacherReservation = {
+  reservation_id: number;
+  codigo: string;
+  nombre: string;
+  apellido_materno: string;
+  apellido_paterno: string;
+  teacher_id: number;
+  teacher: string;
+  workshop: string;
+  time: string;
+  day: string;
+  option_id: string;
+};
+export const SELECT_TEACHER_RESERVATIONS = `
+SELECT
+  t.id as teacher_id,
+  r.id as reservation_id,
+  codigo,
+  nombre,
+  apellido_paterno,
+  apellido_materno,
+  t.id as teacher_id,
+  t.name as teacher,
+  w.name as workshop,
+  o.time,
+  o.day,
+  o.url,
+  o.id as option_id
+FROM teacher t
+INNER JOIN option o ON o.teacher_id=t.id
+INNER JOIN workshop w ON o.workshop_id=w.id
+INNER JOIN reservation r ON r.option_id=o.id
+INNER JOIN student s ON s.id=r.student_id
+WHERE t.id=$1
+`;
+
+export const SELECT_SINGLE_OPTION = `
+SELECT * FROM Option o WHERE o.id=$1;
 `;
 
 class DatabaseAPI extends DataSource {
   db: any;
   constructor(db: any) {
     super();
+    console.log("construting databaseAPI");
     this.db = db;
   }
   _getStudentSql(query: string, values: any[]) {
@@ -72,7 +170,6 @@ class DatabaseAPI extends DataSource {
     return this.db.any(paramQuery);
   }
   async getStudent(codigo: string) {
-    const SELECT_STUDENT = `SELECT * FROM student WHERE codigo=$1`;
     if (/^[1234567890]+$/.test(codigo)) {
       const result: StudentModel[] = await this._getStudentSql(SELECT_STUDENT, [
         codigo
@@ -84,31 +181,15 @@ class DatabaseAPI extends DataSource {
       throw new ApolloError("Input wasn't a number");
     }
   }
-  _getOptionsSql(query: string) {
-    return this.db.many(query);
+  async getOptionsByIDs(ids: string[]): Promise<Option> {
+    const parsedIDs = ids.map(id => Number(id));
+    const result = await this.db.any(
+      new PQ({ text: SELECT_SINGLE_OPTION, values: [parsedIDs] })
+    );
+    return result[0];
   }
   async getAllOptions(max_reservations: number): Promise<Option[]> {
-    const SELECT_OPTIONS = `
-    SELECT
-      Option.id,
-      Workshop.name as workshop_name,
-      Option.day,
-      Option.time,
-      Teacher.name as teacher_name,
-      Option.url,
-      Workshop.description as workshop_description,
-      Workshop.levels as workshop_levels,
-      Teacher.id as teacher_id,
-      Workshop.id as workshop_id,
-      COUNT(Reservation.id) as reservations
-    FROM Option
-    INNER JOIN Teacher ON Option.teacher_id=Teacher.id
-    INNER JOIN Workshop on Option.workshop_id=Workshop.id
-    LEFT JOIN Reservation ON Option.id=Reservation.option_id
-    GROUP BY Option.id, Workshop.id, Teacher.id
-    ORDER BY Option.id;
-    `;
-    const options: OptionModel[] = await this._getOptionsSql(SELECT_OPTIONS);
+    const options: OptionModel[] = await this.db.any(SELECT_OPTIONS);
     const mapped = options.map(option => {
       return {
         ...option,
@@ -150,22 +231,6 @@ class DatabaseAPI extends DataSource {
     return this.db.any(paramQuery);
   }
   getStudentReservation(id: number) {
-    const SELECT_STUDENT_RESERVATION = `
-    SELECT
-      r.*,
-      o.day,
-      o.time,
-      o.url,
-      o.teacher_id,
-      t.name as teacher_name,
-      o.workshop_id,
-      w.name as workshop_name
-    FROM reservation r
-    INNER JOIN option o ON o.id=r.option_id
-    INNER JOIN teacher t ON t.id=o.teacher_id
-    INNER JOIN workshop w ON w.id=o.workshop_id
-    WHERE r.student_id=$1
-    `;
     return this._getStudentReservationSql(SELECT_STUDENT_RESERVATION, [id]);
   }
   async _makeReservation(query: string, values: any[]) {
@@ -174,22 +239,6 @@ class DatabaseAPI extends DataSource {
     return result;
   }
   _newReservation(id: number) {
-    const SELECT_NEW_RESERVATION = `
-    SELECT
-      r.id,
-      o.day,
-      o.time,
-      t.name as teacher_name,
-      t.id as teacher_id,
-      w.name as workshop_name,
-      w.id as workshop_id,
-      o.url
-    FROM reservation r
-    INNER JOIN option o ON r.option_id=o.id
-    INNER JOIN teacher t ON o.teacher_id=t.id
-    INNER JOIN workshop w ON o.workshop_id=w.id
-    WHERE r.id=$1
-    `;
     return this.db.any(new PQ({ text: SELECT_NEW_RESERVATION, values: [id] }));
   }
   async makeReservation(
@@ -222,6 +271,113 @@ class DatabaseAPI extends DataSource {
     }
     return true;
   }
+  _getTeacher(id: number) {
+    const parsedQuery = new PQ({
+      text: SIMPLE_TEACHER_INFO,
+      values: [id]
+    });
+    return this.db.any(parsedQuery);
+  }
+  async getTeacher(id: string) {
+    const parsedID = Number(id);
+    const result: SimpleTeacherInfo[] = await this._getTeacher(parsedID);
+    return {
+      id: result[0].id.toString(),
+      name: result[0].name,
+      option_ids: result[0].option_ids.map(id => id.toString()),
+      options: result.map(teacher => {
+        return {
+          id: teacher.option_id.toString(),
+          day: teacher.day,
+          time: teacher.time,
+          teacher_name: teacher.name,
+          teacher_id: teacher.id.toString(),
+          workshop_name: teacher.workshop_name,
+          workshop_id: teacher.workshop_id.toString(),
+          url: teacher.url
+        };
+      })
+    };
+  }
+  async getAllTeachers() {
+    const result: SelectTeachers = await this.db.any(SELECT_TEACHERS);
+    return result.map(teacher => {
+      return {
+        ...teacher,
+        id: teacher.id.toString(),
+        option_ids: teacher.option_ids.map(id => id.toString())
+      };
+    });
+  }
+  _getTeacherReservations(option_id: number) {
+    return this.db.any(
+      new PQ({ text: GET_TEACHER_RESERVATIONS, values: [option_id] })
+    );
+  }
+  getTeacherReservations(option_id: string) {
+    const parsedOptionID = Number(option_id);
+    return this._getTeacherReservations(parsedOptionID);
+  }
+  _deleteOptionReservations(option_id: number) {
+    return this.db.any(
+      new PQ({ text: DELETE_TEACHER_RESERVATIONS, values: [option_id] })
+    );
+  }
+  deleteOptionReservations(option_id: string) {
+    const parsedID = Number(option_id);
+    this._deleteOptionReservations(parsedID);
+  }
 }
 
-export { DatabaseAPI };
+export const GET_TEACHER_RESERVATIONS = `
+SELECT
+  r.id,
+  w.id as workshop_id,
+  w.name as workshop_name,
+  o.id as option_id,
+  s.codigo,
+  s.nombre,
+  s.apellido_paterno,
+  s.apellido_materno,
+  s.nivel,
+  s.grupo,
+  r.tutorial_reason
+FROM reservation r
+INNER JOIN option o ON r.option_id=o.id
+INNER JOIN workshop w ON o.workshop_id=w.id
+INNER JOIN student s ON s.id=r.student_id
+WHERE o.id=$1
+`;
+export type SelectTeachers = {
+  id: number;
+  name: string;
+  option_ids: number[];
+}[];
+export const SELECT_TEACHERS = `
+SELECT * FROM Teacher;
+`;
+
+export type SimpleTeacherInfo = {
+  id: number;
+  name: string;
+  workshop_name: string;
+  workshop_id: number;
+  option_id: number;
+  day: string;
+  time: string;
+  url: string;
+  option_ids: number[];
+};
+export const SIMPLE_TEACHER_INFO = `
+SELECT t.id, t.name, w.name as workshop_name, w.id as workshop_id, o.id as option_id, o.day, o.time, o.url, t.option_ids
+FROM teacher t
+INNER JOIN option o ON o.teacher_id=t.id
+INNER JOIN workshop w ON w.id=o.workshop_id
+WHERE t.id=$1
+`;
+
+export const DELETE_TEACHER_RESERVATIONS = `
+  DELETE FROM reservation WHERE option_id=$1
+`;
+
+export default DatabaseAPI;

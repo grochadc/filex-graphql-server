@@ -4,7 +4,8 @@
     "target": "es2016",
     "moduleResolution": "node",
     "outDir": "dist/",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src"
   },
   "include": ["src/"],
   "exclude": ["node_modules", "**/*.spec.ts", "src/__tests__/"]

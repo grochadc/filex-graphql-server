@@ -2,7 +2,7 @@ import { RESTDataSource } from "apollo-datasource-rest";
 import * as R from "ramda";
 import * as utils from "../utils";
 import database, { Option } from "./db";
-import { Workshop } from "../generated/graphql";
+import { Workshop, AttendingStudent } from "../generated/graphql";
 import {
   WorkshopModel,
   TeacherModel,
@@ -13,18 +13,6 @@ import {
 } from "../modules/workshops/models";
 
 type Maybe<T> = T | null;
-
-interface AttendingStudent {
-  codigo: string;
-  nombre: string;
-  apellido_paterno: string;
-  apellido_materno?: string;
-  nivel: string;
-  grupo: string;
-  workshop: string;
-  teacher: string;
-  attended: boolean;
-}
 
 class WorkshopsAPI extends RESTDataSource {
   constructor() {

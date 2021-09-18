@@ -8,6 +8,7 @@ export const typeDefs = gql`
     workshops: [Workshop!]!
     student(codigo: ID!): Student!
     teacher(id: ID!): Teacher!
+    teachers: [Teacher!]!
     getWorkshopsByCategory(category: String!): Workshop!
   }
 
@@ -59,16 +60,17 @@ export const typeDefs = gql`
   }
 
   type Reservation {
+    id: ID!
     workshop_id: String!
     workshop_name: String!
     option_id: String!
-    option_name: String!
     codigo: String!
     nombre: String!
     apellido_paterno: String!
     apellido_materno: String!
     nivel: String!
     grupo: String!
+    tutorial_reason: String
   }
 
   type Teacher {
@@ -139,28 +141,20 @@ export const resolvers: Resolvers = {
       );
       return allWorkshops;
     },
-    teacher: (root, args, { dataSources }) =>
-      dataSources.workshopsAPI.getTeacher(args.id),
+    teacher: async (root, args, { dataSources }) => {
+      const result = await dataSources.databaseAPI.getTeacher(args.id);
+      return result;
+    },
+    teachers: (root, args, { dataSources }) => {
+      return dataSources.databaseAPI.getAllTeachers();
+    },
     student: async (root, args, { dataSources }) => {
       return dataSources.databaseAPI.getStudent(args.codigo);
     }
   },
-  Teacher: {
-    options: async (teacher, args, { dataSources }) => {
-      const allOptionsById = await dataSources.workshopsAPI.getOptions();
-      const result = teacher.option_ids.map(option_id => {
-        const reservations =
-          teacher.raw_reservations === undefined
-            ? null
-            : teacher.raw_reservations[option_id]
-            ? Object.values(teacher.raw_reservations[option_id])
-            : null;
-        return {
-          ...allOptionsById[option_id],
-          reservations
-        };
-      });
-      return result;
+  TeacherOption: {
+    reservations: (teacherOption, args, { dataSources }) => {
+      return dataSources.databaseAPI.getTeacherReservations(teacherOption.id);
     }
   },
   Student: {
@@ -181,13 +175,14 @@ export const resolvers: Resolvers = {
       );
       return result[0];
     },
-    saveWorkshopsAttendance: (
+    saveWorkshopsAttendance: async (
       root,
       { input, teacher_id, option_id },
       { dataSources }
     ) => {
-      dataSources.workshopsAPI.deleteReservations(teacher_id, option_id);
-      return dataSources.workshopsAPI.saveAttendance(input);
+      const result = await dataSources.workshopsAPI.saveAttendance(input);
+      dataSources.databaseAPI.deleteOptionReservations(option_id);
+      return result;
     },
     resetReservations: (root, args, { dataSources }) =>
       dataSources.databaseAPI.resetReservations(),
@@ -228,4 +223,23 @@ const legacyWorkshopsResolver = async (root, args, { dataSources }) => {
     };
   });
   return composedWorkshops;
+};
+
+const legacyTeacherResolver = {
+  options: async (teacher, args, { dataSources }) => {
+    const allOptionsById = await dataSources.workshopsAPI.getOptions();
+    const result = teacher.option_ids.map(option_id => {
+      const reservations =
+        teacher.raw_reservations === undefined
+          ? null
+          : teacher.raw_reservations[option_id]
+          ? Object.values(teacher.raw_reservations[option_id])
+          : null;
+      return {
+        ...allOptionsById[option_id],
+        reservations
+      };
+    });
+    return result;
+  }
 };

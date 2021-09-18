@@ -265,6 +265,7 @@ export type Query = {
   workshops: Array<Workshop>;
   student: Student;
   teacher: Teacher;
+  teachers: Array<Teacher>;
   getWorkshopsByCategory: Workshop;
   grades: Grades;
 };
@@ -773,6 +774,7 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   workshops?: Resolver<Array<ResolversTypes['Workshop']>, ParentType, ContextType>;
   student?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<QueryStudentArgs, 'codigo'>>;
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
+  teachers?: Resolver<Array<ResolversTypes['Teacher']>, ParentType, ContextType>;
   getWorkshopsByCategory?: Resolver<ResolversTypes['Workshop'], ParentType, ContextType, RequireFields<QueryGetWorkshopsByCategoryArgs, 'category'>>;
   grades?: Resolver<ResolversTypes['Grades'], ParentType, ContextType, RequireFields<QueryGradesArgs, 'codigo'>>;
 };
