@@ -339,6 +339,8 @@ SELECT
   s.nombre,
   s.apellido_paterno,
   s.apellido_materno,
+  s.email,
+  s.telefono,
   s.nivel,
   s.grupo,
   r.tutorial_reason

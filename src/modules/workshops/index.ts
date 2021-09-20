@@ -68,6 +68,8 @@ export const typeDefs = gql`
     nombre: String!
     apellido_paterno: String!
     apellido_materno: String!
+    telefono: String!
+    email: String!
     nivel: String!
     grupo: String!
     tutorial_reason: String
