@@ -20,6 +20,18 @@ class WorkshopsAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
   }
 
+  isOpen(): Promise<boolean> {
+    return this.get(`${this.context.enviroment}/system/isOpen/result.json`);
+  }
+
+  async toggleOpen(): Promise<boolean> {
+    const open = await this.isOpen();
+    await this.put(`${this.context.enviroment}/system/isOpen.json`, {
+      result: !open
+    });
+    return !open;
+  }
+
   async getWorkshops(): Promise<WorkshopModel[]> {
     const workshops = await this.get(
       `${this.context.enviroment}/workshops.json`

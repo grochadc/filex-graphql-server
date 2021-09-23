@@ -10,6 +10,7 @@ export const typeDefs = gql`
     teacher(id: ID!): Teacher!
     teachers: [Teacher!]!
     getWorkshopsByCategory(category: String!): Workshop!
+    isWorkshopsOpen: Boolean!
   }
 
   type Workshop {
@@ -100,6 +101,7 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
+    toggleOpenWorkshops: Boolean!
     makeWorkshopReservation(
       student_id: ID!
       option_id: ID!
@@ -129,6 +131,8 @@ export const typeDefs = gql`
 
 export const resolvers: Resolvers = {
   Query: {
+    isWorkshopsOpen: (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.isOpen(),
     paramQuery: async (root, args, { dataSources }) => {
       return true;
     },
@@ -169,6 +173,8 @@ export const resolvers: Resolvers = {
     }
   },
   Mutation: {
+    toggleOpenWorkshops: (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.toggleOpen(),
     makeWorkshopReservation: async (root, args, { dataSources }) => {
       const result = await dataSources.databaseAPI.makeReservation(
         Number(args.student_id),

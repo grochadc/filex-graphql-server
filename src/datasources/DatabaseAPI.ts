@@ -162,7 +162,6 @@ class DatabaseAPI extends DataSource {
   db: any;
   constructor(db: any) {
     super();
-    console.log("construting databaseAPI");
     this.db = db;
   }
   _getStudentSql(query: string, values: any[]) {

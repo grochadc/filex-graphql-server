@@ -145,6 +145,7 @@ export type Mutation = {
   registerStudent: RegisterResponse;
   saveRegisteringLevels: Array<Scalars['String']>;
   saveApplicant: ApplicantResponse;
+  toggleOpenWorkshops: Scalars['Boolean'];
   makeWorkshopReservation: StudentReservation;
   saveWorkshopsAttendance: Scalars['Boolean'];
   resetReservations: Scalars['Boolean'];
@@ -267,6 +268,7 @@ export type Query = {
   teacher: Teacher;
   teachers: Array<Teacher>;
   getWorkshopsByCategory: Workshop;
+  isWorkshopsOpen: Scalars['Boolean'];
   grades: Grades;
 };
 
@@ -345,16 +347,19 @@ export type RegisterResponse = {
 
 export type Reservation = {
   __typename?: 'Reservation';
+  id: Scalars['ID'];
   workshop_id: Scalars['String'];
   workshop_name: Scalars['String'];
   option_id: Scalars['String'];
-  option_name: Scalars['String'];
   codigo: Scalars['String'];
   nombre: Scalars['String'];
   apellido_paterno: Scalars['String'];
   apellido_materno: Scalars['String'];
+  telefono: Scalars['String'];
+  email: Scalars['String'];
   nivel: Scalars['String'];
   grupo: Scalars['String'];
+  tutorial_reason?: Maybe<Scalars['String']>;
 };
 
 export type Schedule = {
@@ -722,6 +727,7 @@ export type MutationResolvers<ContextType = ServerContext, ParentType extends Re
   registerStudent?: Resolver<ResolversTypes['RegisterResponse'], ParentType, ContextType, RequireFields<MutationRegisterStudentArgs, 'input'>>;
   saveRegisteringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationSaveRegisteringLevelsArgs, 'levels' | 'course'>>;
   saveApplicant?: Resolver<ResolversTypes['ApplicantResponse'], ParentType, ContextType, RequireFields<MutationSaveApplicantArgs, 'codigo' | 'input'>>;
+  toggleOpenWorkshops?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   makeWorkshopReservation?: Resolver<ResolversTypes['StudentReservation'], ParentType, ContextType, RequireFields<MutationMakeWorkshopReservationArgs, 'student_id' | 'option_id'>>;
   saveWorkshopsAttendance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSaveWorkshopsAttendanceArgs, 'input' | 'option_id' | 'teacher_id'>>;
   resetReservations?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -776,6 +782,7 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
   teachers?: Resolver<Array<ResolversTypes['Teacher']>, ParentType, ContextType>;
   getWorkshopsByCategory?: Resolver<ResolversTypes['Workshop'], ParentType, ContextType, RequireFields<QueryGetWorkshopsByCategoryArgs, 'category'>>;
+  isWorkshopsOpen?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   grades?: Resolver<ResolversTypes['Grades'], ParentType, ContextType, RequireFields<QueryGradesArgs, 'codigo'>>;
 };
 
@@ -802,16 +809,19 @@ export type RegisterResponseResolvers<ContextType = ServerContext, ParentType ex
 };
 
 export type ReservationResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Reservation'] = ResolversParentTypes['Reservation']> = {
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   workshop_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   workshop_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   option_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  option_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   codigo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   nombre?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   apellido_paterno?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   apellido_materno?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  telefono?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   nivel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   grupo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tutorial_reason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
