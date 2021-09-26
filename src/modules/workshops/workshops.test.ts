@@ -90,7 +90,7 @@ const db: { prod: OptionalDatabaseModel } = {
   }
 };
 
-const studentsDB: { prod: StudentsDBModel } = {
+const studentsDB = {
   prod: {
     "1234567890": {
       codigo: "1234567890",
@@ -126,14 +126,11 @@ const studentsDB: { prod: StudentsDBModel } = {
 };
 const database = new Database(db);
 const workshopsAPI = new WorkshopsAPI();
-workshopsAPI.get = jest.fn(url => database.get(url));
-workshopsAPI.put = jest.fn((url, data) => database.put(url, data));
-workshopsAPI.post = jest.fn((url, data) => database.post(url, data));
-workshopsAPI.delete = jest.fn(url => database.delete(url));
+workshopsAPI.isOpen = jest.fn(() => Promise.resolve(true));
+workshopsAPI.getMaxStudentReservations = jest.fn(() => Promise.resolve(30));
 
 const studentsDatabase = new Database(studentsDB);
 const studentsAPI = new StudentsAPI(studentMocks.db);
-studentsAPI.get = jest.fn(url => studentsDatabase.get(url));
 
 const workshopsSheetsAPI = new SheetsAPI("sheetsID");
 workshopsSheetsAPI.append = jest.fn(() => Promise.resolve());
@@ -155,14 +152,7 @@ const context = () => {
 const { query } = testServer(dataSources, context);
 
 afterEach(() => {
-  workshopsAPI.get.mockClear();
-  workshopsAPI.post.mockClear();
-  workshopsAPI.put.mockClear();
-  workshopsAPI.delete.mockClear();
-  studentsAPI.get.mockClear();
-  //databaseAPI._makeReservation.mockClear();
   databaseAPI.db.one.mockClear();
-  //databaseAPI._getStudentReservationSql.mockClear();
 });
 
 test("gets all workshops", async () => {
@@ -188,9 +178,6 @@ test("gets all workshops", async () => {
   const res = await query({
     query: GET_WORKSHOPS
   });
-  expect(workshopsAPI.get).not.toHaveBeenCalledWith(
-    expect.stringContaining("undefined")
-  );
   expect(res.errors).toBeUndefined();
   expect(res.data).toMatchSnapshot();
 });
@@ -321,9 +308,6 @@ describe("teacher dashboard", () => {
     };
     const res = await query({ query: GET_TEACHER_DASHBOARD, variables });
     expect(res.errors).toBeUndefined();
-    expect(workshopsAPI.get).not.toHaveBeenCalledWith(
-      expect.stringContaining("undefined")
-    );
     expect(res.data).toMatchSnapshot();
   });
   test("no reservations", async () => {
@@ -331,9 +315,6 @@ describe("teacher dashboard", () => {
     const res = await query({ query: GET_TEACHER_DASHBOARD, variables });
     if (res.errors) console.log(JSON.stringify(res.errors));
     expect(res.errors).toBeUndefined();
-    expect(workshopsAPI.get).not.toHaveBeenCalledWith(
-      expect.stringContaining("undefined")
-    );
     expect(res.data).toMatchSnapshot();
   });
 
@@ -347,10 +328,6 @@ describe("teacher dashboard", () => {
     const res = await query({ query: SET_WORKSHOP_LINK, variables });
     expect(res.errors).toBeUndefined();
     expect(res.data.setWorkshopLink).toBe(true);
-    expect(workshopsAPI.put).toHaveBeenCalledWith(
-      `prod/options/${variables.option_id}/url.json`,
-      variables.url
-    );
   });
   test("saves workshop attendance", async () => {
     const SAVE_ATTENDANCE = gql`
