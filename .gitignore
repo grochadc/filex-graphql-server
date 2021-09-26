@@ -9,3 +9,7 @@ dev/
 credentials.json
 
 coverage/
+
+db_workshops_sql_csv/
+students_2021B.csv
+students_data.csv

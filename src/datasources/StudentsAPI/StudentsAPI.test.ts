@@ -8,8 +8,8 @@ test("gets a student", async () => {
   expect(result).toMatchSnapshot();
 });
 test("gets an inexistent student", async () => {
-  const result = await api.getStudent("1234509876");
-  expect(result).toBe(null);
+  const result = api.getStudent("1234509876");
+  await expect(result).rejects.toThrow();
 });
 test("adds a student", async () => {
   const result = await api.addStudent(students[0]);
