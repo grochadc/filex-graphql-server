@@ -150,6 +150,8 @@ export type Mutation = {
   saveWorkshopsAttendance: Scalars['Boolean'];
   resetReservations: Scalars['Boolean'];
   setWorkshopLink: Scalars['Boolean'];
+  addStudent: Student;
+  editStudent: Student;
 };
 
 
@@ -219,6 +221,17 @@ export type MutationSetWorkshopLinkArgs = {
   url: Scalars['String'];
 };
 
+
+export type MutationAddStudentArgs = {
+  student: StudentInput;
+};
+
+
+export type MutationEditStudentArgs = {
+  codigo: Scalars['ID'];
+  changes?: Maybe<StudentChangesInput>;
+};
+
 export type MutationResponse = {
   __typename?: 'MutationResponse';
   status: Scalars['Int'];
@@ -264,12 +277,12 @@ export type Query = {
   paramQuery?: Maybe<Scalars['Boolean']>;
   options: Array<Option>;
   workshops: Array<Workshop>;
-  student: Student;
   teacher: Teacher;
   teachers: Array<Teacher>;
   getWorkshopsByCategory: Workshop;
   isWorkshopsOpen: Scalars['Boolean'];
   grades: Grades;
+  student: Student;
 };
 
 
@@ -304,11 +317,6 @@ export type QueryParamQueryArgs = {
 };
 
 
-export type QueryStudentArgs = {
-  codigo: Scalars['ID'];
-};
-
-
 export type QueryTeacherArgs = {
   id: Scalars['ID'];
 };
@@ -321,6 +329,11 @@ export type QueryGetWorkshopsByCategoryArgs = {
 
 export type QueryGradesArgs = {
   codigo: Scalars['String'];
+};
+
+
+export type QueryStudentArgs = {
+  codigo: Scalars['ID'];
 };
 
 export type Question = {
@@ -409,6 +422,22 @@ export type Student = {
   externo: Scalars['Boolean'];
   grupo: Scalars['String'];
   reservation?: Maybe<StudentReservation>;
+};
+
+export type StudentChangesInput = {
+  codigo?: Maybe<Scalars['String']>;
+  nombre?: Maybe<Scalars['String']>;
+  apellido_paterno?: Maybe<Scalars['String']>;
+  apellido_materno?: Maybe<Scalars['String']>;
+  genero?: Maybe<Scalars['String']>;
+  carrera?: Maybe<Scalars['String']>;
+  ciclo?: Maybe<Scalars['String']>;
+  telefono?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  nivel?: Maybe<Scalars['String']>;
+  grupo?: Maybe<Scalars['String']>;
+  externo?: Maybe<Scalars['Boolean']>;
+  curso?: Maybe<Scalars['String']>;
 };
 
 export type StudentInput = {
@@ -594,6 +623,7 @@ export type ResolversTypes = {
   Section: ResolverTypeWrapper<Section>;
   SerializedOptions: SerializedOptions;
   Student: ResolverTypeWrapper<StudentModel>;
+  StudentChangesInput: StudentChangesInput;
   StudentInput: StudentInput;
   StudentReservation: ResolverTypeWrapper<StudentReservationModel>;
   Teacher: ResolverTypeWrapper<TeacherModel>;
@@ -632,6 +662,7 @@ export type ResolversParentTypes = {
   Section: Section;
   SerializedOptions: SerializedOptions;
   Student: StudentModel;
+  StudentChangesInput: StudentChangesInput;
   StudentInput: StudentInput;
   StudentReservation: StudentReservationModel;
   Teacher: TeacherModel;
@@ -732,6 +763,8 @@ export type MutationResolvers<ContextType = ServerContext, ParentType extends Re
   saveWorkshopsAttendance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSaveWorkshopsAttendanceArgs, 'input' | 'option_id' | 'teacher_id'>>;
   resetReservations?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   setWorkshopLink?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSetWorkshopLinkArgs, 'option_id' | 'url'>>;
+  addStudent?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<MutationAddStudentArgs, 'student'>>;
+  editStudent?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<MutationEditStudentArgs, 'codigo'>>;
 };
 
 export type MutationResponseResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['MutationResponse'] = ResolversParentTypes['MutationResponse']> = {
@@ -778,12 +811,12 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   paramQuery?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryParamQueryArgs, never>>;
   options?: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
   workshops?: Resolver<Array<ResolversTypes['Workshop']>, ParentType, ContextType>;
-  student?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<QueryStudentArgs, 'codigo'>>;
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
   teachers?: Resolver<Array<ResolversTypes['Teacher']>, ParentType, ContextType>;
   getWorkshopsByCategory?: Resolver<ResolversTypes['Workshop'], ParentType, ContextType, RequireFields<QueryGetWorkshopsByCategoryArgs, 'category'>>;
   isWorkshopsOpen?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   grades?: Resolver<ResolversTypes['Grades'], ParentType, ContextType, RequireFields<QueryGradesArgs, 'codigo'>>;
+  student?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<QueryStudentArgs, 'codigo'>>;
 };
 
 export type QuestionResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Question'] = ResolversParentTypes['Question']> = {

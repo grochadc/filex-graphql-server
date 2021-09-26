@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`adds a student 1`] = `
+Object {
+  "apellido_materno": "Ocasio",
+  "apellido_paterno": "Martinez",
+  "carrera": "Abogado",
+  "ciclo": "2021A",
+  "codigo": "1234567890",
+  "curso": "en",
+  "email": "bad@bunny.pr",
+  "externo": false,
+  "genero": "M",
+  "grupo": "E4-1",
+  "id": 1,
+  "nivel": "4",
+  "nombre": "Benito Antonio",
+  "telefono": "1234567890",
+}
+`;
+
+exports[`edits a student 1`] = `
+Object {
+  "apellido_materno": "Valadez",
+  "apellido_paterno": "Aguilera",
+  "carrera": "Periodismo",
+  "ciclo": "2021A",
+  "codigo": "0987654321",
+  "curso": "en",
+  "email": "juanga@elnoanoa.mx",
+  "externo": false,
+  "genero": "M",
+  "grupo": "E1-1",
+  "id": 2,
+  "nivel": "1",
+  "nombre": "Alberto",
+  "telefono": "1234567890",
+}
+`;
+
+exports[`gets a student 1`] = `
+Object {
+  "apellido_materno": "Valadez",
+  "apellido_paterno": "Aguilera",
+  "carrera": "Abogado",
+  "ciclo": "2021A",
+  "codigo": "0987654321",
+  "curso": "en",
+  "email": "juanga@elnoanoa.mx",
+  "externo": false,
+  "genero": "M",
+  "grupo": "E1-1",
+  "id": 2,
+  "nivel": "1",
+  "nombre": "Alberto",
+  "telefono": "1234567890",
+}
+`;

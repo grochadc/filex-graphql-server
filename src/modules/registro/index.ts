@@ -83,22 +83,6 @@ export const typeDefs = gql`
     time: Boolean
   }
 
-  input StudentInput {
-    codigo: ID!
-    nombre: String!
-    apellido_materno: String!
-    apellido_paterno: String!
-    genero: String!
-    carrera: String!
-    ciclo: String!
-    telefono: String!
-    email: String!
-    nivel: String!
-    grupo: String!
-    externo: Boolean!
-    curso: String!
-  }
-
   type RegisterResponse {
     codigo: ID!
     nombre: String!

@@ -1,16 +1,6 @@
 import { gql } from "apollo-server";
 
 const typeDefs = gql`
-  type Student {
-    id: ID!
-    code: String!
-    name: String!
-    first_last_name: String!
-    second_last_name: String!
-    level: Int!
-    group: String!
-  }
-
   type Workshop {
     id: ID!
     name: String!

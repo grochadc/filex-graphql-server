@@ -45,7 +45,8 @@ const server = new ApolloServer({
     require("./modules/firebase_api"),
     require("./modules/registro"),
     require("./modules/workshops"),
-    require("./modules/grades")
+    require("./modules/grades"),
+    require("./modules/students")
   ],
   dataSources: () => {
     return {
@@ -53,7 +54,7 @@ const server = new ApolloServer({
       registroAPI: new RegistroAPI(),
       examAPI: new ExamAPI(),
       workshopsAPI: new WorkshopsAPI(),
-      studentsAPI: new StudentsAPI(),
+      studentsAPI: new StudentsAPI(db),
       placementAPI: new PlacementAPI(),
       placementSheetsAPI: new PlacementSheetsAPI(
         "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"
