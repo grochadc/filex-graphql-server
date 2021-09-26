@@ -92,7 +92,7 @@ Object {
 exports[`student data already registered 1`] = `
 Object {
   "student": Object {
-    "nombre": "Juan",
+    "nombre": "Alberto",
     "reservation": Object {
       "day": "Lunes",
       "teacher_name": "Fulanito",
@@ -116,15 +116,29 @@ Object {
 exports[`teacher dashboard no reservations 1`] = `
 Object {
   "teacher": Object {
-    "id": "teacher_id2",
-    "name": "Manganito",
+    "id": "3",
+    "name": "Sutanito",
     "options": Array [
       Object {
         "day": "Lunes",
-        "id": "id1",
+        "id": "5",
         "reservations": null,
-        "time": "1300 - 14:00",
-        "url": "http://url1",
+        "time": "13:00 - 14:00",
+        "url": "https://meet.google.com/sutanitolink1",
+      },
+      Object {
+        "day": "Martes",
+        "id": "6",
+        "reservations": null,
+        "time": "13:00 - 14:00",
+        "url": "https://meet.google.com/sutanitolink2",
+      },
+      Object {
+        "day": "Viernes",
+        "id": "21",
+        "reservations": null,
+        "time": "13:00 - 14:00",
+        "url": "https://meet.google.com/sutanitolink3",
       },
     ],
   },
@@ -134,33 +148,120 @@ Object {
 exports[`teacher dashboard normal 1`] = `
 Object {
   "teacher": Object {
-    "id": "teacher_id1",
-    "name": "Fulanito",
+    "id": "4",
+    "name": "Gonzalo",
     "options": Array [
       Object {
-        "day": "Lunes",
-        "id": "id1",
+        "day": "Miercoles",
+        "id": "7",
         "reservations": Array [
           Object {
             "apellido_materno": "Ocasio",
             "apellido_paterno": "Martinez",
-            "codigo": "1234567890",
+            "codigo": "1234509876",
             "grupo": "E4-1",
             "nivel": "4",
             "nombre": "Benito Antonio",
           },
         ],
-        "time": "1300 - 14:00",
-        "url": "http://url1",
+        "time": "13:00 - 14:00",
+        "url": "https://meet.google.com/ukv-avjt-qiy",
+      },
+      Object {
+        "day": "Jueves",
+        "id": "8",
+        "reservations": Array [
+          Object {
+            "apellido_materno": "Ocasio",
+            "apellido_paterno": "Martinez",
+            "codigo": "1234509876",
+            "grupo": "E4-1",
+            "nivel": "4",
+            "nombre": "Benito Antonio",
+          },
+        ],
+        "time": "13:00 - 14:00",
+        "url": "https://meet.google.com/ukv-avjt-qiy",
       },
       Object {
         "day": "Martes",
-        "id": "id2",
-        "reservations": null,
+        "id": "22",
+        "reservations": Array [
+          Object {
+            "apellido_materno": "Ocasio",
+            "apellido_paterno": "Martinez",
+            "codigo": "1234509876",
+            "grupo": "E4-1",
+            "nivel": "4",
+            "nombre": "Benito Antonio",
+          },
+        ],
         "time": "13:00 - 14:00",
-        "url": "http://url2",
+        "url": "https://meet.google.com/kux-jhii-eyi",
       },
     ],
   },
+}
+`;
+
+exports[`teacher links page dashboard 1`] = `
+Object {
+  "teacher": Object {
+    "id": "4",
+    "name": "Gonzalo",
+    "options": Array [
+      Object {
+        "day": "Miercoles",
+        "id": "7",
+        "reservations": Array [
+          Object {
+            "codigo": "1234509876",
+            "nombre": "Benito Antonio",
+          },
+        ],
+        "time": "13:00 - 14:00",
+        "workshop_name": "Conversation",
+      },
+      Object {
+        "day": "Jueves",
+        "id": "8",
+        "reservations": Array [
+          Object {
+            "codigo": "1234509876",
+            "nombre": "Benito Antonio",
+          },
+        ],
+        "time": "13:00 - 14:00",
+        "workshop_name": "Conversation",
+      },
+      Object {
+        "day": "Martes",
+        "id": "22",
+        "reservations": Array [
+          Object {
+            "codigo": "1234509876",
+            "nombre": "Benito Antonio",
+          },
+        ],
+        "time": "13:00 - 14:00",
+        "workshop_name": "Tutoring",
+      },
+    ],
+  },
+}
+`;
+
+exports[`teacher links page names and ids 1`] = `
+Object {
+  "teachers": Array [
+    Object {
+      "id": "1",
+      "name": "Fulanito",
+    },
+    Object {
+      "id": "2",
+      "name": "Menganito",
+    },
+  ],
 }
 `;

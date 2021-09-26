@@ -6,7 +6,6 @@ export const typeDefs = gql`
     paramQuery(param: String): Boolean
     options: [Option!]!
     workshops: [Workshop!]!
-    student(codigo: ID!): Student!
     teacher(id: ID!): Teacher!
     teachers: [Teacher!]!
     getWorkshopsByCategory(category: String!): Workshop!
@@ -82,36 +81,25 @@ export const typeDefs = gql`
     options: [TeacherOption!]!
   }
 
-  type Student {
-    id: ID!
-    codigo: String!
-    nombre: String!
-    apellido_paterno: String!
-    apellido_materno: String!
-    genero: String!
-    carrera: String!
-    ciclo: String!
-    telefono: String!
-    email: String!
-    nivel: String!
-    curso: String!
-    externo: Boolean!
-    grupo: String!
+  extend type Student {
     reservation: StudentReservation
   }
 
   extend type Mutation {
     toggleOpenWorkshops: Boolean!
+
     makeWorkshopReservation(
       student_id: ID!
       option_id: ID!
       tutorial_reason: String
     ): StudentReservation!
+
     saveWorkshopsAttendance(
       input: [AttendingStudent!]!
       option_id: ID!
       teacher_id: ID!
     ): Boolean!
+
     resetReservations: Boolean!
     setWorkshopLink(option_id: ID!, url: String!): Boolean!
   }
@@ -153,14 +141,14 @@ export const resolvers: Resolvers = {
     },
     teachers: (root, args, { dataSources }) => {
       return dataSources.databaseAPI.getAllTeachers();
-    },
-    student: async (root, args, { dataSources }) => {
-      return dataSources.databaseAPI.getStudent(args.codigo);
     }
   },
   TeacherOption: {
     reservations: (teacherOption, args, { dataSources }) => {
-      return dataSources.databaseAPI.getTeacherReservations(teacherOption.id);
+      const result = dataSources.databaseAPI.getTeacherReservations(
+        teacherOption.id
+      );
+      return result;
     }
   },
   Student: {
@@ -168,8 +156,7 @@ export const resolvers: Resolvers = {
       const reservations = await dataSources.databaseAPI.getStudentReservation(
         student.id
       );
-      if (reservations.length === 0) return null;
-      return reservations[0];
+      return reservations;
     }
   },
   Mutation: {
@@ -181,7 +168,7 @@ export const resolvers: Resolvers = {
         Number(args.option_id),
         args.tutorial_reason
       );
-      return result[0];
+      return result;
     },
     saveWorkshopsAttendance: async (
       root,
@@ -192,62 +179,27 @@ export const resolvers: Resolvers = {
       dataSources.databaseAPI.deleteOptionReservations(option_id);
       return result;
     },
+    editStudent: () => {
+      return {
+        id: 1,
+        codigo: "1234567890",
+        nombre: "Benito Antonio",
+        apellido_paterno: "Martinez",
+        apellido_materno: "Ocasio",
+        genero: "M",
+        carrera: "Abogado",
+        ciclo: "2021A",
+        telefono: "1234567890",
+        email: "bad@bunny.pr",
+        nivel: "4",
+        curso: "en",
+        grupo: "E4-1",
+        externo: false
+      };
+    },
     resetReservations: (root, args, { dataSources }) =>
       dataSources.databaseAPI.resetReservations(),
     setWorkshopLink: (root, { option_id, url }, { dataSources }) =>
       dataSources.workshopsAPI.setWorkshopLink(option_id, url)
-  }
-};
-
-const legacyMakeWorkshopReservationResolver = async (
-  root,
-  args,
-  { dataSources }
-) => {
-  return dataSources.workshopsAPI.makeReservation(
-    args.codigo,
-    args.teacher_id,
-    args.option_id,
-    args.tutorial_reason
-  );
-};
-
-const legacyWorkshopsResolver = async (root, args, { dataSources }) => {
-  const maxStudents = 30;
-  const workshops = await dataSources.workshopsAPI.getWorkshops();
-  const options = await dataSources.workshopsAPI.getOptions();
-  const availableOptions = await dataSources.workshopsAPI.getAvailableOptions();
-  const composedWorkshops = workshops.map(workshop => {
-    return {
-      ...workshop,
-      options: workshop.option_ids.map(option_id => {
-        return {
-          ...options[option_id],
-          available: availableOptions?.hasOwnProperty(option_id)
-            ? Boolean(availableOptions[option_id] < maxStudents)
-            : true
-        };
-      })
-    };
-  });
-  return composedWorkshops;
-};
-
-const legacyTeacherResolver = {
-  options: async (teacher, args, { dataSources }) => {
-    const allOptionsById = await dataSources.workshopsAPI.getOptions();
-    const result = teacher.option_ids.map(option_id => {
-      const reservations =
-        teacher.raw_reservations === undefined
-          ? null
-          : teacher.raw_reservations[option_id]
-          ? Object.values(teacher.raw_reservations[option_id])
-          : null;
-      return {
-        ...allOptionsById[option_id],
-        reservations
-      };
-    });
-    return result;
   }
 };
