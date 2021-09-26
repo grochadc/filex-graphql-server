@@ -2,7 +2,7 @@ import DatabaseAPI, {
   OptionModel,
   SIMPLE_TEACHER_INFO,
   SimpleTeacherInfo
-} from "./DatabaseAPI";
+} from "./index";
 
 const database = new DatabaseAPI({});
 
