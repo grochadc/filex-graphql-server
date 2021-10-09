@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
+import { sortWorkshops } from "./utils";
 
 export const typeDefs = gql`
   extend type Query {
@@ -78,7 +79,7 @@ export const typeDefs = gql`
   type Teacher {
     id: ID!
     name: String!
-    options: [TeacherOption!]!
+    options(sorted: Boolean): [TeacherOption!]!
   }
 
   extend type Student {
@@ -136,11 +137,21 @@ export const resolvers: Resolvers = {
       return allWorkshops;
     },
     teacher: async (root, args, { dataSources }) => {
-      const result = await dataSources.databaseAPI.getTeacher(args.id);
-      return result;
+      const teacher = await dataSources.databaseAPI.getTeacher(args.id);
+      return teacher;
     },
     teachers: (root, args, { dataSources }) => {
       return dataSources.databaseAPI.getAllTeachers();
+    }
+  },
+  Teacher: {
+    options: (root, args, context) => {
+      if (args.sorted) {
+        //@ts-ignore
+        return sortWorkshops(root.options);
+      }
+      //@ts-ignore
+      return root.options;
     }
   },
   TeacherOption: {

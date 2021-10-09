@@ -476,6 +476,11 @@ export type Teacher = {
   options: Array<TeacherOption>;
 };
 
+
+export type TeacherOptionsArgs = {
+  sorted?: Maybe<Scalars['Boolean']>;
+};
+
 export type TeacherOption = {
   __typename?: 'TeacherOption';
   id: Scalars['ID'];
@@ -912,7 +917,7 @@ export type StudentReservationResolvers<ContextType = ServerContext, ParentType 
 export type TeacherResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Teacher'] = ResolversParentTypes['Teacher']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  options?: Resolver<Array<ResolversTypes['TeacherOption']>, ParentType, ContextType>;
+  options?: Resolver<Array<ResolversTypes['TeacherOption']>, ParentType, ContextType, RequireFields<TeacherOptionsArgs, never>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
