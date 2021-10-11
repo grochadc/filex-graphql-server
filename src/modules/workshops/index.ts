@@ -1,6 +1,6 @@
 import { gql } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
-import { sortWorkshops } from "./utils";
+import { sortWorkshops, sortStudents } from "./utils";
 
 export const typeDefs = gql`
   extend type Query {
@@ -155,10 +155,11 @@ export const resolvers: Resolvers = {
     }
   },
   TeacherOption: {
-    reservations: (teacherOption, args, { dataSources }) => {
-      const result = dataSources.databaseAPI.getTeacherReservations(
+    reservations: async (teacherOption, args, { dataSources }) => {
+      const result = await dataSources.databaseAPI.getTeacherReservations(
         teacherOption.id
       );
+      if (result) return sortStudents(result);
       return result;
     }
   },

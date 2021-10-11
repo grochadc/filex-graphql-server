@@ -1,3 +1,4 @@
+import { Student } from "generated/graphql";
 export function sortWorkshops(options) {
   const dict = {
     Lunes: 1,
@@ -17,4 +18,14 @@ export function sortWorkshops(options) {
   const sortedByDay = options.slice().sort(byDay);
   const sortedByTime = sortedByDay.slice().sort(byTime);
   return sortedByTime;
+}
+
+export function sortStudents(students: any[]) {
+  const byName = (
+    left: { nombre: string },
+    right: { nombre: string }
+  ): number => {
+    return left.nombre.localeCompare(right.nombre);
+  };
+  return students.sort(byName);
 }
