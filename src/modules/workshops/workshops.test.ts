@@ -239,6 +239,15 @@ describe("reservations", () => {
     expect(res.errors).toBeUndefined();
     expect(res.data.resetReservations).toBe(true);
   });
+
+  test("errors when student already has a reservation", async () => {
+    const variables = {
+      student_id: "2",
+      option_id: "2"
+    };
+    const res = await query({ query: MAKE_RESERVATION, variables });
+    expect(res.errors[0].extensions.code).toBe("RESERVATION_FORBIDDEN");
+  });
 });
 
 describe("student data", () => {

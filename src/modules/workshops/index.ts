@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql, ApolloError } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
 import { sortWorkshops, sortStudents } from "./utils";
 
@@ -175,6 +175,15 @@ export const resolvers: Resolvers = {
     toggleOpenWorkshops: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.toggleOpen(),
     makeWorkshopReservation: async (root, args, { dataSources }) => {
+      const reservation = await dataSources.databaseAPI.getStudentReservation(
+        Number(args.student_id)
+      );
+      if (reservation) {
+        throw new ApolloError(
+          "Student already has a reservation",
+          "RESERVATION_FORBIDDEN"
+        );
+      }
       const result = await dataSources.databaseAPI.makeReservation(
         Number(args.student_id),
         Number(args.option_id),
