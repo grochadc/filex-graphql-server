@@ -221,6 +221,6 @@ export const resolvers: Resolvers = {
     resetReservations: (root, args, { dataSources }) =>
       dataSources.databaseAPI.resetReservations(),
     setWorkshopLink: (root, { option_id, url }, { dataSources }) =>
-      dataSources.workshopsAPI.setWorkshopLink(option_id, url)
+      dataSources.databaseAPI.setWorkshopLink(option_id, url)
   }
 };

@@ -122,6 +122,12 @@ SELECT
   ) as options FROM teacher Where id=$1 GROUP BY teacher.id;
 `;
 
+
+export const SET_WORKSHOP_LINK = `
+--SET_WORKSHOP_LINK
+UPDATE Option o SET url=$2 WHERE id=$1;
+`;
+
 export type TeacherReservation = {
   reservation_id: number;
   codigo: string;
@@ -176,6 +182,12 @@ class DatabaseAPI extends DataSource {
   constructor(db: any) {
     super();
     this.db = db;
+  }
+
+  async setWorkshopLink(option_id: string, url: string){
+    const id = Number(option_id);
+    await this.db.any(new PQ({text: SET_WORKSHOP_LINK, values: [id, url]}))
+    return true;
   }
   async getOptionsByIDs(ids: string[]): Promise<Option> {
     const parsedIDs = ids.map(id => Number(id));
