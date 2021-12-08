@@ -10,8 +10,6 @@ const typeDefs = gql`
     nombre: String!
     apellido_paterno: String!
     apellido_materno: String!
-    carrera: String!
-    email: String!
     midterm_grammar: String!
     midterm_oral: String!
     final_grammar: String!
@@ -22,6 +20,7 @@ const typeDefs = gql`
     reading: String!
     listening: String!
     final: String!
+    situation: String!
   }
 `;
 
@@ -31,13 +30,11 @@ const resolvers = {
       root,
       args: { codigo: string },
       context: { dataSources: { firebaseAPI: any } }
-    ) => {
-      return context.dataSources.firebaseAPI.getRef(`grades/${args.codigo}`);
-    },
-  },
+    ) => context.dataSources.firebaseAPI.getRef(`grades/${args.codigo}`)
+  }
 };
 
 module.exports = {
   typeDefs,
-  resolvers,
+  resolvers
 };
