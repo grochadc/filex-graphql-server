@@ -1,13 +1,18 @@
 import { gql } from "apollo-server";
 import * as utils from "../../utils";
 import { MeetLink } from "../../types/index";
+import { Resolvers } from "../../generated/graphql";
 
 const typeDefs = gql`
   extend type Query {
-    carreras: [Carrera]
+    carreras: [Carrera!]!
     isClosed: Boolean!
-    logIn: Int!
-    logOut: Int!
+    placementHomePageMessage: HomePageMessage!
+  }
+
+  type HomePageMessage {
+    active: Boolean!
+    message: String!
   }
 
   type Carrera {
@@ -16,21 +21,21 @@ const typeDefs = gql`
   }
 
   extend type Mutation {
-    saveWrittenResults(input: WrittenResultsInput): MutationResponse
+    saveWrittenResults(input: WrittenResultsInput): MutationResponse!
     closeExam: CloseExamResponse
-    setRows(input: WrittenResultsInput): Boolean!
   }
 
   input WrittenResultsInput {
     codigo: String!
     nombre: String!
     apellido_paterno: String!
-    apellido_materno: String
+    apellido_materno: String!
     genero: String!
-    ciclo: String
-    carrera: String
+    ciclo: String!
+    carrera: String!
     telefono: String!
     email: String!
+    institucionalEmail: String
     nivel_escrito: Int!
     curso: String!
     externo: Boolean!
@@ -42,10 +47,7 @@ const typeDefs = gql`
   }
 
   type MutationResponse {
-    status: Int!
-    message: String
-    error: String
-    id: String
+    id: String!
     meetLink: String
   }
 `;
@@ -66,19 +68,14 @@ interface TestInput {
   reubicacion: boolean;
 }
 
-const resolvers = {
+const resolvers: Resolvers = {
   Query: {
-    carreras: () => {
-      return [...carreras];
-    },
-    isClosed: () => {
-      return getIsClosed();
-    },
-    logIn: (root, args, { dataSources }) => {
-      return 0;
-    },
-    logOut: (root, args, { dataSources }) => {
-      return dataSources.placementAPI.logOutUser();
+    carreras: (root, args, { dataSources }) =>
+      dataSources.placementAPI.getCarreras(),
+    isClosed: () => getIsClosed(),
+    placementHomePageMessage: (root, args, { dataSources }) => {
+      const msg = dataSources.placementAPI.getHomePageMessage();
+      return msg;
     },
   },
 
@@ -93,29 +90,24 @@ const resolvers = {
       };
 
       const composeApplicant = (applicant, meetLink) => {
-        const makeExterno = (applicant) => {
-          return {
-            ...applicant,
-            carrera: "NA",
-            ciclo: "NA",
-            codigo: applicant.telefono,
-          };
-        };
-        const addExtraProps = (applicant) => {
-          return {
-            ...applicant,
-            meetLink: applicant.nivel_escrito > 2 ? meetLink : null,
-            id: utils.generateId(),
-          };
-        };
+        const makeExterno = (applicantd) => ({
+          ...applicant,
+          carrera: "NA",
+          ciclo: "NA",
+          codigo: applicant.telefono,
+        });
+        const addExtraProps = (applicantd) => ({
+          ...applicant,
+          meetLink: applicant.nivel_escrito > 2 ? meetLink : null,
+          id: utils.generateId(),
+        });
         return addExtraProps(
           applicant.externo ? makeExterno(applicant) : applicant
         );
       };
 
-      const meetLinksUnfiltered: MeetLink[] = await dataSources.placementAPI.getMeetLinks(
-        enviroment
-      );
+      const meetLinksUnfiltered: MeetLink[] =
+        await dataSources.placementAPI.getMeetLinks(enviroment);
       const meetLinks = meetLinksUnfiltered.filter((link) => link.active);
 
       function getCurrentLink(meetLinks: any[], carousel: any) {
@@ -134,94 +126,26 @@ const resolvers = {
           : getCurrentLink(meetLinks, context.carousel);
 
       const applicant = composeApplicant(args.input, currentLink);
+      await dataSources.placementSheetsAPI.saveApplicant(applicant);
 
-      return dataSources.placementSheetsAPI
-        .saveApplicant(applicant)
-        .then(() => {
-          console.log("Saved applicant to sheets successfully");
-          return {
-            status: 200,
-            message: "successful",
-            meetLink: applicant.meetLink,
-            id: applicant.id,
-          };
-        })
-        .catch(({ errors }) => {
-          console.log("There was an error:", errors[0].message);
-          dataSources.placementAPI
-            .addApplicant(applicant)
-            .then(() =>
-              console.log(
-                "Saved the applicant in firebase because of a problem with sheets"
-              )
-            );
-          return {
-            status: 400,
-            message: errors[0].message,
-            error: errors[0].reason,
-          };
-        });
+      return {
+        meetLink: applicant.meetLink,
+        id: applicant.id,
+      };
     },
     closeExam: (_, args) => {
       toggleIsClosed();
       return { isClosed: getIsClosed() };
     },
-    setRows: (root, args, { dataSources }) => {
-      dataSources.placementSheetsAPI.setRows(args.data);
-      return true;
-    },
   },
 };
 
 let isClosed = true;
-const getIsClosed = () => {
-  return isClosed;
-};
+const getIsClosed = () => isClosed;
 const toggleIsClosed = () => {
   isClosed = !isClosed;
 };
 
-const carreras = [
-  { name: "Academico" },
-  { name: "Administrativo" },
-  { name: "Abogado" },
-  { name: "Administración de Negocios" },
-  { name: "Agrobiotecnología" },
-  { name: "Agronegocios" },
-  { name: "Carrera en Enfermería (ENFE)" },
-  {
-    name:
-      "Ciencia del Comportamiento con Orientación en Alimentación y Nutrición",
-  },
-  {
-    name:
-      "Ciencia del Comportamiento con orientación en Alimentación y Nutrición",
-  },
-  { name: "Cultura Física y Deportes" },
-  { name: "Derecho" },
-  { name: "Desarrollo Turístico Sustentable" },
-  { name: "Enfermería" },
-  { name: "Enfermería Semiescolarizada" },
-  { name: "Estudios Socioterritoriales" },
-  { name: "Ingeniería en Geofísica" },
-  { name: "Ingeniería en Sistemas Biológicos" },
-  { name: "Ingeniería en Telemática" },
-  { name: "Letras Hispánicas" },
-  { name: "Médico Cirujano y Partero" },
-  { name: "Médico Veterinario y Zootecnista" },
-  { name: "Negocios Internacionales" },
-  { name: "Nivelación en Licenciatura en Enfermería" },
-  { name: "Nutrición" },
-  { name: "Periodismo" },
-  { name: "Seguridad Laboral, Protección Civil y Emergencias" },
-  { name: "Psicología" },
-  { name: "Psicología con Orientación en Calidad de Vida y Salud" },
-  { name: "Psicología con Orientación en Calidad de Vida y Salud" },
-  { name: "Salud Pública" },
-  { name: "Tecnologías para el Aprendizaje" },
-  { name: "Trabajo Social" },
-  { name: "Cirujano Dentista" },
-];
 module.exports = {
   typeDefs,
   resolvers,

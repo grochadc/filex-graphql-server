@@ -1,9 +1,10 @@
 import { gql } from "apollo-server";
 import { MeetLink } from "../../types/index";
+import { Resolvers } from "../../generated/graphql";
 
 const typeDefs = gql`
   extend type Query {
-    meetLinks: [meetLink]!
+    meetLinks: [meetLink!]!
   }
 
   type meetLink {
@@ -14,9 +15,15 @@ const typeDefs = gql`
   }
 
   extend type Mutation {
-    setMeetLinks(links: [MeetLinkInput]!): Int
-    setMeetLink(link: MeetLinkInputWithID!): Int
-    removeMeetLink(link: MeetLinkInputWithID!): Int
+    setMeetLinks(links: [MeetLinkInput!]!): Int!
+    setMeetLink(link: MeetLinkInputWithID!): Int!
+    removeMeetLink(link: MeetLinkInputWithID!): Int!
+    setPlacementHomePageMessage(input: PlacementHomePageMessageInput!): Boolean!
+  }
+
+  input PlacementHomePageMessageInput {
+    message: String!
+    active: Boolean!
   }
 
   input MeetLinkInput {
@@ -34,11 +41,10 @@ const typeDefs = gql`
   }
 `;
 
-const resolvers = {
+const resolvers: Resolvers = {
   Query: {
-    meetLinks: async (root, args, { dataSources, enviroment }) => {
-      return dataSources.placementAPI.getMeetLinks(enviroment);
-    },
+    meetLinks: async (root, args, { dataSources, enviroment }) =>
+      dataSources.placementAPI.getMeetLinks(enviroment),
   },
 
   Mutation: {
@@ -66,6 +72,9 @@ const resolvers = {
     ) => {
       await dataSources.placementAPI.removeMeetLink(link, enviroment);
       return 200;
+    },
+    setPlacementHomePageMessage: (root, args, { dataSources }) => {
+      return dataSources.placementAPI.setPlacementHomePageMessage(args.input);
     },
   },
 };

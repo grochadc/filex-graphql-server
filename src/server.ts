@@ -1,6 +1,6 @@
 import { ApolloServer } from "apollo-server";
 import db from "./datasources/database";
-require("dotenv").config();
+import Carousel from "./utils/Carousel";
 import {
   FirebaseAPI,
   RegistroAPI,
@@ -10,9 +10,10 @@ import {
   PlacementAPI,
   PlacementSheetsAPI,
   SheetsAPI,
-  DatabaseAPI
+  DatabaseAPI,
 } from "./datasources";
-import Carousel from "./utils/Carousel";
+
+require("dotenv").config();
 
 //add datasources both here and on server object
 export type DataSourcesType = {
@@ -46,10 +47,10 @@ const server = new ApolloServer({
     require("./modules/registro"),
     require("./modules/workshops"),
     require("./modules/grades"),
-    require("./modules/students")
+    require("./modules/students"),
   ],
   dataSources: () => {
-    return {
+    const result = {
       firebaseAPI: new FirebaseAPI(),
       registroAPI: new RegistroAPI(),
       examAPI: new ExamAPI(),
@@ -65,8 +66,9 @@ const server = new ApolloServer({
       workshopsSheetsAPI: new SheetsAPI(
         "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
       ),
-      databaseAPI: new DatabaseAPI(db)
+      databaseAPI: new DatabaseAPI(db),
     };
+    return result;
   },
   cors: true,
   introspection: true,
@@ -74,7 +76,7 @@ const server = new ApolloServer({
   context: ({ req }) => {
     const clientEnviroment = req.headers["client-enviroment"];
     return { enviroment: clientEnviroment, carousel };
-  }
+  },
 });
 
 server.listen(process.env.PORT || 5000).then(({ url }) => {

@@ -50,7 +50,7 @@ class PlacementAPI extends RESTDataSource {
     const links: MeetLink[] = await this.get(
       defaultMeetLinksLocation + ".json"
     );
-    const result = links.filter(item => item.id !== link.id);
+    const result = links.filter((item) => item.id !== link.id);
     return this.put(`${defaultMeetLinksLocation}.json`, JSON.stringify(result));
   }
 
@@ -72,6 +72,25 @@ class PlacementAPI extends RESTDataSource {
     this.context.dataSources.placementSheetsAPI.setOnlineUsers(counter);
     this.put(`/online.json`, counter.toString());
     return counter;
+  }
+
+  getCarreras() {
+    return this.get("/carreras.json");
+  }
+
+  getHomePageMessage() {
+    return this.get("/homePageMessage.json");
+  }
+
+  async setPlacementHomePageMessage(input: {
+    active: boolean;
+    message: string;
+  }) {
+    await this.put("/homePageMessage.json", {
+      active: input.active,
+      message: input.message,
+    });
+    return true;
   }
 }
 
