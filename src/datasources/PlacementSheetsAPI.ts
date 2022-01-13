@@ -22,6 +22,7 @@ class PlacementSheetsAPI extends SheetsAPI {
         applicant.carrera,
         applicant.telefono,
         applicant.email,
+        applicant.institucionalEmail,
         applicant.externo,
         applicant.reubicacion,
         applicant.curso,
