@@ -72,7 +72,7 @@ class RegistroAPI extends RESTDataSource {
     this.post(
       `${localUrl}/availableGroups/${student.curso}/level${student.nivel}/${student.grupo}.json`,
       "1"
-    ).catch(e => console.log("this.post Error", e));
+    ).catch((e) => console.log("this.post Error", e));
     this.setAlreadyRegistered(student.codigo, student.grupo);
 
     const parsedStudent = [
@@ -85,16 +85,17 @@ class RegistroAPI extends RESTDataSource {
       student.carrera,
       student.telefono,
       student.email,
+      student.institucionalEmail,
       student.nivel,
       student.grupo,
-      student.externo
+      student.externo,
     ];
     const values = [parsedStudent];
     const range = `${student.curso.charAt(0).toUpperCase()}${student.nivel}!A1`;
     this.context.dataSources.registroSheetsAPI
       .append(values, range)
       .then(() => "Saved student to sheets successfully!")
-      .catch(e => console.log("registriSheets Error", e));
+      .catch((e) => console.log("registriSheets Error", e));
 
     const schedule = await this.getSchedule(
       student.nivel,
@@ -166,7 +167,9 @@ class RegistroAPI extends RESTDataSource {
     this.put(
       `${this.context.enviroment}/alreadyRegistered/${codigo}.json`,
       JSON.stringify(grupo)
-    ).catch(e => console.log("Put already registered", e.extensions.response));
+    ).catch((e) =>
+      console.log("Put already registered", e.extensions.response)
+    );
   }
 }
 

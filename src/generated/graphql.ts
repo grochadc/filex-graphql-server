@@ -34,6 +34,7 @@ export type Applicant = {
   ciclo: Scalars['String'];
   telefono: Scalars['String'];
   email: Scalars['String'];
+  institucionalEmail?: Maybe<Scalars['String']>;
   nivel: Scalars['String'];
   curso: Scalars['String'];
   externo: Scalars['Boolean'];
@@ -53,6 +54,7 @@ export type ApplicantInput = {
   ciclo: Scalars['String'];
   telefono: Scalars['String'];
   email: Scalars['String'];
+  institucionalEmail?: Maybe<Scalars['String']>;
   nivel: Scalars['String'];
   curso: Scalars['String'];
   externo: Scalars['Boolean'];
@@ -70,6 +72,7 @@ export type ApplicantResponse = {
   ciclo: Scalars['String'];
   telefono: Scalars['String'];
   email: Scalars['String'];
+  institucionalEmail?: Maybe<Scalars['String']>;
   nivel: Scalars['String'];
   curso: Scalars['String'];
   externo: Scalars['Boolean'];
@@ -459,6 +462,7 @@ export type StudentInput = {
   nivel: Scalars['String'];
   grupo: Scalars['String'];
   externo: Scalars['Boolean'];
+  institucionalEmail?: Maybe<Scalars['String']>;
   curso: Scalars['String'];
 };
 
@@ -520,6 +524,7 @@ export type WrittenResultsInput = {
   carrera: Scalars['String'];
   telefono: Scalars['String'];
   email: Scalars['String'];
+  institucionalEmail?: Maybe<Scalars['String']>;
   nivel_escrito: Scalars['Int'];
   curso: Scalars['String'];
   externo: Scalars['Boolean'];
@@ -704,6 +709,7 @@ export type ApplicantResolvers<ContextType = ServerContext, ParentType extends R
   ciclo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   telefono?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  institucionalEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   nivel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   curso?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -724,6 +730,7 @@ export type ApplicantResponseResolvers<ContextType = ServerContext, ParentType e
   ciclo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   telefono?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  institucionalEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   nivel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   curso?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;

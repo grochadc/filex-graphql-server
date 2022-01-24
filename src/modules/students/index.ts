@@ -41,6 +41,7 @@ export const typeDefs = gql`
     nivel: String!
     grupo: String!
     externo: Boolean!
+    institucionalEmail: String
     curso: String!
   }
 
@@ -65,7 +66,7 @@ export const resolvers: Resolvers = {
   Query: {
     student: async (root, args, { dataSources }) => {
       return dataSources.studentsAPI.getStudent(args.codigo);
-    }
+    },
   },
   Mutation: {
     addStudent: async (root, args, { dataSources }) => {
@@ -73,6 +74,6 @@ export const resolvers: Resolvers = {
     },
     editStudent: async (root, { codigo, changes }, { dataSources }) => {
       return dataSources.studentsAPI.editStudent(codigo, changes);
-    }
-  }
+    },
+  },
 };

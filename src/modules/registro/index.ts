@@ -25,6 +25,7 @@ export const typeDefs = gql`
     ciclo: String!
     telefono: String!
     email: String!
+    institucionalEmail: String
     nivel: String!
     curso: String!
     externo: Boolean!
@@ -44,6 +45,7 @@ export const typeDefs = gql`
     ciclo: String!
     telefono: String!
     email: String!
+    institucionalEmail: String
     nivel: String!
     curso: String!
     externo: Boolean!
@@ -60,6 +62,7 @@ export const typeDefs = gql`
     ciclo: String!
     telefono: String!
     email: String!
+    institucionalEmail: String
     nivel: String!
     curso: String!
     externo: Boolean!
@@ -112,7 +115,7 @@ export const resolvers: Resolvers = {
       const course = group.substr(0, 1) === "E" ? "en" : "fr";
       const level = group.substr(1, 1);
       return dataSources.registroAPI.getSchedule(level, group, course);
-    }
+    },
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {
@@ -130,13 +133,12 @@ export const resolvers: Resolvers = {
       );
     },
     saveApplicant: (root, args, { dataSources }) =>
-      dataSources.registroAPI.saveApplicant(args.codigo, args.input)
+      dataSources.registroAPI.saveApplicant(args.codigo, args.input),
   },
   Applicant: {
     registering: async (root, args, { dataSources }) => {
-      const registeringLevels = await dataSources.registroAPI.getLevelsRegistering(
-        root.curso
-      );
+      const registeringLevels =
+        await dataSources.registroAPI.getLevelsRegistering(root.curso);
       return registeringLevels.includes(root.nivel);
     },
     schedules: async (root, args, { dataSources }) => {
@@ -161,16 +163,15 @@ export const resolvers: Resolvers = {
         unavailable: string[]
       ) {
         return schedules.filter(
-          schedule => !unavailable.includes(schedule.group)
+          (schedule) => !unavailable.includes(schedule.group)
         );
       }
 
       return availableSchedules(allSchedules, unavailable);
     },
     registeredSchedule: async (root, args, { dataSources }) => {
-      const registeredGroup = await dataSources.registroAPI.getAlreadyRegistered(
-        root.codigo
-      );
+      const registeredGroup =
+        await dataSources.registroAPI.getAlreadyRegistered(root.codigo);
       if (registeredGroup) {
         return dataSources.registroAPI.getSchedule(
           root.nivel,
@@ -179,7 +180,7 @@ export const resolvers: Resolvers = {
         );
       }
       return null;
-    }
+    },
   },
   Schedule: {
     serialized: (root, args) => {
@@ -189,6 +190,6 @@ export const resolvers: Resolvers = {
         } ${options.time ? source.time : ""}`;
       };
       return serialize(args.options, root);
-    }
-  }
+    },
+  },
 };
