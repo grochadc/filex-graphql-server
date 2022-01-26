@@ -38,6 +38,7 @@ export const typeDefs = gql`
     ciclo: String!
     telefono: String!
     email: String!
+    institucionalEmail: String
     nivel: String!
     grupo: String!
     externo: Boolean!
