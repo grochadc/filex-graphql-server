@@ -9,7 +9,7 @@ import {
   OptionModel,
   StudentReservationModel,
   TeacherReservationModel,
-  DatabaseModel
+  DatabaseModel,
 } from "../modules/workshops/models";
 
 type Maybe<T> = T | null;
@@ -30,7 +30,7 @@ class WorkshopsAPI extends RESTDataSource {
   async toggleOpen(): Promise<boolean> {
     const open = await this.isOpen();
     await this.put(`${this.context.enviroment}/system/isOpen.json`, {
-      result: !open
+      result: !open,
     });
     return !open;
   }
@@ -80,13 +80,8 @@ class WorkshopsAPI extends RESTDataSource {
     const student = await this.context.dataSources.studentsAPI.getStudent(
       codigo
     );
-    const {
-      nombre,
-      apellido_paterno,
-      apellido_materno,
-      nivel,
-      grupo
-    } = student;
+    const { nombre, apellido_paterno, apellido_materno, nivel, grupo } =
+      student;
     const teacherReservation: TeacherReservationModel = {
       codigo: student.codigo,
       nombre,
@@ -98,14 +93,14 @@ class WorkshopsAPI extends RESTDataSource {
       option_name: "why? option_name from makeReservation dataSource",
       workshop_id: option.workshop_id,
       workshop_name: option.workshop_name,
-      tutorial_reason: tutorial_reason ? tutorial_reason : null
+      tutorial_reason: tutorial_reason ? tutorial_reason : null,
     };
     this.post(
       `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`,
       teacherReservation
     );
     this.put(`${this.context.enviroment}/studentsReservations/${codigo}.json`, {
-      option_id: option_id
+      option_id: option_id,
     });
 
     //enqueue
@@ -138,7 +133,7 @@ class WorkshopsAPI extends RESTDataSource {
 
   async saveAttendance(attendance: AttendingStudent[]) {
     const date = new Date();
-    const values = attendance.map(student => {
+    const values = attendance.map((student) => {
       return [
         `=date(${date.getFullYear()},${date.getMonth() + 1},${date.getDate()})`,
         student.codigo,
@@ -149,7 +144,7 @@ class WorkshopsAPI extends RESTDataSource {
         student.grupo,
         student.workshop,
         student.teacher,
-        student.attended
+        student.attended,
       ];
     });
     const range = "Attendance!A1";
@@ -170,6 +165,10 @@ class WorkshopsAPI extends RESTDataSource {
   async getMaxStudentReservations() {
     const result = await this.get(`${this.context.enviroment}/system.json`);
     return result.max_reservations;
+  }
+
+  async getReservationLimit(): Promise<number> {
+    return this.get("/reservationLimit.json");
   }
 }
 

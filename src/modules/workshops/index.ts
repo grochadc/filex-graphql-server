@@ -84,6 +84,8 @@ export const typeDefs = gql`
 
   extend type Student {
     reservation: StudentReservation
+    reservationCount: Int!
+    reservationLimit: Int!
   }
 
   extend type Mutation {
@@ -126,11 +128,13 @@ export const resolvers: Resolvers = {
       return true;
     },
     options: async (option, args, { dataSources }) => {
-      const max_students = await dataSources.workshopsAPI.getMaxStudentReservations();
+      const max_students =
+        await dataSources.workshopsAPI.getMaxStudentReservations();
       return dataSources.databaseAPI.getAllOptions(max_students);
     },
     workshops: async (root, args, { dataSources }) => {
-      const max_students = await dataSources.workshopsAPI.getMaxStudentReservations();
+      const max_students =
+        await dataSources.workshopsAPI.getMaxStudentReservations();
       const allWorkshops = await dataSources.databaseAPI.getAllWorkshops(
         max_students
       );
@@ -142,7 +146,7 @@ export const resolvers: Resolvers = {
     },
     teachers: (root, args, { dataSources }) => {
       return dataSources.databaseAPI.getAllTeachers();
-    }
+    },
   },
   Teacher: {
     options: (root, args, context) => {
@@ -152,7 +156,7 @@ export const resolvers: Resolvers = {
       }
       //@ts-ignore
       return root.options;
-    }
+    },
   },
   TeacherOption: {
     reservations: async (teacherOption, args, { dataSources }) => {
@@ -161,7 +165,7 @@ export const resolvers: Resolvers = {
       );
       if (result) return sortStudents(result);
       return result;
-    }
+    },
   },
   Student: {
     reservation: async (student, args, { dataSources }) => {
@@ -169,7 +173,11 @@ export const resolvers: Resolvers = {
         student.id
       );
       return reservations;
-    }
+    },
+    reservationCount: () => 0,
+    reservationLimit: (student, args, { dataSources }) => {
+      return dataSources.workshopsAPI.getReservationLimit();
+    },
   },
   Mutation: {
     toggleOpenWorkshops: (root, args, { dataSources }) =>
@@ -215,12 +223,12 @@ export const resolvers: Resolvers = {
         nivel: "4",
         curso: "en",
         grupo: "E4-1",
-        externo: false
+        externo: false,
       };
     },
     resetReservations: (root, args, { dataSources }) =>
       dataSources.databaseAPI.resetReservations(),
     setWorkshopLink: (root, { option_id, url }, { dataSources }) =>
-      dataSources.databaseAPI.setWorkshopLink(option_id, url)
-  }
+      dataSources.databaseAPI.setWorkshopLink(option_id, url),
+  },
 };

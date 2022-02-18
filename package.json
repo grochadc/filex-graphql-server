@@ -12,7 +12,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "test": "jest --watchAll",
-    "build": "npx typescript@latest",
+    "build": "npx tsc",
     "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
     "codegenserver": "ts-node -T --files src/server.ts",
     "publish": "git push heroku master",

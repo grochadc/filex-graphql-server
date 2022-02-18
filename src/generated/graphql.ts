@@ -290,6 +290,7 @@ export type Query = {
   teachers: Array<Teacher>;
   getWorkshopsByCategory: Workshop;
   isWorkshopsOpen: Scalars['Boolean'];
+  codegen?: Maybe<Scalars['Boolean']>;
   grades: Grades;
   student: Student;
 };
@@ -431,6 +432,8 @@ export type Student = {
   externo: Scalars['Boolean'];
   grupo: Scalars['String'];
   reservation?: Maybe<StudentReservation>;
+  reservationCount: Scalars['Int'];
+  reservationLimit: Scalars['Int'];
 };
 
 export type StudentChangesInput = {
@@ -838,6 +841,7 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   teachers?: Resolver<Array<ResolversTypes['Teacher']>, ParentType, ContextType>;
   getWorkshopsByCategory?: Resolver<ResolversTypes['Workshop'], ParentType, ContextType, RequireFields<QueryGetWorkshopsByCategoryArgs, 'category'>>;
   isWorkshopsOpen?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  codegen?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   grades?: Resolver<ResolversTypes['Grades'], ParentType, ContextType, RequireFields<QueryGradesArgs, 'codigo'>>;
   student?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<QueryStudentArgs, 'codigo'>>;
 };
@@ -916,6 +920,8 @@ export type StudentResolvers<ContextType = ServerContext, ParentType extends Res
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   grupo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   reservation?: Resolver<Maybe<ResolversTypes['StudentReservation']>, ParentType, ContextType>;
+  reservationCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  reservationLimit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
