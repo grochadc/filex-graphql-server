@@ -177,6 +177,18 @@ export const INSERT_RESERVATION = `
 
 export const DELETE_RESERVATIONS = `DELETE FROM reservation`;
 
+export const UPDATE_RESERVATION_COUNT = `
+--UPDATES STUDENT'S RESERVATION COUNT OR CREATES AN ENTRY IF STUDENT DOESN'T EXIST IN RESERVATIONCOUNTER TABLE
+INSERT INTO ReservationCounter (student_id, reservation_count) VALUES ($1, 1)
+ON CONFLICT (student_id) DO
+UPDATE SET reservation_count=excluded.reservation_count+ReservationCounter.reservation_count;
+`;
+
+export const SELECT_RESERVATION_COUNT = `
+--SELECTS A RESERVATION COUNT BY STUDENT_ID
+SELECT reservation_count FROM ReservationCounter WHERE student_id=$1;
+`;
+
 class DatabaseAPI extends DataSource {
   db: any;
   constructor(db: any) {
@@ -317,6 +329,22 @@ class DatabaseAPI extends DataSource {
       new PQ({ text: DELETE_TEACHER_RESERVATIONS, values: [parsedID] })
     );
   }
+  async updateReservationCount(student_id: number): Promise<boolean> {
+  const reservation = await this.db.none(
+    new PQ({
+      text: UPDATE_RESERVATION_COUNT,
+      values: [student_id]
+    })
+  );
+  return true;
+}
+async getReservationCount(student_id: number): Promise<number>{
+  const result = await this.db.one(
+    new PQ({ text: SELECT_RESERVATION_COUNT, values: [student_id] })
+  );
+  return result.reservation_count;
+}
+
 }
 
 export const GET_TEACHER_RESERVATIONS = `

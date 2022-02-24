@@ -174,7 +174,9 @@ export const resolvers: Resolvers = {
       );
       return reservations;
     },
-    reservationCount: () => 0,
+    reservationCount: (student, args, {dataSources}) => {
+      return dataSources.databaseAPI.getReservationCount(student.id)
+    },
     reservationLimit: (student, args, { dataSources }) => {
       return dataSources.workshopsAPI.getReservationLimit();
     },
@@ -192,12 +194,13 @@ export const resolvers: Resolvers = {
           "RESERVATION_FORBIDDEN"
         );
       }
-      const result = await dataSources.databaseAPI.makeReservation(
+      const resCount = await dataSources.databaseAPI.updateReservationCount(Number(args.student_id))
+      console.log('resCount', resCount)
+      return dataSources.databaseAPI.makeReservation(
         Number(args.student_id),
         Number(args.option_id),
         args.tutorial_reason
       );
-      return result;
     },
     saveWorkshopsAttendance: async (
       root,
