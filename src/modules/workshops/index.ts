@@ -174,8 +174,15 @@ export const resolvers: Resolvers = {
       );
       return reservations;
     },
-    reservationCount: (student, args, {dataSources}) => {
-      return dataSources.databaseAPI.getReservationCount(student.id)
+    //@ts-ignore
+    reservationCount: async (student, args, {dataSources}) => {
+      const reservationCount = await dataSources.databaseAPI.getReservationCount(student.id).catch((error) => {
+        if(error.code == "queryResultErrorCode.noData"){
+          console.log('Query Result Error')
+        }
+      });
+      console.log('reservationCount from resolver', reservationCount)
+      return reservationCount;
     },
     reservationLimit: (student, args, { dataSources }) => {
       return dataSources.workshopsAPI.getReservationLimit();

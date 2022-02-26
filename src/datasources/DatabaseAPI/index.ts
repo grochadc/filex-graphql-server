@@ -186,7 +186,11 @@ UPDATE SET reservation_count=excluded.reservation_count+ReservationCounter.reser
 
 export const SELECT_RESERVATION_COUNT = `
 --SELECTS A RESERVATION COUNT BY STUDENT_ID
-SELECT reservation_count FROM ReservationCounter WHERE student_id=$1;
+SELECT 
+COALESCE(
+  (SELECT reservation_count FROM ReservationCounter WHERE student_id=$1), 
+  0
+) AS reservation_count;
 `;
 
 class DatabaseAPI extends DataSource {
@@ -339,9 +343,11 @@ class DatabaseAPI extends DataSource {
   return true;
 }
 async getReservationCount(student_id: number): Promise<number>{
-  const result = await this.db.one(
+  const result: any = await this.db.one(
     new PQ({ text: SELECT_RESERVATION_COUNT, values: [student_id] })
-  );
+  ).catch(() => {
+    console.log("Catched error on reservation count db.one");
+  });
   return result.reservation_count;
 }
 
