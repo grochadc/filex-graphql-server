@@ -23,6 +23,7 @@ export const typeDefs = gql`
 
   type Option {
     id: ID!
+    active: Boolean!
     day: String!
     time: String!
     teacher_name: String!
