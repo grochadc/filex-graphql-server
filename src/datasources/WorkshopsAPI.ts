@@ -163,7 +163,7 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getMaxStudentReservations() {
-    const result = await this.get(`${this.context.enviroment}/system.json`);
+    const result = await this.get(`system.json`);
     return result.max_reservations;
   }
 

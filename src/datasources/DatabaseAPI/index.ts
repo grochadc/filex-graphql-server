@@ -89,6 +89,7 @@ export const SELECT_OPTIONS = `
 SELECT
   Option.id,
   Workshop.name as workshop_name,
+  Option.active,
   Option.day,
   Option.time,
   Teacher.name as teacher_name,
