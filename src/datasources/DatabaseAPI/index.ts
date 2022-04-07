@@ -5,6 +5,7 @@ import { ParameterizedQuery as PQ } from "pg-promise";
 
 export interface OptionModel {
   id: number;
+  active: boolean;
   day: string;
   time: string;
   teacher_name: string;

@@ -40,6 +40,8 @@ export interface OptionModel {
   workshop_id: string;
   workshop_name: string;
   isTutorial: boolean;
+  available: boolean;
+  active: boolean;
   url: string;
 }
 
