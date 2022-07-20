@@ -1,15 +1,72 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { MeetLink } from "../types/index";
 import { getIndexToModify, addIDsToLinks } from "../utils";
+import { ParameterizedQuery as PQ } from "pg-promise";
+import db from "../datasources/database";
+
+
+export interface TestInput {
+  codigo: string;
+  nombre: string;
+  apellido_paterno: string;
+  apellido_materno: string;
+  genero: string;
+  ciclo: string;
+  carrera: string;
+  telefono: string;
+  email: string;
+  institutionalEmail?: string;
+  nivel_escrito: number;
+  curso: string;
+  externo: boolean;
+  reubicacion: boolean;
+}
+
+export interface TestResults extends TestInput{
+  generated_id: string;
+  meetLink: string;
+}
+type PGDatabase = typeof db;
 
 class PlacementAPI extends RESTDataSource {
-  constructor() {
+  db: PGDatabase;
+  constructor(db: PGDatabase) {
     super();
+    this.db = db;
     this.baseURL = "https://filex-5726c.firebaseio.com/placement";
   }
 
   async addApplicant(applicant) {
-    return this.post(`applications.json`, applicant);
+    return this.post(`applications.json`, applicant );
+  }
+
+  async getTestResults(): Promise<TestResults[]> {
+    return this.db.many(GET_TEST_RESULTS);
+  }
+
+  async postTestResults(results: TestResults): Promise<null> {
+    const params = [
+      results.codigo, 
+      results.nombre, 
+      results.apellido_paterno, 
+      results.apellido_materno, 
+      results.genero, 
+      results.ciclo, 
+      results.carrera, 
+      results.telefono, 
+      results.email, 
+      results.institutionalEmail, 
+      results.nivel_escrito, 
+      results.curso,
+      results.externo, 
+      results.reubicacion,
+      results.generated_id,
+      results.meetLink
+    ];
+
+    return this.db.none(
+      new PQ({ text: POST_TEST_RESULTS, values: [...params] })
+    );
   }
 
   async getMeetLinks(env?: "dev" | "prod") {
@@ -93,5 +150,49 @@ class PlacementAPI extends RESTDataSource {
     return true;
   }
 }
+
+export const POST_TEST_RESULTS = `
+-- POST TEST RESULTS INTO DB
+INSERT INTO test_results (
+  codigo, 
+  nombre, 
+  apellido_paterno, 
+  apellido_materno, 
+  genero, 
+  ciclo, 
+  carrera, 
+  telefono, 
+  email, 
+  institucionalEmail, 
+  nivel_escrito, 
+  curso, externo, 
+  reubicacion,
+  generated_id,
+  meetLink
+  )
+VALUES (
+  $1, 
+  $2, 
+  $3, 
+  $4, 
+  $5, 
+  $6, 
+  $7, 
+  $8, 
+  $9, 
+  $10, 
+  $11, 
+  $12, 
+  $13, 
+  $14,
+  $15,
+  $16
+  );
+`;
+
+export const GET_TEST_RESULTS = `
+  -- Get the first 100 test results
+  SELECT * FROM test_results LIMIT 100;
+`;
 
 export { PlacementAPI };

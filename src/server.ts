@@ -8,8 +8,8 @@ import {
   WorkshopsAPI,
   StudentsAPI,
   PlacementAPI,
-  PlacementSheetsAPI,
-  SheetsAPI,
+  //PlacementSheetsAPI,
+  //SheetsAPI,
   DatabaseAPI,
 } from "./datasources";
 
@@ -23,9 +23,9 @@ export type DataSourcesType = {
   workshopsAPI: WorkshopsAPI;
   studentsAPI: StudentsAPI;
   placementAPI: PlacementAPI;
-  placementSheetsAPI: PlacementSheetsAPI;
-  registroSheetsAPI: SheetsAPI;
-  workshopsSheetsAPI: SheetsAPI;
+  //placementSheetsAPI: PlacementSheetsAPI;
+  //registroSheetsAPI: SheetsAPI;
+  //workshopsSheetsAPI: SheetsAPI;
   databaseAPI: DatabaseAPI;
 };
 
@@ -56,7 +56,8 @@ const server = new ApolloServer({
       examAPI: new ExamAPI(),
       workshopsAPI: new WorkshopsAPI(),
       studentsAPI: new StudentsAPI(db),
-      placementAPI: new PlacementAPI(),
+      placementAPI: new PlacementAPI(db),
+      /*
       placementSheetsAPI: new PlacementSheetsAPI(
         "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"
       ),
@@ -66,6 +67,7 @@ const server = new ApolloServer({
       workshopsSheetsAPI: new SheetsAPI(
         "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
       ),
+      */
       databaseAPI: new DatabaseAPI(db),
     };
     return result;

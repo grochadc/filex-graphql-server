@@ -2,12 +2,34 @@ import { gql } from "apollo-server";
 import * as utils from "../../utils";
 import { MeetLink } from "../../types/index";
 import { Resolvers } from "../../generated/graphql";
+import { TestInput, TestResults } from "datasources/PlacementAPI";
 
 const typeDefs = gql`
   extend type Query {
     carreras: [Carrera!]!
     isClosed: Boolean!
     placementHomePageMessage: HomePageMessage!
+    testResults: [TestResults]!
+  }
+
+
+  type TestResults {
+    codigo: String!
+    nombre: String!
+    apellido_paterno: String!
+    apellido_materno: String!
+    genero: String!
+    ciclo: String!
+    carrera: String!
+    telefono: String!
+    email: String!
+    institutionalEmail: String
+    nivel_escrito: Int!
+    curso: String!
+    externo: Boolean!
+    reubicacion: Boolean!
+    generated_id: String!
+    meetlink: String
   }
 
   type HomePageMessage {
@@ -52,22 +74,6 @@ const typeDefs = gql`
   }
 `;
 
-interface TestInput {
-  codigo: string;
-  nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  genero: string;
-  ciclo: string;
-  carrera: string;
-  telefono: string;
-  email: string;
-  nivel_escrito: number;
-  curso: string;
-  externo: boolean;
-  reubicacion: boolean;
-}
-
 const resolvers: Resolvers = {
   Query: {
     carreras: (root, args, { dataSources }) =>
@@ -77,6 +83,9 @@ const resolvers: Resolvers = {
       const msg = dataSources.placementAPI.getHomePageMessage();
       return msg;
     },
+    testResults: async (root, args, { dataSources }) => {
+      return dataSources.placementAPI.getTestResults();
+    }
   },
 
   Mutation: {
@@ -89,19 +98,21 @@ const resolvers: Resolvers = {
         carousel,
       };
 
-      const composeApplicant = (applicant, meetLink) => {
-        const makeExterno = (applicantd) => ({
+      const composeApplicant = (applicant: TestInput, meetLink: string) => {
+
+        const makeExterno = (applicantd: TestInput): TestInput => ({
           ...applicant,
           carrera: "NA",
           ciclo: "NA",
           codigo: applicant.telefono,
         });
-        const addExtraProps = (applicantd) => ({
+        const assignLink = (applicantd: TestInput): TestResults => ({
           ...applicant,
           meetLink: applicant.nivel_escrito > 2 ? meetLink : null,
-          id: utils.generateId(),
+          generated_id: utils.generateId(),
         });
-        return addExtraProps(
+
+        return assignLink(
           applicant.externo ? makeExterno(applicant) : applicant
         );
       };
@@ -111,6 +122,8 @@ const resolvers: Resolvers = {
       const meetLinks = meetLinksUnfiltered.filter((link) => link.active);
 
       function getCurrentLink(meetLinks: any[], carousel: any) {
+        if(meetLinks.length < 1) throw new Error("No video links available");
+
         const lastIndex = meetLinks.length - 1;
 
         if (carousel.limit !== lastIndex) carousel.setNewLimit(lastIndex);
@@ -125,12 +138,13 @@ const resolvers: Resolvers = {
           ? "http://meet.google.com/fwm-wqdb-ifw"
           : getCurrentLink(meetLinks, context.carousel);
 
+      //change SheetsAPI.saveApplicant for PlacementAPI.postTestResults(results/applicant);
       const applicant = composeApplicant(args.input, currentLink);
-      await dataSources.placementSheetsAPI.saveApplicant(applicant);
-
+      await dataSources.placementAPI.postTestResults(applicant);
+  
       return {
         meetLink: applicant.meetLink,
-        id: applicant.id,
+        id: applicant.generated_id,
       };
     },
     closeExam: (_, args) => {
