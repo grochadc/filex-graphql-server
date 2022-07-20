@@ -57,6 +57,8 @@ const db: { prod: OptionalDatabaseModel } = {
     },
     options: {
       option_id1: {
+        active: true,
+        available: true,
         id: "id1",
         day: "Lunes",
         time: "1300 - 14:00",
@@ -69,6 +71,8 @@ const db: { prod: OptionalDatabaseModel } = {
       },
       option_id2: {
         id: "id2",
+        active: true,
+        available: true,
         day: "Martes",
         time: "13:00 - 14:00",
         teacher_id: "teacher_id1",
