@@ -13,6 +13,8 @@ import {
   DatabaseAPI,
 } from "./datasources";
 
+import { PrismaClient } from "@prisma/client";
+
 require("dotenv").config();
 
 //add datasources both here and on server object
@@ -37,6 +39,7 @@ export type ServerContext = {
 
 //carousel has to be constructed here because context rebuilds on every request
 const carousel = new Carousel();
+const prisma = new PrismaClient();
 
 const server = new ApolloServer({
   modules: [
@@ -56,7 +59,7 @@ const server = new ApolloServer({
       examAPI: new ExamAPI(),
       workshopsAPI: new WorkshopsAPI(),
       studentsAPI: new StudentsAPI(db),
-      placementAPI: new PlacementAPI(db),
+      placementAPI: new PlacementAPI(prisma),
       /*
       placementSheetsAPI: new PlacementSheetsAPI(
         "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"

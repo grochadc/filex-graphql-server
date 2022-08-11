@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id               Int     @id @default(autoincrement())
+  codigo           String
+  nombre           String
+  apellido_paterno String
+  apellido_materno String
+  genero           String
+  carrera          String
+  ciclo_ingreso    String?
+  telefono         String
+  email            String
+  nivel            String
+  curso            String
+  externo          Boolean
+  grupo            String
+
+  @@map("student")
+}
+
+model Ciclo {
+  id         Int     @id(map: "course_pkey") @default(autoincrement())
+  codigo     String  @db.VarChar(255)
+  nivel      String? @db.VarChar(255)
+  curso      String? @db.VarChar(255)
+  grupo      String? @db.VarChar(255)
+  ciclo      String? @db.VarChar(255)
+  student_id Int?
+
+  @@map("ciclo")
+}
+
+model TestResults {
+  id                 Int      @id @default(autoincrement())
+  codigo             String   @db.VarChar(255)
+  nombre             String   @db.VarChar(255)
+  apellidoPaterno    String   @db.VarChar(255) @map("apellido_paterno")
+  apellidoMaterno    String   @db.VarChar(255) @map("apellido_materno")
+  genero             String   @db.VarChar(255)
+  ciclo              String   @db.VarChar(255)
+  carrera            String   @db.VarChar(255)
+  telefono           String   @db.VarChar(255)
+  email              String   @db.VarChar(255)
+  institucionalemail String?  @db.VarChar(255)
+  nivelEscrito       Int      @map("nivel_escrito")
+  curso              String   @db.VarChar(255)
+  externo            Boolean?
+  reubicacion        Boolean?
+  generated_id       String?  @db.VarChar(255)
+  meetLink           String?  @db.VarChar(255) @map("meetlink")
+  nivelOral          Int?     @map("nivel_oral")
+  nivelFinal         Int?     @map("nivel_final")
+
+  @@map("test_results")
+}
+
+model Option {
+  id          Int      @id(map: "options_pkey") @default(autoincrement())
+  day         String
+  time        String
+  url         String
+  teacher_id  Int
+  workshop_id Int
+  active      Boolean?
+
+  @@map("option")
+}
+
+model reservation {
+  id              Int     @id @default(autoincrement())
+  student_id      Int
+  option_id       Int
+  tutorial_reason String?
+}
+
+model reservationcounter {
+  id                Int  @id @default(autoincrement())
+  student_id        Int? @unique
+  reservation_count Int  @default(autoincrement())
+}
+
+model Teacher {
+  id         Int    @id(map: "teachers_pkey") @default(autoincrement())
+  name       String
+  option_ids Int[]
+
+  @@map("teacher")
+}
+
+model Workshop {
+  id          Int    @id(map: "workshops_pkey") @default(autoincrement())
+  name        String
+  description String
+  levels      Int[]
+  option_ids  Int[]
+
+  @@map("workshop")
+}

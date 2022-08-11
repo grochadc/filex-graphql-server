@@ -1,0 +1,120 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PlacementAPI Datasource gets assigned filtered results 1`] = `
+Object {
+  "testResults": Array [
+    Object {
+      "apellidoMaterno": "Ocasio",
+      "apellidoPaterno": "Martinez",
+      "carrera": "Abogado",
+      "ciclo": "2022A",
+      "codigo": "1234567890",
+      "curso": "en",
+      "email": "bad@bunny.pr",
+      "externo": false,
+      "generated_id": "generated_id_1",
+      "genero": "M",
+      "id": "1",
+      "institutionalEmail": null,
+      "meetLink": "meetLink1",
+      "nivelEscrito": 4,
+      "nivelFinal": 4,
+      "nivelOral": 4,
+      "nombre": "Benito Antonio",
+      "reubicacion": false,
+      "telefono": "34121234567",
+    },
+    Object {
+      "apellidoMaterno": "Valadez",
+      "apellidoPaterno": "Aguilera",
+      "carrera": "Abogado",
+      "ciclo": "2022A",
+      "codigo": "0987654321",
+      "curso": "en",
+      "email": "juanga@elnoanoa.mx",
+      "externo": false,
+      "generated_id": "generated_id_2",
+      "genero": "M",
+      "id": "2",
+      "institutionalEmail": null,
+      "meetLink": "meetLink2",
+      "nivelEscrito": 4,
+      "nivelFinal": 5,
+      "nivelOral": 5,
+      "nombre": "Alberto",
+      "reubicacion": false,
+      "telefono": "34121234567",
+    },
+  ],
+}
+`;
+
+exports[`PlacementAPI Datasource gets nonassigned filtered results 1`] = `
+Object {
+  "testResults": Array [
+    Object {
+      "apellidoMaterno": "Ocasio",
+      "apellidoPaterno": "Martinez",
+      "carrera": "Abogado",
+      "ciclo": "2022A",
+      "codigo": "1234567890",
+      "curso": "en",
+      "email": "bad@bunny.pr",
+      "externo": false,
+      "generated_id": "generated_id_1",
+      "genero": "M",
+      "id": "1",
+      "institutionalEmail": null,
+      "meetLink": "meetLink1",
+      "nivelEscrito": 4,
+      "nivelFinal": null,
+      "nivelOral": null,
+      "nombre": "Benito Antonio",
+      "reubicacion": false,
+      "telefono": "34121234567",
+    },
+    Object {
+      "apellidoMaterno": "Valadez",
+      "apellidoPaterno": "Aguilera",
+      "carrera": "Abogado",
+      "ciclo": "2022A",
+      "codigo": "0987654321",
+      "curso": "en",
+      "email": "juanga@elnoanoa.mx",
+      "externo": false,
+      "generated_id": "generated_id_2",
+      "genero": "M",
+      "id": "2",
+      "institutionalEmail": null,
+      "meetLink": "meetLink2",
+      "nivelEscrito": 4,
+      "nivelFinal": null,
+      "nivelOral": null,
+      "nombre": "Alberto",
+      "reubicacion": false,
+      "telefono": "34121234567",
+    },
+  ],
+}
+`;
+
+exports[`PlacementAPI Datasource gets unfiltered test results 1`] = `
+Object {
+  "testResults": Array [
+    Object {
+      "codigo": "1234567890",
+      "nivelEscrito": 4,
+      "nivelFinal": null,
+      "nivelOral": null,
+      "nombre": "Benito Antonio",
+    },
+    Object {
+      "codigo": "0987654321",
+      "nivelEscrito": 4,
+      "nivelFinal": 4,
+      "nivelOral": 4,
+      "nombre": "Alberto",
+    },
+  ],
+}
+`;

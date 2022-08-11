@@ -1,72 +1,73 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { MeetLink } from "../types/index";
 import { getIndexToModify, addIDsToLinks } from "../utils";
-import { ParameterizedQuery as PQ } from "pg-promise";
-import db from "../datasources/database";
 
+import { PrismaClient } from "@prisma/client";
 
-export interface TestInput {
-  codigo: string;
-  nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  genero: string;
-  ciclo: string;
-  carrera: string;
-  telefono: string;
-  email: string;
-  institutionalEmail?: string;
-  nivel_escrito: number;
-  curso: string;
-  externo: boolean;
-  reubicacion: boolean;
-}
-
-export interface TestResults extends TestInput{
-  generated_id: string;
-  meetLink: string;
-}
-type PGDatabase = typeof db;
+import {
+  TestResults,
+  Scalars,
+  OralResults,
+  WrittenResultsInput,
+} from "../generated/graphql";
+import { ApplicantWithMeetLink } from "modules/placement_exam";
 
 class PlacementAPI extends RESTDataSource {
-  db: PGDatabase;
-  constructor(db: PGDatabase) {
+  prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
     super();
-    this.db = db;
+    if (prisma === undefined) {
+      throw Error("Supply a new PrismaCLient() on constructor");
+    }
+
+    this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/placement";
   }
 
+  updateFinalResults(input: {
+    id: number;
+    nivelOral: number;
+    nivelFinal: number;
+  }): void {
+    this.prisma.testResults.update({
+      where: { id: input.id },
+      data: { nivelOral: input.nivelOral, nivelFinal: input.nivelFinal },
+    });
+  }
+
   async addApplicant(applicant) {
-    return this.post(`applications.json`, applicant );
+    return this.post(`applications.json`, applicant);
   }
 
-  async getTestResults(): Promise<TestResults[]> {
-    return this.db.many(GET_TEST_RESULTS);
+  async getTestResults(
+    filter: "ASSIGNED" | "NONASSIGNED" | "ALL" | undefined
+  ): Promise<TestResults[]> {
+    switch (filter) {
+      case "ASSIGNED":
+        return (
+          await this.prisma.testResults.findMany({
+            where: { nivelFinal: { not: null } },
+          })
+        ).map((item) => ({ ...item, id: String(item.id) }));
+      case "NONASSIGNED":
+        return (
+          await this.prisma.testResults.findMany({
+            where: { nivelFinal: null },
+          })
+        ).map((item) => ({ ...item, id: String(item.id) }));
+      default:
+        return (await this.prisma.testResults.findMany()).map((item) => ({
+          ...item,
+          id: String(item.id),
+        }));
+    }
   }
 
-  async postTestResults(results: TestResults): Promise<null> {
-    const params = [
-      results.codigo, 
-      results.nombre, 
-      results.apellido_paterno, 
-      results.apellido_materno, 
-      results.genero, 
-      results.ciclo, 
-      results.carrera, 
-      results.telefono, 
-      results.email, 
-      results.institutionalEmail, 
-      results.nivel_escrito, 
-      results.curso,
-      results.externo, 
-      results.reubicacion,
-      results.generated_id,
-      results.meetLink
-    ];
-
-    return this.db.none(
-      new PQ({ text: POST_TEST_RESULTS, values: [...params] })
-    );
+  async postTestResults(results: ApplicantWithMeetLink): Promise<string> {
+    const posted = await this.prisma.testResults.create({
+      data: results,
+    });
+    return String(posted.id);
   }
 
   async getMeetLinks(env?: "dev" | "prod") {

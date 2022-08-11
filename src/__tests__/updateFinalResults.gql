@@ -1,0 +1,3 @@
+mutation updateFinalResults($codigo: String!, $nivelOral: String!, $nivelFinal: String!) {
+        saveOralResults({ codigo: $codigo, nivelOral: $nivelOral, nivelFinal: $nivelFinal })
+    }

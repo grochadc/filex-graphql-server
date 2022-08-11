@@ -2,34 +2,51 @@ import { gql } from "apollo-server";
 import * as utils from "../../utils";
 import { MeetLink } from "../../types/index";
 import { Resolvers } from "../../generated/graphql";
-import { TestInput, TestResults } from "datasources/PlacementAPI";
+import { WrittenResultsInput, TestResults } from "../../generated/graphql";
+
+export interface ApplicantWithMeetLink extends WrittenResultsInput {
+  meetLink: string;
+  generated_id: string;
+  nivelEscrito: number;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+}
 
 const typeDefs = gql`
   extend type Query {
     carreras: [Carrera!]!
     isClosed: Boolean!
     placementHomePageMessage: HomePageMessage!
-    testResults: [TestResults]!
+    testResults(filter: Filter): [TestResults]!
+  }
+
+  enum Filter {
+    ASSIGNED,
+    NONASSIGNED,
+    ALL
   }
 
 
   type TestResults {
+    id: ID!
     codigo: String!
     nombre: String!
-    apellido_paterno: String!
-    apellido_materno: String!
+    apellidoPaterno: String!
+    apellidoMaterno: String!
     genero: String!
     ciclo: String!
     carrera: String!
     telefono: String!
     email: String!
     institutionalEmail: String
-    nivel_escrito: Int!
+    nivelEscrito: Int!
     curso: String!
     externo: Boolean!
     reubicacion: Boolean!
     generated_id: String!
-    meetlink: String
+    meetLink: String!
+    nivelOral: Int
+    nivelFinal: Int
   }
 
   type HomePageMessage {
@@ -45,6 +62,13 @@ const typeDefs = gql`
   extend type Mutation {
     saveWrittenResults(input: WrittenResultsInput): MutationResponse!
     closeExam: CloseExamResponse
+    saveOralResults(input: OralResults): Boolean!
+  }
+
+  input OralResults {
+    id: ID!
+    nivelOral: Int!
+    nivelFinal: Int!
   }
 
   input WrittenResultsInput {
@@ -84,11 +108,16 @@ const resolvers: Resolvers = {
       return msg;
     },
     testResults: async (root, args, { dataSources }) => {
-      return dataSources.placementAPI.getTestResults();
+      return dataSources.placementAPI.getTestResults(args.filter);
     }
   },
 
   Mutation: {
+    saveOralResults: async (root, { input }, { dataSources }) => {
+      const { id, nivelOral, nivelFinal } = input;
+      dataSources.placementAPI.updateFinalResults({ id: Number(id), nivelOral, nivelFinal })
+      return true;
+    },
     saveWrittenResults: async (
       _,
       args,
@@ -98,23 +127,27 @@ const resolvers: Resolvers = {
         carousel,
       };
 
-      const composeApplicant = (applicant: TestInput, meetLink: string) => {
+      const composeApplicant = (applicant: WrittenResultsInput, meetLink: string): ApplicantWithMeetLink => {
 
-        const makeExterno = (applicantd: TestInput): TestInput => ({
+        const makeExterno = (applicantd: WrittenResultsInput): WrittenResultsInput => ({
           ...applicant,
           carrera: "NA",
           ciclo: "NA",
           codigo: applicant.telefono,
         });
-        const assignLink = (applicantd: TestInput): TestResults => ({
+        const assignLink = (applicantd: WrittenResultsInput): ApplicantWithMeetLink => ({
           ...applicant,
+          apellidoPaterno: applicant.apellido_paterno,
+          apellidoMaterno: applicant.apellido_materno,
+          nivelEscrito: applicant.nivel_escrito,
           meetLink: applicant.nivel_escrito > 2 ? meetLink : null,
           generated_id: utils.generateId(),
         });
 
-        return assignLink(
+        const linkAssigned = assignLink(
           applicant.externo ? makeExterno(applicant) : applicant
         );
+        return linkAssigned;
       };
 
       const meetLinksUnfiltered: MeetLink[] =
@@ -140,11 +173,12 @@ const resolvers: Resolvers = {
 
       //change SheetsAPI.saveApplicant for PlacementAPI.postTestResults(results/applicant);
       const applicant = composeApplicant(args.input, currentLink);
-      await dataSources.placementAPI.postTestResults(applicant);
+      const createdId = await dataSources.placementAPI.postTestResults(applicant);
   
       return {
         meetLink: applicant.meetLink,
-        id: applicant.generated_id,
+        generated_id: applicant.generated_id,
+        id: createdId,
       };
     },
     closeExam: (_, args) => {
