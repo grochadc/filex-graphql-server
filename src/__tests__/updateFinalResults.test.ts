@@ -1,8 +1,9 @@
 import testServer from "../testUtils/testServer";
 import { PlacementAPI } from "../datasources";
 import { gql } from "apollo-server";
-import {Filter} from "../generated/graphql";
+import { Filter } from "../generated/graphql";
 import { PrismaClient } from "@prisma/client";
+import Carousel from "../utils/Carousel";
 
 describe("PlacementAPI Datasource", () => {
   let prisma;
@@ -14,6 +15,94 @@ describe("PlacementAPI Datasource", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
+  });
+
+  test("saves written results", async () => {
+    prisma.testResults.create = jest.fn(() => {
+      return Promise.resolve({ id: 1 });
+    });
+
+    const placementDatasource = new PlacementAPI(prisma);
+
+    placementDatasource.getMeetLinks = jest.fn(() => {
+      return Promise.resolve([
+        { id: "1", link: "meetLink", teacher: "gonzo", active: true },
+      ]);
+    });
+
+    const server = testServer(
+      () => ({
+        placementAPI: placementDatasource,
+      }),
+      () => ({
+        carousel: new Carousel(),
+      })
+    );
+
+    const res = await server.mutate({
+      mutation: gql`
+        mutation PostResults(
+          $codigo: String!
+          $nombre: String!
+          $apellido_paterno: String!
+          $apellido_materno: String!
+          $genero: String!
+          $ciclo: String!
+          $carrera: String!
+          $telefono: String!
+          $email: String!
+          $institucionalEmail: String
+          $externo: Boolean!
+          $reubicacion: Boolean!
+          $nivel_escrito: Int!
+          $curso: String!
+        ) {
+          saveWrittenResults(
+            input: {
+              codigo: $codigo
+              nombre: $nombre
+              apellidoPaterno: $apellido_paterno
+              apellidoMaterno: $apellido_materno
+              genero: $genero
+              ciclo: $ciclo
+              carrera: $carrera
+              telefono: $telefono
+              email: $email
+              institucionalEmail: $institucionalEmail
+              externo: $externo
+              reubicacion: $reubicacion
+              nivelEscrito: $nivel_escrito
+              curso: $curso
+            }
+          ) {
+            id
+            meetLink
+          }
+        }
+      `,
+      variables: {
+        codigo: "1234567890",
+        nombre: "Benito Antonio",
+        apellido_paterno: "Martinez",
+        apellido_materno: "Ocasio",
+        genero: "M",
+        ciclo: "2022A",
+        carrera: "Abogado",
+        telefono: "3121234567",
+        email: "bad@bunny.pr",
+        institucionalEmail: "benito.om@alumnos.cusur.udg.mx",
+        externo: false,
+        reubicacion: false,
+        nivel_escrito: 4,
+        curso: "en",
+      },
+    });
+
+    expect(res.errors).toBeUndefined();
+    expect(res.data).toEqual({
+      saveWrittenResults: { id: "1", meetLink: "meetLink" },
+    });
+    expect(prisma.testResults.create).toBeCalled();
   });
 
   test("calls prisma update on updateFinalResults", async () => {
@@ -95,7 +184,7 @@ describe("PlacementAPI Datasource", () => {
           apellidoPaterno: "Martinez",
           apellidoMaterno: "Ocasio",
           genero: "M",
-          ciclo:"2022A",
+          ciclo: "2022A",
           carrera: "Abogado",
           telefono: "34121234567",
           email: "bad@bunny.pr",
@@ -114,7 +203,7 @@ describe("PlacementAPI Datasource", () => {
           apellidoPaterno: "Aguilera",
           apellidoMaterno: "Valadez",
           genero: "M",
-          ciclo:"2022A",
+          ciclo: "2022A",
           carrera: "Abogado",
           telefono: "34121234567",
           email: "juanga@elnoanoa.mx",
@@ -125,7 +214,7 @@ describe("PlacementAPI Datasource", () => {
           generated_id: "generated_id_2",
           meetLink: "meetLink2",
           nivelEscrito: 4,
-        }
+        },
       ]);
     });
 
@@ -160,8 +249,8 @@ describe("PlacementAPI Datasource", () => {
         }
       `,
       variables: {
-          filter: Filter.Nonassigned
-      }
+        filter: Filter.Nonassigned,
+      },
     });
 
     expect(res.errors).toBeUndefined();
@@ -181,7 +270,7 @@ describe("PlacementAPI Datasource", () => {
           apellidoPaterno: "Martinez",
           apellidoMaterno: "Ocasio",
           genero: "M",
-          ciclo:"2022A",
+          ciclo: "2022A",
           carrera: "Abogado",
           telefono: "34121234567",
           email: "bad@bunny.pr",
@@ -202,7 +291,7 @@ describe("PlacementAPI Datasource", () => {
           apellidoPaterno: "Aguilera",
           apellidoMaterno: "Valadez",
           genero: "M",
-          ciclo:"2022A",
+          ciclo: "2022A",
           carrera: "Abogado",
           telefono: "34121234567",
           email: "juanga@elnoanoa.mx",
@@ -250,8 +339,8 @@ describe("PlacementAPI Datasource", () => {
         }
       `,
       variables: {
-          filter: Filter.Assigned
-      }
+        filter: Filter.Assigned,
+      },
     });
 
     expect(res.errors).toBeUndefined();

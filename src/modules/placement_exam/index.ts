@@ -21,11 +21,10 @@ const typeDefs = gql`
   }
 
   enum Filter {
-    ASSIGNED,
-    NONASSIGNED,
+    ASSIGNED
+    NONASSIGNED
     ALL
   }
-
 
   type TestResults {
     id: ID!
@@ -74,15 +73,15 @@ const typeDefs = gql`
   input WrittenResultsInput {
     codigo: String!
     nombre: String!
-    apellido_paterno: String!
-    apellido_materno: String!
+    apellidoPaterno: String!
+    apellidoMaterno: String!
     genero: String!
     ciclo: String!
     carrera: String!
     telefono: String!
     email: String!
     institucionalEmail: String
-    nivel_escrito: Int!
+    nivelEscrito: Int!
     curso: String!
     externo: Boolean!
     reubicacion: Boolean!
@@ -109,13 +108,17 @@ const resolvers: Resolvers = {
     },
     testResults: async (root, args, { dataSources }) => {
       return dataSources.placementAPI.getTestResults(args.filter);
-    }
+    },
   },
 
   Mutation: {
     saveOralResults: async (root, { input }, { dataSources }) => {
       const { id, nivelOral, nivelFinal } = input;
-      dataSources.placementAPI.updateFinalResults({ id: Number(id), nivelOral, nivelFinal })
+      dataSources.placementAPI.updateFinalResults({
+        id: Number(id),
+        nivelOral,
+        nivelFinal,
+      });
       return true;
     },
     saveWrittenResults: async (
@@ -127,20 +130,23 @@ const resolvers: Resolvers = {
         carousel,
       };
 
-      const composeApplicant = (applicant: WrittenResultsInput, meetLink: string): ApplicantWithMeetLink => {
-
-        const makeExterno = (applicantd: WrittenResultsInput): WrittenResultsInput => ({
+      const composeApplicant = (
+        applicant: WrittenResultsInput,
+        meetLink: string
+      ): ApplicantWithMeetLink => {
+        const makeExterno = (
+          applicantd: WrittenResultsInput
+        ): WrittenResultsInput => ({
           ...applicant,
           carrera: "NA",
           ciclo: "NA",
           codigo: applicant.telefono,
         });
-        const assignLink = (applicantd: WrittenResultsInput): ApplicantWithMeetLink => ({
+        const assignLink = (
+          applicantd: WrittenResultsInput
+        ): ApplicantWithMeetLink => ({
           ...applicant,
-          apellidoPaterno: applicant.apellido_paterno,
-          apellidoMaterno: applicant.apellido_materno,
-          nivelEscrito: applicant.nivel_escrito,
-          meetLink: applicant.nivel_escrito > 2 ? meetLink : null,
+          meetLink: applicant.nivelEscrito > 2 ? meetLink : null,
           generated_id: utils.generateId(),
         });
 
@@ -155,7 +161,7 @@ const resolvers: Resolvers = {
       const meetLinks = meetLinksUnfiltered.filter((link) => link.active);
 
       function getCurrentLink(meetLinks: any[], carousel: any) {
-        if(meetLinks.length < 1) throw new Error("No video links available");
+        if (meetLinks.length < 1) throw new Error("No video links available");
 
         const lastIndex = meetLinks.length - 1;
 
@@ -173,8 +179,10 @@ const resolvers: Resolvers = {
 
       //change SheetsAPI.saveApplicant for PlacementAPI.postTestResults(results/applicant);
       const applicant = composeApplicant(args.input, currentLink);
-      const createdId = await dataSources.placementAPI.postTestResults(applicant);
-  
+      const createdId = await dataSources.placementAPI.postTestResults(
+        applicant
+      );
+
       return {
         meetLink: applicant.meetLink,
         generated_id: applicant.generated_id,

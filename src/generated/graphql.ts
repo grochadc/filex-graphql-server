@@ -567,15 +567,15 @@ export type Workshop = {
 export type WrittenResultsInput = {
   codigo: Scalars['String'];
   nombre: Scalars['String'];
-  apellido_paterno: Scalars['String'];
-  apellido_materno: Scalars['String'];
+  apellidoPaterno: Scalars['String'];
+  apellidoMaterno: Scalars['String'];
   genero: Scalars['String'];
   ciclo: Scalars['String'];
   carrera: Scalars['String'];
   telefono: Scalars['String'];
   email: Scalars['String'];
   institucionalEmail?: Maybe<Scalars['String']>;
-  nivel_escrito: Scalars['Int'];
+  nivelEscrito: Scalars['Int'];
   curso: Scalars['String'];
   externo: Scalars['Boolean'];
   reubicacion: Scalars['Boolean'];
