@@ -35,7 +35,7 @@ model TestResults {
   carrera            String   @db.VarChar(255)
   telefono           String   @db.VarChar(255)
   email              String   @db.VarChar(255)
-  institucionalemail String?  @db.VarChar(255)
+  institucionalEmail String?  @db.VarChar(255) @map("institucionalemail")
   nivelEscrito       Int      @map("nivel_escrito")
   curso              String   @db.VarChar(255)
   externo            Boolean?
