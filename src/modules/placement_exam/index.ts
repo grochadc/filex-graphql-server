@@ -43,7 +43,7 @@ const typeDefs = gql`
     externo: Boolean!
     reubicacion: Boolean!
     generated_id: String!
-    meetLink: String!
+    meetLink: String
     nivelOral: Int
     nivelFinal: Int
   }
