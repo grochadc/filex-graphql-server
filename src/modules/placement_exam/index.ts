@@ -153,7 +153,15 @@ const resolvers: Resolvers = {
         const linkAssigned = assignLink(
           applicant.externo ? makeExterno(applicant) : applicant
         );
-        return linkAssigned;
+        const result =
+          linkAssigned.nivelEscrito < 3
+            ? {
+                ...linkAssigned,
+                nivelFinal: linkAssigned.nivelEscrito,
+                nivelOral: linkAssigned.nivelEscrito,
+              }
+            : linkAssigned;
+        return result;
       };
 
       const meetLinksUnfiltered: MeetLink[] =
