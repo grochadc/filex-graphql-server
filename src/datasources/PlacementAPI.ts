@@ -3,6 +3,7 @@ import { MeetLink } from "../types/index";
 import { getIndexToModify, addIDsToLinks } from "../utils";
 
 import { PrismaClient } from "@prisma/client";
+import { ParameterizedQuery as PQ } from "pg-promise";
 
 import {
   TestResults,
@@ -14,12 +15,16 @@ import { ApplicantWithMeetLink } from "modules/placement_exam";
 
 class PlacementAPI extends RESTDataSource {
   prisma: PrismaClient;
-  constructor(prisma: PrismaClient) {
+  db: any;
+  constructor(prisma: PrismaClient, db: any) {
     super();
     if (prisma === undefined) {
       throw Error("Supply a new PrismaCLient() on constructor");
     }
-
+    if (db === undefined) {
+      throw Error("Supply the db on constructor");
+    }
+    this.db = db;
     this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/placement";
   }
@@ -29,10 +34,17 @@ class PlacementAPI extends RESTDataSource {
     nivelOral: number;
     nivelFinal: number;
   }): void {
+    /*
     this.prisma.testResults.update({
       where: { id: input.id },
       data: { nivelOral: input.nivelOral, nivelFinal: input.nivelFinal },
     });
+    */
+    const sql_query = new PQ({
+      text: UPDATE_FINAL_RESULTS,
+      values: [input.nivelOral, input.nivelFinal, input.id],
+    });
+    this.db.none(sql_query);
   }
 
   async addApplicant(applicant) {
@@ -194,6 +206,10 @@ VALUES (
 export const GET_TEST_RESULTS = `
   -- Get the first 100 test results
   SELECT * FROM test_results LIMIT 100;
+`;
+
+export const UPDATE_FINAL_RESULTS = `
+UPDATE test_results SET nivel_oral = $1, nivel_final = $2 WHERE id=$3;
 `;
 
 export { PlacementAPI };

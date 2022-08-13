@@ -59,7 +59,7 @@ const server = new ApolloServer({
       examAPI: new ExamAPI(),
       workshopsAPI: new WorkshopsAPI(prisma),
       studentsAPI: new StudentsAPI(db, prisma),
-      placementAPI: new PlacementAPI(prisma),
+      placementAPI: new PlacementAPI(prisma, db),
       /*
       placementSheetsAPI: new PlacementSheetsAPI(
         "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"
