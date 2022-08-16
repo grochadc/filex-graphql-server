@@ -58,17 +58,22 @@ class PlacementAPI extends RESTDataSource {
       case "ASSIGNED":
         return (
           await this.prisma.testResults.findMany({
-            where: { nivelFinal: { not: null } },
+            where: {
+              nivelFinal: { not: null },
+              id: { gt: 745 },
+            },
           })
         ).map((item) => ({ ...item, id: String(item.id) }));
       case "NONASSIGNED":
         return (
           await this.prisma.testResults.findMany({
-            where: { nivelFinal: null },
+            where: { nivelFinal: null, id: { gt: 745 } },
           })
         ).map((item) => ({ ...item, id: String(item.id) }));
       default:
-        return (await this.prisma.testResults.findMany()).map((item) => ({
+        return (
+          await this.prisma.testResults.findMany({ where: { id: { gt: 745 } } })
+        ).map((item) => ({
           ...item,
           id: String(item.id),
         }));
