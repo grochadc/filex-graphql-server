@@ -180,10 +180,7 @@ const resolvers: Resolvers = {
         return meetLinks[currentIndex].link;
       }
 
-      const currentLink =
-        args.input.curso === "fr"
-          ? "http://meet.google.com/fwm-wqdb-ifw"
-          : getCurrentLink(meetLinks, context.carousel);
+      const currentLink = getCurrentLink(meetLinks, context.carousel);
 
       //change SheetsAPI.saveApplicant for PlacementAPI.postTestResults(results/applicant);
       const applicant = composeApplicant(args.input, currentLink);
