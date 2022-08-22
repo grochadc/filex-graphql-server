@@ -24,25 +24,24 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    addStudent(student: StudentInput!): Student!
     editStudent(codigo: ID!, changes: StudentChangesInput): Student!
   }
 
   input StudentInput {
     codigo: ID!
-    nombre: String!
-    apellido_materno: String!
-    apellido_paterno: String!
-    genero: String!
-    carrera: String!
+    nombre: String
+    apellido_materno: String
+    apellido_paterno: String
+    genero: String
+    carrera: String
     ciclo: String!
-    telefono: String!
-    email: String!
-    nivel: String!
-    grupo: String!
-    externo: Boolean!
+    telefono: String
+    email: String
+    nivel: Int
+    grupo: String
+    externo: Boolean
     institucionalEmail: String
-    curso: String!
+    curso: String
   }
 
   input StudentChangesInput {
@@ -69,9 +68,6 @@ export const resolvers: Resolvers = {
     },
   },
   Mutation: {
-    addStudent: async (root, args, { dataSources }) => {
-      return dataSources.studentsAPI.addStudent(args.student);
-    },
     editStudent: async (root, { codigo, changes }, { dataSources }) => {
       return dataSources.studentsAPI.editStudent(codigo, changes);
     },

@@ -8,7 +8,73 @@ datasource db {
 }
 
 model Student {
-  id               Int     @id @default(autoincrement())
+  id          Int       @id(map: "student_pkey1") @default(autoincrement())
+  applicantId Int       @map("applicant_id")
+  applicant   Applicant @relation(fields: [applicantId], references: [id])
+  ciclo       String    @map("ciclo_actual") @db.VarChar(255)
+  codigo      String    @db.VarChar(255)
+  desertor    Boolean?
+  nivel       Int
+  curso       String    @db.VarChar(255)
+  situacion   String?   @db.VarChar(255)
+  groupId     Int?      @map("group_id")
+  group       Group?    @relation(fields: [groupId], references: [id])
+
+  @@map("student")
+}
+
+model TestResults {
+  id                 Int      @id @default(autoincrement())
+  codigo             String   @db.VarChar(255)
+  nombre             String   @db.VarChar(255)
+  apellidoPaterno    String   @map("apellido_paterno") @db.VarChar(255)
+  apellidoMaterno    String   @map("apellido_materno") @db.VarChar(255)
+  genero             String   @db.VarChar(255)
+  ciclo              String   @db.VarChar(255)
+  carrera            String   @db.VarChar(255)
+  telefono           String   @db.VarChar(255)
+  email              String   @db.VarChar(255)
+  institucionalEmail String?  @map("institucionalemail") @db.VarChar(255)
+  nivelEscrito       Int      @map("nivel_escrito")
+  curso              String   @db.VarChar(255)
+  externo            Boolean?
+  reubicacion        Boolean?
+  generated_id       String?  @db.VarChar(255)
+  meetLink           String?  @map("meetlink") @db.VarChar(255)
+  nivelOral          Int?     @map("nivel_oral")
+  nivelFinal         Int?     @map("nivel_final")
+
+  @@map("test_results")
+}
+
+model Teacher {
+  id     Int     @id @default(autoincrement())
+  nombre String  @db.VarChar(255)
+  Group  Group[]
+
+  @@map("teacher")
+}
+
+model Applicant {
+  id                  Int       @id @default(autoincrement())
+  codigo              String?   @db.VarChar(255)
+  nombre              String?   @db.VarChar(255)
+  apellido_paterno    String?   @db.VarChar(255)
+  apellido_materno    String?   @db.VarChar(255)
+  genero              String?   @db.VarChar(255)
+  carrera             String?   @db.VarChar(255)
+  ciclo_ingreso       String?   @db.VarChar(255)
+  telefono            String?   @db.VarChar(255)
+  email               String?   @db.VarChar(255)
+  institutional_email String?   @db.VarChar(255)
+  externo             Boolean?
+  Student             Student[]
+
+  @@map("applicant")
+}
+
+model student_ciclo {
+  id               Int     @id(map: "student_pkey") @default(autoincrement())
   codigo           String
   nombre           String
   apellido_paterno String
@@ -22,85 +88,30 @@ model Student {
   curso            String
   externo          Boolean
   grupo            String
-
-  @@map("student")
 }
 
-model Ciclo {
-  id         Int     @id(map: "course_pkey") @default(autoincrement())
-  codigo     String  @db.VarChar(255)
-  nivel      String? @db.VarChar(255)
-  curso      String? @db.VarChar(255)
-  grupo      String? @db.VarChar(255)
-  ciclo      String? @db.VarChar(255)
-  student_id Int?
-
-  @@map("ciclo")
+model student_old {
+  id           Int     @id(map: "course_pkey") @default(autoincrement())
+  codigo       String  @db.VarChar(255)
+  nivel        String? @db.VarChar(255)
+  curso        String? @db.VarChar(255)
+  grupo        String? @db.VarChar(255)
+  ciclo_actual String? @db.VarChar(255)
+  applicant_id Int?
+  situacion    String? @db.VarChar(255)
 }
 
-model TestResults {
-  id                 Int      @id @default(autoincrement())
-  codigo             String   @db.VarChar(255)
-  nombre             String   @db.VarChar(255)
-  apellidoPaterno    String   @db.VarChar(255) @map("apellido_paterno")
-  apellidoMaterno    String   @db.VarChar(255) @map("apellido_materno")
-  genero             String   @db.VarChar(255)
-  ciclo              String   @db.VarChar(255)
-  carrera            String   @db.VarChar(255)
-  telefono           String   @db.VarChar(255)
-  email              String   @db.VarChar(255)
-  institucionalEmail String?  @db.VarChar(255) @map("institucionalemail")
-  nivelEscrito       Int      @map("nivel_escrito")
-  curso              String   @db.VarChar(255)
-  externo            Boolean?
-  reubicacion        Boolean?
-  generated_id       String?  @db.VarChar(255)
-  meetLink           String?  @db.VarChar(255) @map("meetlink")
-  nivelOral          Int?     @map("nivel_oral")
-  nivelFinal         Int?     @map("nivel_final")
+model Group {
+  ciclo       String    @db.VarChar(255)
+  name        String    @db.VarChar(255)
+  time        String    @db.VarChar(255)
+  aula        String    @db.VarChar(255)
+  teacher     Teacher   @relation(fields: [teacherId], references: [id])
+  id          Int       @id @default(autoincrement())
+  nivel       Int
+  registrados Int?
+  Student     Student[]
+  teacherId   Int       @map("teacher_id")
 
-  @@map("test_results")
-}
-
-model Option {
-  id          Int      @id(map: "options_pkey") @default(autoincrement())
-  day         String
-  time        String
-  url         String
-  teacher_id  Int
-  workshop_id Int
-  active      Boolean?
-
-  @@map("option")
-}
-
-model reservation {
-  id              Int     @id @default(autoincrement())
-  student_id      Int
-  option_id       Int
-  tutorial_reason String?
-}
-
-model reservationcounter {
-  id                Int  @id @default(autoincrement())
-  student_id        Int? @unique
-  reservation_count Int  @default(autoincrement())
-}
-
-model Teacher {
-  id         Int    @id(map: "teachers_pkey") @default(autoincrement())
-  name       String
-  option_ids Int[]
-
-  @@map("teacher")
-}
-
-model Workshop {
-  id          Int    @id(map: "workshops_pkey") @default(autoincrement())
-  name        String
-  description String
-  levels      Int[]
-  option_ids  Int[]
-
-  @@map("workshop")
+  @@map("group_table")
 }

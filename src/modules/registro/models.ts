@@ -1,3 +1,5 @@
+import internal from "stream";
+
 export { ServerContext } from "../../server";
 type Nivel = "1" | "2" | "3" | "4" | "5" | "6";
 type Curso = "en" | "fr";
@@ -21,13 +23,14 @@ export type ApplicantModel = {
 };
 
 export type ScheduleModel = {
+  id: number;
+  ciclo: string;
+  name: string;
+  time: string;
+  aula: string;
+  teacher_id: number;
+  nivel: number;
   teacher: string;
-  group: string;
-  entry: Url;
-  sesiones?: Url;
-  chat?: Url;
-  classroom?: Url;
-  time?: string;
 };
 
 type RgisteringLevelsEndpoint = {
