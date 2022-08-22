@@ -87,7 +87,6 @@ export const typeDefs = gql`
       teacher_id: ID!
     ): Boolean!
 
-
     resetReservations: Boolean!
     setWorkshopLink(option_id: ID!, url: String!): Boolean!
   }
@@ -135,7 +134,16 @@ export const resolvers: Resolvers = {
       const allWorkshops = await dataSources.workshopsAPI.getAllWorkshops(
         max_students
       );
-      return allWorkshops;
+      return allWorkshops.map((workshop) => {
+        const { options: _, ...workshopWithoutOptions } = workshop;
+        return {
+          ...workshop,
+          options: workshop.options.map((option) => ({
+            ...option,
+            workshop: workshopWithoutOptions,
+          })),
+        };
+      });
     },
     teacher: async (root, args, { dataSources }) => {
       return dataSources.workshopsAPI.getTeacher(args.id);
@@ -159,11 +167,11 @@ export const resolvers: Resolvers = {
         String(teacherOption.id)
       );
       const finalResult = res.map((reservation) => {
-        return ({
+        return {
           ...reservation,
           id: String(reservation.id),
           student: unwindPrismaStudent(reservation.student),
-        });
+        };
       });
       return finalResult;
     },
@@ -179,7 +187,9 @@ export const resolvers: Resolvers = {
   Option: {
     available: async (option, args, { dataSources }) => {
       const reservationCount =
-        await dataSources.workshopsAPI.getOptionReservationCount(String(option.id));
+        await dataSources.workshopsAPI.getOptionReservationCount(
+          String(option.id)
+        );
       console.log("reservationCOunt", reservationCount);
       return true;
     },
@@ -224,7 +234,7 @@ export const resolvers: Resolvers = {
       { attendingStudents, teacher_id, option_id },
       { dataSources }
     ) => {
-      return dataSources.workshopsAPI.saveAttendance(attendingStudents, );
+      return dataSources.workshopsAPI.saveAttendance(attendingStudents);
     },
     resetReservations: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.resetReservations(),

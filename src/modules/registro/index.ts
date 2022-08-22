@@ -1,16 +1,16 @@
 import { gql } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
-import { ScheduleModel } from "./models";
 
 export const typeDefs = gql`
   extend type Query {
     registeringLevels(course: String!, course: String!): [String!]!
     applicant(codigo: ID!): Applicant!
-    schedule(id: String!): Schedule!
+    group(id: Int!): Group!
+    groups: [Group!]!
   }
 
   extend type Mutation {
-    registerStudent(input: StudentInput!): RegisterResponse!
+    registerStudent(input: StudentInput!, groupId: Int!): RegisterResponse!
     saveRegisteringLevels(levels: [String!]!, course: String!): [String!]!
     saveApplicant(codigo: String!, input: ApplicantInput!): ApplicantResponse!
   }
@@ -26,13 +26,13 @@ export const typeDefs = gql`
     telefono: String!
     email: String!
     institucionalEmail: String
-    nivel: String!
+    nivel: Int!
     curso: String!
     externo: Boolean!
     desertor: Boolean!
     registering: Boolean!
-    schedules: [Schedule!]!
-    registeredSchedule: Schedule
+    groups: [Group!]!
+    registeredGroup: Group
   }
 
   input ApplicantInput {
@@ -69,15 +69,13 @@ export const typeDefs = gql`
     desertor: Boolean!
   }
 
-  type Schedule {
-    group: String!
+  type Group {
+    id: Int!
+    ciclo: String!
+    name: String!
+    time: String!
+    aula: String!
     teacher: String!
-    entry: String!
-    chat: String
-    classroom: String
-    sesiones: String
-    time: String
-    serialized(options: SerializedOptions!): String!
   }
 
   input SerializedOptions {
@@ -98,7 +96,7 @@ export const typeDefs = gql`
     email: String!
     nivel: String!
     grupo: String!
-    schedule: Schedule!
+    group: Group!
   }
 `;
 
@@ -107,24 +105,32 @@ export const resolvers: Resolvers = {
     //TODO: type returns string[] but resolver should return Int[] (check in db what is the type for level)
     registeringLevels: (root, args, { dataSources }) =>
       dataSources.registroAPI.getLevelsRegistering(args.course),
+    //@ts-ignore
     applicant: (root, args, { dataSources }) =>
-      dataSources.registroAPI.getApplicant(args.codigo),
-    schedule: (root, args, { dataSources }) => {
-      //args.id is a group string eg. E1-1
-      const group = args.id;
-      const course = group.substr(0, 1) === "E" ? "en" : "fr";
-      const level = group.substr(1, 1);
-      return dataSources.registroAPI.getSchedule(level, group, course) as any;
+      dataSources.registroAPI.getApplicant(args.codigo, "2022B"),
+    group: async (root, args, { dataSources }) => {
+      const res = await dataSources.registroAPI.getSchedule(args.id);
+      return { ...res, teacher: res.teacher.nombre };
     },
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {
-      const student = args.input;
       const registeredStudent = await dataSources.registroAPI.registerStudent(
-        student,
-        student.curso
+        args.input,
+        args.groupId
       );
-      return registeredStudent as any;
+      const currentGroup = {
+        ...registeredStudent.groupObject,
+        teacher: registeredStudent.groupObject.teacher.nombre,
+      };
+      return {
+        ...registeredStudent,
+        ...registeredStudent.applicant,
+        grupo: registeredStudent.groupObject.name,
+        group: currentGroup,
+        nivel: String(registeredStudent.nivel),
+        ciclo: registeredStudent.ciclo_actual
+      };
     },
     saveRegisteringLevels: (root, args, { dataSources }) => {
       return dataSources.registroAPI.setLevelsRegistering(
@@ -136,60 +142,30 @@ export const resolvers: Resolvers = {
       dataSources.registroAPI.saveApplicant(args.codigo, args.input),
   },
   Applicant: {
+    desertor: () => false,
     registering: async (root, args, { dataSources }) => {
       const registeringLevels =
         await dataSources.registroAPI.getLevelsRegistering(root.curso);
-      return registeringLevels.includes(root.nivel);
+      return registeringLevels.includes(String(root.nivel));
     },
-    schedules: async (root, args, { dataSources }) => {
+    groups: async (root, args, { dataSources }) => {
       const course = root.curso;
       const currentLevel = root.nivel;
       const maxStudents = 35;
-      const unavailable = await dataSources.registroAPI.getUnAvailableGroups(
+      const result = await dataSources.registroAPI.getSchedules(
         currentLevel,
-        maxStudents,
-        course
+        course,
+        maxStudents
       );
-      const allSchedules = await dataSources.registroAPI.getSchedules(
-        currentLevel,
-        course
+      return result.map((el) => ({ ...el, teacher: el.teacher.nombre }));
+    },
+    registeredGroup: async (root, args, { dataSources }) => {
+      const res = await dataSources.registroAPI.getAlreadyRegistered(
+        root.codigo,
+        "2022B"
       );
-
-      if (allSchedules === null)
-        throw new Error("No schedule data for that level exists");
-
-      function availableSchedules(
-        schedules: ScheduleModel[],
-        unavailable: string[]
-      ) {
-        return schedules.filter(
-          (schedule) => !unavailable.includes(schedule.group)
-        );
-      }
-
-      return availableSchedules(allSchedules, unavailable) as any;
-    },
-    registeredSchedule: async (root, args, { dataSources }) => {
-      const registeredGroup =
-        await dataSources.registroAPI.getAlreadyRegistered(root.codigo);
-      if (registeredGroup) {
-        return dataSources.registroAPI.getSchedule(
-          root.nivel,
-          registeredGroup,
-          root.curso
-        ) as any;
-      }
-      return null;
-    },
-  },
-  Schedule: {
-    serialized: (root, args) => {
-      const serialize = (options: typeof args.options, source: typeof root) => {
-        return `${options.group ? source.group : ""} ${
-          options.teacher ? source.teacher : ""
-        } ${options.time ? source.time : ""}`;
-      };
-      return serialize(args.options, root);
+      if(res==null) return null;
+      return { ...res, teacher: res.teacher.nombre };
     },
   },
 };
