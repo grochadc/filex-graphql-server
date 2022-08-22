@@ -55,7 +55,7 @@ const server = new ApolloServer({
   dataSources: () => {
     const result = {
       firebaseAPI: new FirebaseAPI(),
-      registroAPI: new RegistroAPI(),
+      registroAPI: new RegistroAPI(prisma, db),
       examAPI: new ExamAPI(),
       workshopsAPI: new WorkshopsAPI(),
       studentsAPI: new StudentsAPI(db),

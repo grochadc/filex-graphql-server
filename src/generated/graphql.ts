@@ -1,12 +1,10 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { ApplicantModel, ScheduleModel } from '../modules/registro/models';
 import { StudentModel, TeacherModel, StudentReservationModel } from '../modules/workshops/models';
 import { ServerContext } from '../server';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -35,13 +33,13 @@ export type Applicant = {
   telefono: Scalars['String'];
   email: Scalars['String'];
   institucionalEmail?: Maybe<Scalars['String']>;
-  nivel: Scalars['String'];
+  nivel: Scalars['Int'];
   curso: Scalars['String'];
   externo: Scalars['Boolean'];
   desertor: Scalars['Boolean'];
   registering: Scalars['Boolean'];
-  schedules: Array<Schedule>;
-  registeredSchedule?: Maybe<Schedule>;
+  groups: Array<Group>;
+  registeredGroup?: Maybe<Group>;
 };
 
 export type ApplicantInput = {
@@ -127,6 +125,16 @@ export type Grades = {
   situation: Scalars['String'];
 };
 
+export type Group = {
+  __typename?: 'Group';
+  id: Scalars['Int'];
+  ciclo: Scalars['String'];
+  name: Scalars['String'];
+  time: Scalars['String'];
+  aula: Scalars['String'];
+  teacher: Scalars['String'];
+};
+
 export type HomePageMessage = {
   __typename?: 'HomePageMessage';
   active: Scalars['Boolean'];
@@ -165,7 +173,6 @@ export type Mutation = {
   saveWorkshopsAttendance: Scalars['Boolean'];
   resetReservations: Scalars['Boolean'];
   setWorkshopLink: Scalars['Boolean'];
-  addStudent: Student;
   editStudent: Student;
 };
 
@@ -207,6 +214,7 @@ export type MutationDatabaseSetArgs = {
 
 export type MutationRegisterStudentArgs = {
   input: StudentInput;
+  groupId: Scalars['Int'];
 };
 
 
@@ -239,11 +247,6 @@ export type MutationSaveWorkshopsAttendanceArgs = {
 export type MutationSetWorkshopLinkArgs = {
   option_id: Scalars['ID'];
   url: Scalars['String'];
-};
-
-
-export type MutationAddStudentArgs = {
-  student: StudentInput;
 };
 
 
@@ -302,7 +305,8 @@ export type Query = {
   database?: Maybe<Array<Maybe<Scalars['String']>>>;
   registeringLevels: Array<Scalars['String']>;
   applicant: Applicant;
-  schedule: Schedule;
+  group: Group;
+  groups: Array<Group>;
   paramQuery?: Maybe<Scalars['Boolean']>;
   options: Array<Option>;
   workshops: Array<Workshop>;
@@ -341,8 +345,8 @@ export type QueryApplicantArgs = {
 };
 
 
-export type QueryScheduleArgs = {
-  id: Scalars['String'];
+export type QueryGroupArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -389,7 +393,7 @@ export type RegisterResponse = {
   email: Scalars['String'];
   nivel: Scalars['String'];
   grupo: Scalars['String'];
-  schedule: Schedule;
+  group: Group;
 };
 
 export type Reservation = {
@@ -407,23 +411,6 @@ export type Reservation = {
   nivel: Scalars['String'];
   grupo: Scalars['String'];
   tutorial_reason?: Maybe<Scalars['String']>;
-};
-
-export type Schedule = {
-  __typename?: 'Schedule';
-  group: Scalars['String'];
-  teacher: Scalars['String'];
-  entry: Scalars['String'];
-  chat?: Maybe<Scalars['String']>;
-  classroom?: Maybe<Scalars['String']>;
-  sesiones?: Maybe<Scalars['String']>;
-  time?: Maybe<Scalars['String']>;
-  serialized: Scalars['String'];
-};
-
-
-export type ScheduleSerializedArgs = {
-  options: SerializedOptions;
 };
 
 export type Section = {
@@ -478,19 +465,19 @@ export type StudentChangesInput = {
 
 export type StudentInput = {
   codigo: Scalars['ID'];
-  nombre: Scalars['String'];
-  apellido_materno: Scalars['String'];
-  apellido_paterno: Scalars['String'];
-  genero: Scalars['String'];
-  carrera: Scalars['String'];
+  nombre?: Maybe<Scalars['String']>;
+  apellido_materno?: Maybe<Scalars['String']>;
+  apellido_paterno?: Maybe<Scalars['String']>;
+  genero?: Maybe<Scalars['String']>;
+  carrera?: Maybe<Scalars['String']>;
   ciclo: Scalars['String'];
-  telefono: Scalars['String'];
-  email: Scalars['String'];
-  nivel: Scalars['String'];
-  grupo: Scalars['String'];
-  externo: Scalars['Boolean'];
+  telefono?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  nivel?: Maybe<Scalars['Int']>;
+  grupo?: Maybe<Scalars['String']>;
+  externo?: Maybe<Scalars['Boolean']>;
   institucionalEmail?: Maybe<Scalars['String']>;
-  curso: Scalars['String'];
+  curso?: Maybe<Scalars['String']>;
 };
 
 export type StudentReservation = {
@@ -550,7 +537,7 @@ export type TestResults = {
   externo: Scalars['Boolean'];
   reubicacion: Scalars['Boolean'];
   generated_id: Scalars['String'];
-  meetLink: Scalars['String'];
+  meetLink?: Maybe<Scalars['String']>;
   nivelOral?: Maybe<Scalars['Int']>;
   nivelFinal?: Maybe<Scalars['Int']>;
 };
@@ -666,8 +653,9 @@ export type ResolversTypes = {
   AnswerOption: ResolverTypeWrapper<AnswerOption>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  Applicant: ResolverTypeWrapper<ApplicantModel>;
+  Applicant: ResolverTypeWrapper<Applicant>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   ApplicantInput: ApplicantInput;
   ApplicantResponse: ResolverTypeWrapper<ApplicantResponse>;
   AttendingStudent: AttendingStudent;
@@ -675,11 +663,11 @@ export type ResolversTypes = {
   CloseExamResponse: ResolverTypeWrapper<CloseExamResponse>;
   Filter: Filter;
   Grades: ResolverTypeWrapper<Grades>;
+  Group: ResolverTypeWrapper<Group>;
   HomePageMessage: ResolverTypeWrapper<HomePageMessage>;
   MeetLinkInput: MeetLinkInput;
   MeetLinkInputWithID: MeetLinkInputWithId;
   Mutation: ResolverTypeWrapper<{}>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
   MutationResponse: ResolverTypeWrapper<MutationResponse>;
   Option: ResolverTypeWrapper<Option>;
   OralResults: OralResults;
@@ -687,9 +675,8 @@ export type ResolversTypes = {
   PlacementHomePageMessageInput: PlacementHomePageMessageInput;
   Query: ResolverTypeWrapper<{}>;
   Question: ResolverTypeWrapper<Question>;
-  RegisterResponse: ResolverTypeWrapper<Omit<RegisterResponse, 'schedule'> & { schedule: ResolversTypes['Schedule'] }>;
+  RegisterResponse: ResolverTypeWrapper<RegisterResponse>;
   Reservation: ResolverTypeWrapper<Reservation>;
-  Schedule: ResolverTypeWrapper<ScheduleModel>;
   Section: ResolverTypeWrapper<Section>;
   SerializedOptions: SerializedOptions;
   Student: ResolverTypeWrapper<StudentModel>;
@@ -710,19 +697,20 @@ export type ResolversParentTypes = {
   AnswerOption: AnswerOption;
   String: Scalars['String'];
   Boolean: Scalars['Boolean'];
-  Applicant: ApplicantModel;
+  Applicant: Applicant;
   ID: Scalars['ID'];
+  Int: Scalars['Int'];
   ApplicantInput: ApplicantInput;
   ApplicantResponse: ApplicantResponse;
   AttendingStudent: AttendingStudent;
   Carrera: Carrera;
   CloseExamResponse: CloseExamResponse;
   Grades: Grades;
+  Group: Group;
   HomePageMessage: HomePageMessage;
   MeetLinkInput: MeetLinkInput;
   MeetLinkInputWithID: MeetLinkInputWithId;
   Mutation: {};
-  Int: Scalars['Int'];
   MutationResponse: MutationResponse;
   Option: Option;
   OralResults: OralResults;
@@ -730,9 +718,8 @@ export type ResolversParentTypes = {
   PlacementHomePageMessageInput: PlacementHomePageMessageInput;
   Query: {};
   Question: Question;
-  RegisterResponse: Omit<RegisterResponse, 'schedule'> & { schedule: ResolversParentTypes['Schedule'] };
+  RegisterResponse: RegisterResponse;
   Reservation: Reservation;
-  Schedule: ScheduleModel;
   Section: Section;
   SerializedOptions: SerializedOptions;
   Student: StudentModel;
@@ -765,13 +752,13 @@ export type ApplicantResolvers<ContextType = ServerContext, ParentType extends R
   telefono?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   institucionalEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  nivel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  nivel?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   curso?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   desertor?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   registering?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  schedules?: Resolver<Array<ResolversTypes['Schedule']>, ParentType, ContextType>;
-  registeredSchedule?: Resolver<Maybe<ResolversTypes['Schedule']>, ParentType, ContextType>;
+  groups?: Resolver<Array<ResolversTypes['Group']>, ParentType, ContextType>;
+  registeredGroup?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -823,6 +810,16 @@ export type GradesResolvers<ContextType = ServerContext, ParentType extends Reso
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type GroupResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Group'] = ResolversParentTypes['Group']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  ciclo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  time?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  aula?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  teacher?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type HomePageMessageResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['HomePageMessage'] = ResolversParentTypes['HomePageMessage']> = {
   active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -838,7 +835,7 @@ export type MutationResolvers<ContextType = ServerContext, ParentType extends Re
   removeMeetLink?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationRemoveMeetLinkArgs, 'link'>>;
   setPlacementHomePageMessage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSetPlacementHomePageMessageArgs, 'input'>>;
   databaseSet?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationDatabaseSetArgs, never>>;
-  registerStudent?: Resolver<ResolversTypes['RegisterResponse'], ParentType, ContextType, RequireFields<MutationRegisterStudentArgs, 'input'>>;
+  registerStudent?: Resolver<ResolversTypes['RegisterResponse'], ParentType, ContextType, RequireFields<MutationRegisterStudentArgs, 'input' | 'groupId'>>;
   saveRegisteringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationSaveRegisteringLevelsArgs, 'levels' | 'course'>>;
   saveApplicant?: Resolver<ResolversTypes['ApplicantResponse'], ParentType, ContextType, RequireFields<MutationSaveApplicantArgs, 'codigo' | 'input'>>;
   toggleOpenWorkshops?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -846,7 +843,6 @@ export type MutationResolvers<ContextType = ServerContext, ParentType extends Re
   saveWorkshopsAttendance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSaveWorkshopsAttendanceArgs, 'input' | 'option_id' | 'teacher_id'>>;
   resetReservations?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   setWorkshopLink?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSetWorkshopLinkArgs, 'option_id' | 'url'>>;
-  addStudent?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<MutationAddStudentArgs, 'student'>>;
   editStudent?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<MutationEditStudentArgs, 'codigo'>>;
 };
 
@@ -888,7 +884,8 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   database?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType, RequireFields<QueryDatabaseArgs, 'ref'>>;
   registeringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryRegisteringLevelsArgs, 'course'>>;
   applicant?: Resolver<ResolversTypes['Applicant'], ParentType, ContextType, RequireFields<QueryApplicantArgs, 'codigo'>>;
-  schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType, RequireFields<QueryScheduleArgs, 'id'>>;
+  group?: Resolver<ResolversTypes['Group'], ParentType, ContextType, RequireFields<QueryGroupArgs, 'id'>>;
+  groups?: Resolver<Array<ResolversTypes['Group']>, ParentType, ContextType>;
   paramQuery?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryParamQueryArgs, never>>;
   options?: Resolver<Array<ResolversTypes['Option']>, ParentType, ContextType>;
   workshops?: Resolver<Array<ResolversTypes['Workshop']>, ParentType, ContextType>;
@@ -918,7 +915,7 @@ export type RegisterResponseResolvers<ContextType = ServerContext, ParentType ex
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   nivel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   grupo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  schedule?: Resolver<ResolversTypes['Schedule'], ParentType, ContextType>;
+  group?: Resolver<ResolversTypes['Group'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -936,18 +933,6 @@ export type ReservationResolvers<ContextType = ServerContext, ParentType extends
   nivel?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   grupo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tutorial_reason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type ScheduleResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Schedule'] = ResolversParentTypes['Schedule']> = {
-  group?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  teacher?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  entry?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  chat?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  classroom?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  sesiones?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  serialized?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<ScheduleSerializedArgs, 'options'>>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1030,7 +1015,7 @@ export type TestResultsResolvers<ContextType = ServerContext, ParentType extends
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   reubicacion?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   generated_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  meetLink?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  meetLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   nivelOral?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   nivelFinal?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1060,6 +1045,7 @@ export type Resolvers<ContextType = ServerContext> = {
   Carrera?: CarreraResolvers<ContextType>;
   CloseExamResponse?: CloseExamResponseResolvers<ContextType>;
   Grades?: GradesResolvers<ContextType>;
+  Group?: GroupResolvers<ContextType>;
   HomePageMessage?: HomePageMessageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   MutationResponse?: MutationResponseResolvers<ContextType>;
@@ -1069,7 +1055,6 @@ export type Resolvers<ContextType = ServerContext> = {
   Question?: QuestionResolvers<ContextType>;
   RegisterResponse?: RegisterResponseResolvers<ContextType>;
   Reservation?: ReservationResolvers<ContextType>;
-  Schedule?: ScheduleResolvers<ContextType>;
   Section?: SectionResolvers<ContextType>;
   Student?: StudentResolvers<ContextType>;
   StudentReservation?: StudentReservationResolvers<ContextType>;

@@ -1,4 +1,4 @@
-import * as pgPromise from "pg-promise";
+import pgPromise from "pg-promise";
 import path from "path";
 const { QueryFile } = pgPromise;
 require("dotenv").config();
