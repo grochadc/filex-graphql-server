@@ -152,16 +152,17 @@ class RegistroAPI extends RESTDataSource {
 
   async getSchedules(level: number, course: string, maxStudents: number) {
     return this.prisma.group.findMany({
+      include: {
+        teacher: true
+      },
       where: {
         ciclo: "2022B",
         nivel: level,
+        course: course,
         registrados: {
           lt: maxStudents,
         },
       },
-      include: {
-        teacher: true
-      }
     });
   }
 

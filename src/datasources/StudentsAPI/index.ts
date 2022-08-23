@@ -14,6 +14,9 @@ class StudentsAPI extends DataSource {
   prisma: PrismaClient;
   constructor(db: any, prisma: PrismaClient) {
     super();
+    if (prisma === undefined)
+      throw new Error("Include a new PrismaCLient() on constructor");
+    this.prisma = prisma;
     this.db = db;
     if (prisma === undefined) {
       throw Error("Supply a new PrismaCLient() on constructor");
@@ -53,8 +56,8 @@ class StudentsAPI extends DataSource {
           student.nivel,
           student.grupo,
           student.externo,
-          student.curso
-        ]
+          student.curso,
+        ],
       })
     );
     return { id: addedStudent.id, ...student };
@@ -81,8 +84,8 @@ class StudentsAPI extends DataSource {
             newStudent.grupo,
             newStudent.externo,
             newStudent.curso,
-            newStudent.id
-          ]
+            newStudent.id,
+          ],
         })
       );
     } catch (e) {

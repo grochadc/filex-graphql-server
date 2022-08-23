@@ -75,6 +75,9 @@ export const resolvers: Resolvers = {
         grupo: res.groupObject?.name,
       });
     },
+    masterlist: async (root, args, { dataSources }) => {
+      return dataSources.studentsAPI.getAllStudents(args.ciclo);
+    }
   },
   Mutation: {
     //@ts-ignore

@@ -343,8 +343,8 @@ export type QueryMasterlistArgs = {
 };
 
 
-export type QueryParamQueryArgs = {
-  param?: Maybe<Scalars['String']>;
+export type QueryMasterlistArgs = {
+  ciclo: Scalars['String'];
 };
 
 
@@ -361,6 +361,16 @@ export type QuerySectionArgs = {
 
 export type QueryStudentArgs = {
   codigo: Scalars['ID'];
+};
+
+
+export type QueryTeacherArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryTestResultsArgs = {
+  filter?: Maybe<Filter>;
 };
 
 
