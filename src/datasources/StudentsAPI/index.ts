@@ -2,15 +2,48 @@ import { DataSource } from "apollo-datasource";
 import { StudentModel } from "../../modules/workshops/models";
 import { ParameterizedQuery as PQ } from "pg-promise";
 import { ApolloError } from "apollo-server";
+import { PrismaClient } from "@prisma/client";
 
 type StudentInput = Omit<StudentModel, "id">;
 type Changes = Partial<StudentInput>;
 
 class StudentsAPI extends DataSource {
   db: any;
-  constructor(db: any) {
+  prisma: PrismaClient;
+  constructor(db: any, prisma: PrismaClient) {
     super();
+    if (prisma === undefined)
+      throw new Error("Include a new PrismaCLient() on constructor");
+    this.prisma = prisma;
     this.db = db;
+  }
+
+  async getAllStudents(ciclo: string) {
+    const result = await this.prisma.student.findMany({
+      include: {
+        group: true,
+        applicant: true,
+      },
+      where: {
+        ciclo,
+        groupId: {
+          not: null
+        },
+        applicantId: {
+          gt: 100
+        }
+      },
+    });
+
+    if (result === null)
+      throw new Error(`No students found for ciclo ${ciclo}`);
+
+    return result.map((el) => ({
+      ...el,
+      ...el.applicant,
+      grupo: el.group.name,
+      nivel: String(el.nivel),
+    }));
   }
 
   async getStudent(codigo: string): Promise<StudentModel> {
@@ -41,8 +74,8 @@ class StudentsAPI extends DataSource {
           student.nivel,
           student.grupo,
           student.externo,
-          student.curso
-        ]
+          student.curso,
+        ],
       })
     );
     return { id: addedStudent.id, ...student };
@@ -69,8 +102,8 @@ class StudentsAPI extends DataSource {
             newStudent.grupo,
             newStudent.externo,
             newStudent.curso,
-            newStudent.id
-          ]
+            newStudent.id,
+          ],
         })
       );
     } catch (e) {

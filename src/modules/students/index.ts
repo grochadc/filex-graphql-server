@@ -4,6 +4,7 @@ import { Resolvers } from "../../generated/graphql";
 export const typeDefs = gql`
   extend type Query {
     student(codigo: ID!): Student!
+    masterlist(ciclo: String!): [Student!]!
   }
 
   type Student {
@@ -66,6 +67,9 @@ export const resolvers: Resolvers = {
     student: async (root, args, { dataSources }) => {
       return dataSources.studentsAPI.getStudent(args.codigo);
     },
+    masterlist: async (root, args, { dataSources }) => {
+      return dataSources.studentsAPI.getAllStudents(args.ciclo);
+    }
   },
   Mutation: {
     editStudent: async (root, { codigo, changes }, { dataSources }) => {

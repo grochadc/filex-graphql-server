@@ -13,12 +13,12 @@ model Student {
   applicant   Applicant @relation(fields: [applicantId], references: [id])
   ciclo       String    @map("ciclo_actual") @db.VarChar(255)
   codigo      String    @db.VarChar(255)
-  desertor    Boolean?
   nivel       Int
   curso       String    @db.VarChar(255)
   situacion   String?   @db.VarChar(255)
   groupId     Int?      @map("group_id")
   group       Group?    @relation(fields: [groupId], references: [id])
+  desertor    Boolean?
 
   @@map("student")
 }
@@ -106,12 +106,13 @@ model Group {
   name        String    @db.VarChar(255)
   time        String    @db.VarChar(255)
   aula        String    @db.VarChar(255)
+  teacherId   Int       @map("teacher_id")
   teacher     Teacher   @relation(fields: [teacherId], references: [id])
   id          Int       @id @default(autoincrement())
   nivel       Int
-  registrados Int?
+  registrados Int       @default(0)
+  course      String?   @db.VarChar(255)
   Student     Student[]
-  teacherId   Int       @map("teacher_id")
 
   @@map("group_table")
 }
