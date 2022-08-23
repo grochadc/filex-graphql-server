@@ -3,17 +3,17 @@ import mocks from "../../datasources/StudentsAPI/mocks";
 import { StudentsAPI } from "../../datasources/StudentsAPI";
 import { gql } from "apollo-server";
 
-const studentsAPI = new StudentsAPI(mocks.db);
+const studentsAPI = new StudentsAPI(mocks.db, {} as any);
 
 const dataSources = () => {
   return {
-    studentsAPI: studentsAPI
+    studentsAPI: studentsAPI,
   };
 };
 
 const context = () => {
   return {
-    enviroment: "prod"
+    enviroment: "prod",
   };
 };
 const { query } = testServer(dataSources, context);
@@ -42,7 +42,7 @@ test("gets student", async () => {
 
   const res = await query({
     query: GET_STUDENT_QUERY,
-    variables: { codigo: "1234567890" }
+    variables: { codigo: "1234567890" },
   });
   expect(res.errors).toBeUndefined();
   expect(res.data).toMatchSnapshot();
@@ -82,12 +82,12 @@ test("adds a student", async () => {
     telefono: "1234567890",
     email: "juanga@elnoanoa.mx",
     curso: "en",
-    externo: false
+    externo: false,
   };
 
   const res = await query({
     query: ADD_STUDENT_MUTATION,
-    variables: { student }
+    variables: { student },
   });
 
   expect(res.errors).toBeUndefined();
@@ -106,7 +106,7 @@ test("edits a student", async () => {
 
   const res = await query({
     query: EDIT_STUDENT_MUTATION,
-    variables: { codigo: "0987654321", changes: { carrera: "Periodismo" } }
+    variables: { codigo: "0987654321", changes: { carrera: "Periodismo" } },
   });
 
   expect(res.errors).toBeUndefined();

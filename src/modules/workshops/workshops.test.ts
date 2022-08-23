@@ -16,7 +16,7 @@ type OptionalDatabaseModel = Partial<DatabaseModel>;
 const db: { prod: OptionalDatabaseModel } = {
   prod: {
     system: {
-      max_reservations: 30
+      max_reservations: 30,
     },
     workshops: {
       workshop_id1: {
@@ -24,8 +24,8 @@ const db: { prod: OptionalDatabaseModel } = {
         name: "Conversation",
         description: "This is the conversation workshop description.",
         levels: ["1", "2", "3", "4", "5", "6"],
-        option_ids: ["option_id1", "option_id2"]
-      }
+        option_ids: ["option_id1", "option_id2"],
+      },
     },
     teachers: {
       teacher_id1: {
@@ -44,16 +44,16 @@ const db: { prod: OptionalDatabaseModel } = {
               workshop_id: "workshop_id1",
               workshop_name: "Conversation",
               option_id: "option_id1",
-              option_name: "why?"
-            }
-          }
-        }
+              option_name: "why?",
+            },
+          },
+        },
       },
       teacher_id2: {
         id: "teacher_id2",
         name: "Manganito",
-        option_ids: ["option_id1"]
-      }
+        option_ids: ["option_id1"],
+      },
     },
     options: {
       option_id1: {
@@ -67,7 +67,7 @@ const db: { prod: OptionalDatabaseModel } = {
         workshop_id: "workshop_id1",
         workshop_name: "Conversation",
         url: "http://url1",
-        isTutorial: false
+        isTutorial: false,
       },
       option_id2: {
         id: "id2",
@@ -80,18 +80,18 @@ const db: { prod: OptionalDatabaseModel } = {
         workshop_id: "workshop_id1",
         workshop_name: "Conversation",
         url: "http://url2",
-        isTutorial: false
-      }
+        isTutorial: false,
+      },
     },
     availableOptions: {
-      option_id1: 10
+      option_id1: 10,
     },
     studentsReservations: {
       "1234509876": {
-        option_id: "option_id1"
-      }
-    }
-  }
+        option_id: "option_id1",
+      },
+    },
+  },
 };
 
 const studentsDB = {
@@ -109,7 +109,7 @@ const studentsDB = {
       nivel: "4",
       curso: "en",
       grupo: "E4-1",
-      externo: false
+      externo: false,
     },
     "1234509876": {
       codigo: "1234509876",
@@ -124,9 +124,9 @@ const studentsDB = {
       nivel: "5",
       curso: "en",
       grupo: "E5-1",
-      externo: false
-    }
-  }
+      externo: false,
+    },
+  },
 };
 const database = new Database(db);
 const workshopsAPI = new WorkshopsAPI();
@@ -134,7 +134,7 @@ workshopsAPI.isOpen = jest.fn(() => Promise.resolve(true));
 workshopsAPI.getMaxStudentReservations = jest.fn(() => Promise.resolve(30));
 
 const studentsDatabase = new Database(studentsDB);
-const studentsAPI = new StudentsAPI(studentMocks.db);
+const studentsAPI = new StudentsAPI(studentMocks.db, {} as any);
 
 const workshopsSheetsAPI = new SheetsAPI("sheetsID");
 workshopsSheetsAPI.append = jest.fn(() => Promise.resolve());
@@ -144,13 +144,13 @@ const dataSources = () => {
     workshopsAPI: workshopsAPI,
     studentsAPI: studentsAPI,
     workshopsSheetsAPI: workshopsSheetsAPI,
-    databaseAPI: databaseAPI
+    databaseAPI: databaseAPI,
   };
 };
 
 const context = () => {
   return {
-    enviroment: "prod"
+    enviroment: "prod",
   };
 };
 const { query } = testServer(dataSources, context);
@@ -180,7 +180,7 @@ test("gets all workshops", async () => {
     }
   `;
   const res = await query({
-    query: GET_WORKSHOPS
+    query: GET_WORKSHOPS,
   });
   expect(res.errors).toBeUndefined();
   expect(res.data).toMatchSnapshot();
@@ -213,7 +213,7 @@ describe("reservations", () => {
   test("makes a reservation", async () => {
     const variables = {
       student_id: "1",
-      option_id: "1"
+      option_id: "1",
     };
     const res = await query({ query: MAKE_RESERVATION, variables });
     expect(res.errors).toBeUndefined();
@@ -225,7 +225,7 @@ describe("reservations", () => {
     const variables = {
       student_id: "1",
       option_id: "1",
-      tutorial_reason: "negative questions"
+      tutorial_reason: "negative questions",
     };
     const res = await query({ query: MAKE_RESERVATION, variables });
     expect(res.errors).toBeUndefined();
@@ -247,7 +247,7 @@ describe("reservations", () => {
   test("errors when student already has a reservation", async () => {
     const variables = {
       student_id: "2",
-      option_id: "2"
+      option_id: "2",
     };
     const res = await query({ query: MAKE_RESERVATION, variables });
     expect(res.errors[0].extensions.code).toBe("RESERVATION_FORBIDDEN");
@@ -317,7 +317,7 @@ describe("teacher dashboard", () => {
 
   test("normal", async () => {
     const variables = {
-      teacher_id: "1"
+      teacher_id: "1",
     };
     const res = await query({ query: GET_TEACHER_DASHBOARD, variables });
     expect(res.errors).toBeUndefined();
@@ -368,11 +368,11 @@ describe("teacher dashboard", () => {
           grupo: "E4-1",
           workshop: "conversation",
           teacher: "Fulanito",
-          attended: true
-        }
+          attended: true,
+        },
       ],
       option_id: "1",
-      teacher_id: "1"
+      teacher_id: "1",
     };
 
     const res = await query({ query: SAVE_ATTENDANCE, variables });
@@ -395,7 +395,7 @@ describe("teacher links page", () => {
       }
     `;
     const res = await query({
-      query: GET_TEACHERS_PAGE
+      query: GET_TEACHERS_PAGE,
     });
     expect(res.errors).toBeUndefined();
     expect(res.data).toMatchSnapshot();

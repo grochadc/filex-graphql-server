@@ -1,7 +1,7 @@
 import { StudentsAPI } from "../index";
 import mocks, { students } from "./mocks";
 
-const api = new StudentsAPI(mocks.db);
+const api = new StudentsAPI(mocks.db, {} as any);
 
 test("gets a student", async () => {
   const result = await api.getStudent("0987654321");
