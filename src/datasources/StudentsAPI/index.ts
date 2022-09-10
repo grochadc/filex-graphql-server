@@ -24,6 +24,14 @@ class StudentsAPI extends DataSource {
     this.prisma = prisma;
   }
 
+  async getAllStudents(ciclo_actual: string) {
+    return this.prisma.student.findMany({
+      where: {
+        ciclo_actual
+      }
+    });
+  }
+
   async getStudent(codigo: string, ciclo_actual: string) {
     const res = await this.prisma.student.findFirst({
       include: {

@@ -3,19 +3,13 @@ import { ApolloError } from "apollo-server";
 import { StudentInput, ApplicantInput } from "../generated/graphql";
 import * as R from "ramda";
 import { PrismaClient, Group } from "@prisma/client";
-import { PrismaClient, Group } from "@prisma/client";
 
 const ALREADY_REGISTERED = "ALREADY_REGISTERED";
 
 class RegistroAPI extends RESTDataSource {
   prisma: PrismaClient;
-  prisma: PrismaClient;
-  constructor(prisma: PrismaClient, db: anyprisma: PrismaClient, db: any) {
+  constructor(prisma: PrismaClient, db: any) {
     super();
-    if (prisma === undefined) {
-      throw Error("Supply a new PrismaCLient() on constructor");
-    }
-    this.prisma = prisma;
     if (prisma === undefined) {
       throw Error("Supply a new PrismaCLient() on constructor");
     }
@@ -32,7 +26,7 @@ class RegistroAPI extends RESTDataSource {
   async getApplicant(codigo: string, ciclo: string) {
     const res = await this.prisma.student.findFirst({
       where: {
-        ciclo,
+        ciclo_actual: ciclo,
         codigo: codigo,
       },
       include: {
@@ -45,18 +39,18 @@ class RegistroAPI extends RESTDataSource {
   async getAlreadyRegistered(codigo: string, ciclo: string) {
     const res = await this.prisma.student.findFirst({
       where: {
-        ciclo,
+        ciclo_actual: ciclo,
         codigo,
       },
       include: {
-        group: {
+        groupObject: {
           include: {
             teacher: true
           }
         },
       },
     });
-    return res.group;
+    return res.groupObject;
   }
 
   async saveApplicant(codigo: string, applicant: ApplicantInput) {
@@ -79,14 +73,14 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async registerStudent(student: StudentInput, groupId: number) {
-    const { group: registeredGroup, id: currentStudentId } =
+    const { groupObject: registeredGroup, id: currentStudentId } =
       await this.prisma.student.findFirst({
         where: {
           codigo: student.codigo,
-          ciclo: "2022B",
+          ciclo_actual: "2022B",
         },
         include: {
-          group: {
+          groupObject: {
             include: {
               teacher: true,
             },
@@ -104,7 +98,7 @@ class RegistroAPI extends RESTDataSource {
       where: { id: currentStudentId },
       include: {
         applicant: true,
-        group: {
+        groupObject: {
           include: {
             teacher: true,
           },
