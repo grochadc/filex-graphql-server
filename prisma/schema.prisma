@@ -155,5 +155,4 @@ model Workshop {
   options     WorkshopOption[]
 
   @@map("workshop")
-
 }

@@ -7,7 +7,7 @@
     "node": "*"
   },
   "scripts": {
-    "start": "ts-node -T --files src/server.ts",
+    "start": "npx ts-node -T --files src/server.ts",
     "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
     "codegenserver": "ts-node -T --files src/server.ts",
     "publish": "git push heroku master",
@@ -26,7 +26,7 @@
     "@types/express-serve-static-core": "^4.17.30",
     "@types/gapi": "^0.0.39",
     "@types/jest": "^29.0.0",
-    "@types/node": "^14.11.2",
+    "@types/node": "^18.7.9",
     "apollo-datasource-firebase": "^0.0.43",
     "apollo-datasource-rest": "^0.9.4",
     "apollo-server": "^2.18.1",
