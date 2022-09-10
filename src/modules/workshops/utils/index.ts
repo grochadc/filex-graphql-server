@@ -1,10 +1,15 @@
-import { Student } from "generated/graphql";
+import {
+  Student as PrismaStudent,
+  Applicant as PrismaApplicant,
+  Group as PrismaGroup,
+} from "@prisma/client";
+import { Student as GraphStudent } from "generated/graphql";
 export function sortWorkshops(options) {
   const dict = {
     Lunes: 1,
     Martes: 2,
     Miercoles: 3,
-    Jueves: 4
+    Jueves: 4,
   };
 
   const byDay = (a, b) => {
@@ -20,7 +25,7 @@ export function sortWorkshops(options) {
   return sortedByTime;
 }
 
-export function sortStudents(students: any[]) {
+export function sortStudents(students: { nombre: string }[]) {
   const byName = (
     left: { nombre: string },
     right: { nombre: string }
@@ -29,3 +34,31 @@ export function sortStudents(students: any[]) {
   };
   return students.sort(byName);
 }
+
+type StudentBeforeUnwind = PrismaStudent & {
+  applicant: PrismaApplicant;
+  groupObject: PrismaGroup;
+};
+
+type PropType<TObj, TProp extends keyof TObj> = TObj[TProp];
+
+type MappedProps = 
+  Record<"ciclo", PropType<PrismaStudent, "ciclo_actual">> &
+  Record<"grupo", PropType<PrismaGroup, "name">>;
+
+
+
+type StudentAfterUnwind = PrismaStudent & PrismaApplicant & MappedProps;
+
+export function unwindPrismaStudent(
+  student: StudentBeforeUnwind
+): StudentAfterUnwind {
+  return {
+    ...student,
+    ...student.applicant,
+    ciclo: student.ciclo_actual,
+    grupo: student.groupObject.name,
+  };
+}
+
+

@@ -11,12 +11,17 @@ import {
   TeacherReservationModel,
   DatabaseModel,
 } from "../modules/workshops/models";
+import { PrismaClient } from "@prisma/client";
 
 type Maybe<T> = T | null;
 
 class WorkshopsAPI extends RESTDataSource {
-  constructor() {
+  prisma: PrismaClient;
+  constructor(prisma: PrismaClient) {
     super();
+    if (prisma === undefined)
+      throw new Error("Must include a new PrismaClient() on constrctor");
+    this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
   }
 
@@ -58,61 +63,143 @@ class WorkshopsAPI extends RESTDataSource {
     ) as Promise<Maybe<DatabaseModel["availableOptions"]>>;
   }
 
-  getTeacher(id: string): Promise<TeacherModel> {
-    return this.get(`${this.context.enviroment}/teachers/${id}.json`);
-  }
-
-  getStudentReservation(codigo: string): Promise<StudentReservationModel> {
-    return this.get(
-      `/${this.context.enviroment}/studentsReservations/${codigo}.json`
-    );
-  }
-
-  async makeReservation(
-    codigo: string,
-    teacher_id: string,
-    option_id: string,
-    tutorial_reason?: string
-  ) {
-    const option = await this.getOptionById(option_id);
-    if (option === null)
-      throw new Error("option with id " + option_id + " returned null");
-    const student = await this.context.dataSources.studentsAPI.getStudent(
-      codigo
-    );
-    const { nombre, apellido_paterno, apellido_materno, nivel, grupo } =
-      student;
-    const teacherReservation: TeacherReservationModel = {
-      codigo: student.codigo,
-      nombre,
-      apellido_paterno,
-      apellido_materno,
-      nivel,
-      grupo,
-      option_id: option.id,
-      option_name: "why? option_name from makeReservation dataSource",
-      workshop_id: option.workshop_id,
-      workshop_name: option.workshop_name,
-      tutorial_reason: tutorial_reason ? tutorial_reason : null,
-    };
-    this.post(
-      `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`,
-      teacherReservation
-    );
-    this.put(`${this.context.enviroment}/studentsReservations/${codigo}.json`, {
-      option_id: option_id,
+  getTeacher(id: string) {
+    return this.prisma.teacher.findUnique({
+      where: {
+        id: Number(id),
+      },
     });
+  }
 
-    //enqueue
-    const availableNumber = await this.get(
-      `${this.context.enviroment}/availableOptions/${option_id}.json`
-    );
-    this.put(
-      `${this.context.enviroment}/availableOptions/${option_id}.json`,
-      availableNumber + 1
+  async getAllTeachers() {
+    return this.prisma.teacher.findMany({
+      include: {
+        options: {
+          include: {
+            workshop: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getReservationCount(student_id: string) {
+    return this.prisma.workshopReservation.count({
+      where: {
+        student_id: Number(student_id),
+      },
+    });
+  }
+
+  async getOptionReservationCount(option_id: string) {
+    const todayDate = new Date();
+    const oneWeekAgo = new Date(
+      todayDate.getFullYear(),
+      todayDate.getMonth(),
+      todayDate.getDate() - 7
     );
 
-    return { ...option, option_id: option.id };
+    return this.prisma.workshopReservation.count({
+      where: {
+        option_id: Number(option_id),
+        create_time: {
+          gt: oneWeekAgo,
+        },
+      },
+    });
+  }
+
+  async getAllOptions(max_students: number) {
+    return this.prisma.workshopOption.findMany();
+  }
+
+  async getAllWorkshops(max_students: number) {
+    return this.prisma.workshop.findMany({
+      include: {
+        options: {
+          include: {
+            teacher: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getTeacherReservations(teacherId: string) {
+    return this.prisma.workshopReservation.findMany({
+      where: {
+        option: {
+          teacher_id: Number(teacherId),
+        },
+      },
+      include: {
+        option: true,
+        student: {
+          include: {
+            applicant: true,
+            groupObject: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getTeacherOptions(teacherId: string) {
+    return this.prisma.workshopOption.findMany({
+      include: {
+        workshop: true,
+      },
+      where: {
+        teacher_id: Number(teacherId),
+      },
+    });
+  }
+
+  async getStudentReservation(studentId: string) {
+    const today = new Date();
+    const lastWeek = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 7
+    );
+    const reservation = await this.prisma.workshopReservation.findFirst({
+      where: {
+        student_id: Number(studentId),
+        create_time: {
+          gt: lastWeek,
+        },
+      },
+      include: {
+        student: true,
+        option: {
+          include: {
+            workshop: true,
+            teacher: true,
+          }
+        },
+      },
+    });
+    if(!reservation) return null;
+    return {...reservation, id: String(reservation.id)}
+  }
+
+  async makeReservation(student_id: string, option_id: string) {
+    const reservation = await this.prisma.workshopReservation.create({
+      data: {
+        student_id: Number(student_id),
+        option_id: Number(option_id),
+      },
+      include: {
+        student: true,
+        option: {
+          include: {
+            teacher: true,
+            workshop: true
+          }
+        },
+      },
+    });
+    return {...reservation, id: String(reservation.id)}
   }
 
   deleteReservations(teacher_id: string, option_id: string) {
@@ -131,29 +218,18 @@ class WorkshopsAPI extends RESTDataSource {
     return this.get(`${this.context.enviroment}/options/${id}.json`);
   }
 
-  async saveAttendance(attendance: AttendingStudent[]) {
-    const date = new Date();
-    const values = attendance.map((student) => {
-      return [
-        `=date(${date.getFullYear()},${date.getMonth() + 1},${date.getDate()})`,
-        student.codigo,
-        student.nombre,
-        student.apellido_paterno,
-        student.apellido_materno,
-        student.nivel,
-        student.grupo,
-        student.workshop,
-        student.teacher,
-        student.attended,
-      ];
-    });
-    const range = "Attendance!A1";
-
-    try {
-      await this.context.dataSources.workshopsSheetsAPI.append(values, range);
-    } catch (e) {
-      console.error(e);
-    }
+  async saveAttendance(attendance: AttendingStudent[], ) {
+    const ids = attendance.filter((student) => student.attended).map(student => Number(student.id));
+    this.prisma.workshopReservation.updateMany({
+      where: {
+        id: {
+          in: ids
+        }
+      },
+      data: {
+        attended: true
+      }
+    })
     return true;
   }
 

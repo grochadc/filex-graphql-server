@@ -114,7 +114,7 @@ export const resolvers: Resolvers = {
       const group = args.id;
       const course = group.substr(0, 1) === "E" ? "en" : "fr";
       const level = group.substr(1, 1);
-      return dataSources.registroAPI.getSchedule(level, group, course);
+      return dataSources.registroAPI.getSchedule(level, group, course) as any;
     },
   },
   Mutation: {
@@ -124,7 +124,7 @@ export const resolvers: Resolvers = {
         student,
         student.curso
       );
-      return registeredStudent;
+      return registeredStudent as any;
     },
     saveRegisteringLevels: (root, args, { dataSources }) => {
       return dataSources.registroAPI.setLevelsRegistering(
@@ -167,7 +167,7 @@ export const resolvers: Resolvers = {
         );
       }
 
-      return availableSchedules(allSchedules, unavailable);
+      return availableSchedules(allSchedules, unavailable) as any;
     },
     registeredSchedule: async (root, args, { dataSources }) => {
       const registeredGroup =
@@ -177,7 +177,7 @@ export const resolvers: Resolvers = {
           root.nivel,
           registeredGroup,
           root.curso
-        );
+        ) as any;
       }
       return null;
     },

@@ -5,12 +5,12 @@ generates:
   src/generated/graphql.ts:
     config:
       contextType: ../server#ServerContext
-      mappers:
-        Applicant: ../modules/registro/models#ApplicantModel
-        Schedule: ../modules/registro/models#ScheduleModel
-        Student: ../modules/workshops/models#StudentModel
-        Teacher: ../modules/workshops/models#TeacherModel
-        StudentReservation: ../modules/workshops/models#StudentReservationModel
+      mappers: 
+        Option: ../../node_modules/.prisma/client#WorkshopOption
+        TeacherOption: ../../node_modules/.prisma/client#WorkshopOption  
+        Teacher: ../../node_modules/.prisma/client#Teacher
+        Workshop: ../../node_modules/.prisma/client#Workshop  
+        Student: ../../node_modules/.prisma/client#Student  
     plugins:
       - "typescript"
       - "typescript-resolvers"

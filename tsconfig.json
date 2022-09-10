@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "commonjs",
     "target": "es2016",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "outDir": "dist/",
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "sourceMap": true,
   },
   "include": ["src/"],
   "exclude": ["node_modules", "**/*.spec.ts", "src/__tests__/"]

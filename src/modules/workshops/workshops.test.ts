@@ -1,14 +1,16 @@
-import testServer from "testUtils/testServer";
+import testServer from "../../testUtils/testServer";
 import { gql } from "apollo-server";
 import mocks from "../../datasources/DatabaseAPI/mocks";
-import DatabaseAPI from "datasources/DatabaseAPI";
-import studentMocks from "datasources/StudentsAPI/mocks";
-import { StudentsAPI } from "datasources/StudentsAPI";
-import Database from "testUtils/databaseCreator";
-import { WorkshopsAPI } from "datasources/WorkshopsAPI";
-import { SheetsAPI } from "datasources/SheetsAPI";
-import { MutationSaveWorkshopsAttendanceArgs } from "generated/graphql";
+import DatabaseAPI from "../../datasources/DatabaseAPI";
+import studentMocks from "../../datasources/StudentsAPI/mocks";
+import { StudentsAPI } from "../../datasources/StudentsAPI";
+import Database from "../../testUtils/databaseCreator";
+import { WorkshopsAPI } from "../../datasources/WorkshopsAPI";
+//import { SheetsAPI } from "../../datasources/SheetsAPI";
+import { MutationSaveWorkshopsAttendanceArgs } from "../../generated/graphql";
 import { DatabaseModel, StudentsDBModel } from "./models";
+
+import { prismaMock } from "../../datasources/StudentsAPI/testutils/singleton";
 
 const databaseAPI = new DatabaseAPI(mocks.db);
 
@@ -129,12 +131,12 @@ const studentsDB = {
   }
 };
 const database = new Database(db);
-const workshopsAPI = new WorkshopsAPI();
+const workshopsAPI = new WorkshopsAPI(prismaMock);
 workshopsAPI.isOpen = jest.fn(() => Promise.resolve(true));
 workshopsAPI.getMaxStudentReservations = jest.fn(() => Promise.resolve(30));
 
 const studentsDatabase = new Database(studentsDB);
-const studentsAPI = new StudentsAPI(studentMocks.db);
+const studentsAPI = new StudentsAPI(studentMocks.db, prismaMock);
 
 const workshopsSheetsAPI = new SheetsAPI("sheetsID");
 workshopsSheetsAPI.append = jest.fn(() => Promise.resolve());
@@ -143,21 +145,10 @@ const dataSources = () => {
   return {
     workshopsAPI: workshopsAPI,
     studentsAPI: studentsAPI,
-    workshopsSheetsAPI: workshopsSheetsAPI,
-    databaseAPI: databaseAPI
   };
 };
 
-const context = () => {
-  return {
-    enviroment: "prod"
-  };
-};
-const { query } = testServer(dataSources, context);
-
-afterEach(() => {
-  databaseAPI.db.one.mockClear();
-});
+const { query } = testServer(dataSources);
 
 test("gets all workshops", async () => {
   const GET_WORKSHOPS = gql`
@@ -255,6 +246,10 @@ describe("reservations", () => {
 });
 
 describe("student data", () => {
+  const { query: studentQuery } = testServer(() => ({
+    workshopsAPI: new WorkshopsAPI(prismaMock),
+    studentsAPI: new StudentsAPI(mocks.db, prismaMock)
+  }));
   const GET_STUDENT = gql`
     query getStudent($codigo: ID!) {
       student(codigo: $codigo) {
@@ -272,21 +267,21 @@ describe("student data", () => {
 
   test("normal not registered", async () => {
     const variables = { codigo: "1234567890" };
-    const res = await query({ query: GET_STUDENT, variables });
+    const res = await studentQuery({ query: GET_STUDENT, variables });
     expect(res.errors).toBeUndefined();
     expect(res.data.student.reservation).toBeNull();
     expect(res.data).toMatchSnapshot();
   });
   test("already registered", async () => {
     const variables = { codigo: "0987654321" };
-    const res = await query({ query: GET_STUDENT, variables });
+    const res = await studentQuery({ query: GET_STUDENT, variables });
     expect(res.errors).toBeUndefined();
     expect(res.data.student.reservation).toBeTruthy();
     expect(res.data).toMatchSnapshot();
   });
   test("not found", async () => {
     const variables = { codigo: "1234509876" };
-    const res = await query({ query: GET_STUDENT, variables });
+    const res = await studentQuery({ query: GET_STUDENT, variables });
     expect(res.errors[0].message).toBe("404: Alumno inexistente");
   });
 });

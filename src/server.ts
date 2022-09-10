@@ -10,7 +10,7 @@ import {
   PlacementAPI,
   //PlacementSheetsAPI,
   //SheetsAPI,
-  DatabaseAPI,
+  //DatabaseAPI,
 } from "./datasources";
 
 import { PrismaClient } from "@prisma/client";
@@ -28,7 +28,7 @@ export type DataSourcesType = {
   //placementSheetsAPI: PlacementSheetsAPI;
   //registroSheetsAPI: SheetsAPI;
   //workshopsSheetsAPI: SheetsAPI;
-  databaseAPI: DatabaseAPI;
+  //databaseAPI: DatabaseAPI;
 };
 
 export type ServerContext = {
@@ -57,8 +57,8 @@ const server = new ApolloServer({
       firebaseAPI: new FirebaseAPI(),
       registroAPI: new RegistroAPI(),
       examAPI: new ExamAPI(),
-      workshopsAPI: new WorkshopsAPI(),
-      studentsAPI: new StudentsAPI(db),
+      workshopsAPI: new WorkshopsAPI(prisma),
+      studentsAPI: new StudentsAPI(db, prisma),
       placementAPI: new PlacementAPI(prisma),
       /*
       placementSheetsAPI: new PlacementSheetsAPI(
@@ -71,7 +71,7 @@ const server = new ApolloServer({
         "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
       ),
       */
-      databaseAPI: new DatabaseAPI(db),
+      //databaseAPI: new DatabaseAPI(db),
     };
     return result;
   },

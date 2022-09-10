@@ -1,8 +1,12 @@
 import { gql, ApolloError } from "apollo-server";
+import { datastore } from "googleapis/build/src/apis/datastore";
+import { GraphQLScalarType, Kind } from "graphql";
 import { Resolvers } from "../../generated/graphql";
-import { sortWorkshops, sortStudents } from "./utils";
+import { sortWorkshops, sortStudents, unwindPrismaStudent } from "./utils";
 
 export const typeDefs = gql`
+  scalar Date
+
   extend type Query {
     paramQuery(param: String): Boolean
     options: [Option!]!
@@ -14,7 +18,7 @@ export const typeDefs = gql`
   }
 
   type Workshop {
-    id: ID!
+    id: Int!
     name: String!
     description: String!
     levels: [String!]!
@@ -26,65 +30,44 @@ export const typeDefs = gql`
     active: Boolean!
     day: String!
     time: String!
-    teacher_name: String!
-    teacher_id: String!
-    workshop_name: String!
-    workshop_id: String!
+    teacher: Teacher!
+    workshop: Workshop!
     url: String!
     zoom_id: String
     isTutorial: Boolean!
     available: Boolean!
   }
 
-  type StudentReservation {
-    id: ID!
-    day: String!
-    time: String!
-    teacher_name: String!
-    teacher_id: ID!
-    workshop_name: String!
-    workshop_id: String!
-    url: String!
-    zoom_id: String
-  }
-
   type TeacherOption {
     id: ID!
     day: String!
     time: String!
-    teacher_name: String!
-    teacher_id: String!
-    workshop_name: String!
-    workshop_id: String!
+    teacher: Teacher!
+    workshop: Workshop!
     url: String!
     zoom_id: String
-    reservations: [Reservation!]
+    isTutorial: Boolean!
+    available: Boolean!
+    reservations: [Reservation]!
   }
 
   type Reservation {
     id: ID!
-    workshop_id: String!
-    workshop_name: String!
-    option_id: String!
-    codigo: String!
-    nombre: String!
-    apellido_paterno: String!
-    apellido_materno: String!
-    telefono: String!
-    email: String!
-    nivel: String!
-    grupo: String!
-    tutorial_reason: String
+    create_time: Date!
+    student: Student!
+    option: Option!
+    tutorialReason: String
+    attended: Boolean!
   }
 
   type Teacher {
     id: ID!
-    name: String!
-    options(sorted: Boolean): [TeacherOption!]!
+    nombre: String!
+    options: [TeacherOption!]!
   }
 
   extend type Student {
-    reservation: StudentReservation
+    reservation: Reservation
     reservationCount: Int!
     reservationLimit: Int!
   }
@@ -96,32 +79,44 @@ export const typeDefs = gql`
       student_id: ID!
       option_id: ID!
       tutorial_reason: String
-    ): StudentReservation!
+    ): Reservation!
 
     saveWorkshopsAttendance(
-      input: [AttendingStudent!]!
+      attendingStudents: [AttendingStudent!]!
       option_id: ID!
       teacher_id: ID!
     ): Boolean!
+
 
     resetReservations: Boolean!
     setWorkshopLink(option_id: ID!, url: String!): Boolean!
   }
 
   input AttendingStudent {
-    codigo: String!
-    nombre: String!
-    apellido_paterno: String!
-    apellido_materno: String
-    nivel: String!
-    grupo: String!
-    workshop: String!
-    teacher: String!
+    id: ID!
     attended: Boolean!
   }
 `;
 
+const dateScalar = new GraphQLScalarType({
+  name: "Date",
+  description: "Date custom scalar type based on Javascript Date object",
+  serialize(value) {
+    return value.getTime();
+  },
+  parseValue(value: number) {
+    return new Date(value);
+  },
+  parseLiteral(ast: any) {
+    if (ast.kind === Kind.INT) {
+      return new Date(parseInt(ast.value, 10));
+    }
+    return null;
+  },
+});
+
 export const resolvers: Resolvers = {
+  Date: dateScalar,
   Query: {
     isWorkshopsOpen: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.isOpen(),
@@ -131,59 +126,76 @@ export const resolvers: Resolvers = {
     options: async (option, args, { dataSources }) => {
       const max_students =
         await dataSources.workshopsAPI.getMaxStudentReservations();
-      return dataSources.databaseAPI.getAllOptions(max_students);
+      const res = await dataSources.workshopsAPI.getAllOptions(max_students);
+      return res;
     },
     workshops: async (root, args, { dataSources }) => {
       const max_students =
         await dataSources.workshopsAPI.getMaxStudentReservations();
-      const allWorkshops = await dataSources.databaseAPI.getAllWorkshops(
+      const allWorkshops = await dataSources.workshopsAPI.getAllWorkshops(
         max_students
       );
       return allWorkshops;
     },
     teacher: async (root, args, { dataSources }) => {
-      const teacher = await dataSources.databaseAPI.getTeacher(args.id);
-      return teacher;
+      return dataSources.workshopsAPI.getTeacher(args.id);
     },
-    teachers: (root, args, { dataSources }) => {
-      return dataSources.databaseAPI.getAllTeachers();
+    teachers: async (root, args, { dataSources }) => {
+      const res = await dataSources.workshopsAPI.getAllTeachers();
+      return res;
     },
   },
   Teacher: {
-    options: (root, args, context) => {
-      if (args.sorted) {
-        //@ts-ignore
-        return sortWorkshops(root.options);
-      }
-      //@ts-ignore
-      return root.options;
+    options: async (teacher, args, { dataSources }) => {
+      const options = await dataSources.workshopsAPI.getTeacherOptions(
+        String(teacher.id)
+      );
+      return options;
     },
   },
   TeacherOption: {
     reservations: async (teacherOption, args, { dataSources }) => {
-      const result = await dataSources.databaseAPI.getTeacherReservations(
-        teacherOption.id
+      const res = await dataSources.workshopsAPI.getTeacherReservations(
+        String(teacherOption.id)
       );
-      if (result) return sortStudents(result);
-      return result;
+      const finalResult = res.map((reservation) => {
+        return ({
+          ...reservation,
+          id: String(reservation.id),
+          student: unwindPrismaStudent(reservation.student),
+        });
+      });
+      return finalResult;
+    },
+    available: async (teacherOption, args, { dataSources }) => {
+      const reservationCount =
+        await dataSources.workshopsAPI.getOptionReservationCount(
+          String(teacherOption.id)
+        );
+      return Boolean(reservationCount < 30);
+    },
+    isTutorial: (teacherOption) => Boolean(teacherOption.workshop_id > 1),
+  },
+  Option: {
+    available: async (option, args, { dataSources }) => {
+      const reservationCount =
+        await dataSources.workshopsAPI.getOptionReservationCount(String(option.id));
+      console.log("reservationCOunt", reservationCount);
+      return true;
+    },
+    isTutorial: (option, args, context) => {
+      return Boolean(option.workshop_id > 1);
     },
   },
   Student: {
     reservation: async (student, args, { dataSources }) => {
-      const reservations = await dataSources.databaseAPI.getStudentReservation(
-        student.id
+      const reservation = await dataSources.workshopsAPI.getStudentReservation(
+        String(student.id)
       );
-      return reservations;
+      return reservation;
     },
-    //@ts-ignore
-    reservationCount: async (student, args, {dataSources}) => {
-      const reservationCount = await dataSources.databaseAPI.getReservationCount(student.id).catch((error) => {
-        if(error.code == "queryResultErrorCode.noData"){
-          console.log('Query Result Error')
-        }
-      });
-      console.log('reservationCount from resolver', reservationCount)
-      return reservationCount;
+    reservationCount: async (student, args, { dataSources }) => {
+      return dataSources.workshopsAPI.getReservationCount(String(student.id));
     },
     reservationLimit: (student, args, { dataSources }) => {
       return dataSources.workshopsAPI.getReservationLimit();
@@ -193,8 +205,8 @@ export const resolvers: Resolvers = {
     toggleOpenWorkshops: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.toggleOpen(),
     makeWorkshopReservation: async (root, args, { dataSources }) => {
-      const reservation = await dataSources.databaseAPI.getStudentReservation(
-        Number(args.student_id)
+      const reservation = await dataSources.workshopsAPI.getStudentReservation(
+        args.student_id
       );
       if (reservation) {
         throw new ApolloError(
@@ -202,44 +214,21 @@ export const resolvers: Resolvers = {
           "RESERVATION_FORBIDDEN"
         );
       }
-      const resCount = await dataSources.databaseAPI.updateReservationCount(Number(args.student_id))
-      console.log('resCount', resCount)
-      return dataSources.databaseAPI.makeReservation(
-        Number(args.student_id),
-        Number(args.option_id),
-        args.tutorial_reason
+      return dataSources.workshopsAPI.makeReservation(
+        args.student_id,
+        args.option_id
       );
     },
     saveWorkshopsAttendance: async (
       root,
-      { input, teacher_id, option_id },
+      { attendingStudents, teacher_id, option_id },
       { dataSources }
     ) => {
-      const result = await dataSources.workshopsAPI.saveAttendance(input);
-      dataSources.databaseAPI.deleteOptionReservations(option_id);
-      return result;
-    },
-    editStudent: () => {
-      return {
-        id: 1,
-        codigo: "1234567890",
-        nombre: "Benito Antonio",
-        apellido_paterno: "Martinez",
-        apellido_materno: "Ocasio",
-        genero: "M",
-        carrera: "Abogado",
-        ciclo: "2021A",
-        telefono: "1234567890",
-        email: "bad@bunny.pr",
-        nivel: "4",
-        curso: "en",
-        grupo: "E4-1",
-        externo: false,
-      };
+      return dataSources.workshopsAPI.saveAttendance(attendingStudents, );
     },
     resetReservations: (root, args, { dataSources }) =>
-      dataSources.databaseAPI.resetReservations(),
+      dataSources.workshopsAPI.resetReservations(),
     setWorkshopLink: (root, { option_id, url }, { dataSources }) =>
-      dataSources.databaseAPI.setWorkshopLink(option_id, url),
+      dataSources.workshopsAPI.setWorkshopLink(option_id, url),
   },
 };

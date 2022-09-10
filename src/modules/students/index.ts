@@ -7,8 +7,8 @@ export const typeDefs = gql`
   }
 
   type Student {
-    id: ID!
-    codigo: String!
+    id: Int!
+    codigo: ID!
     nombre: String!
     apellido_paterno: String!
     apellido_materno: String!
@@ -17,7 +17,7 @@ export const typeDefs = gql`
     ciclo: String!
     telefono: String!
     email: String!
-    nivel: String!
+    nivel: Int!
     curso: String!
     externo: Boolean!
     grupo: String!
@@ -65,15 +65,25 @@ export const typeDefs = gql`
 export const resolvers: Resolvers = {
   Query: {
     student: async (root, args, { dataSources }) => {
-      return dataSources.studentsAPI.getStudent(args.codigo);
+      const res = await dataSources.studentsAPI.getStudent(
+        args.codigo,
+        "2022B"
+      );
+      return ({ 
+        ...res,
+        ciclo: res.ciclo_ingreso, 
+        grupo: res.groupObject?.name,
+      });
     },
   },
   Mutation: {
+    //@ts-ignore
     addStudent: async (root, args, { dataSources }) => {
-      return dataSources.studentsAPI.addStudent(args.student);
+      const res = await dataSources.studentsAPI.addStudent(args.student);
+      return {...res, reservationCount: 0, reservationLimit: 6, nivel: Number(res.nivel)};
     },
     editStudent: async (root, { codigo, changes }, { dataSources }) => {
-      return dataSources.studentsAPI.editStudent(codigo, changes);
+      return dataSources.studentsAPI.editStudent(codigo, changes, "2022B");
     },
   },
 };

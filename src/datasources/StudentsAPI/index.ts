@@ -2,26 +2,38 @@ import { DataSource } from "apollo-datasource";
 import { StudentModel } from "../../modules/workshops/models";
 import { ParameterizedQuery as PQ } from "pg-promise";
 import { ApolloError } from "apollo-server";
+import { PrismaClient } from "@prisma/client";
+import {Student} from "../../generated/graphql";
+
 
 type StudentInput = Omit<StudentModel, "id">;
 type Changes = Partial<StudentInput>;
 
 class StudentsAPI extends DataSource {
   db: any;
-  constructor(db: any) {
+  prisma: PrismaClient;
+  constructor(db: any, prisma: PrismaClient) {
     super();
     this.db = db;
+    if (prisma === undefined) {
+      throw Error("Supply a new PrismaCLient() on constructor");
+    }
+    this.prisma = prisma;
   }
 
-  async getStudent(codigo: string): Promise<StudentModel> {
-    const result = await this.db.oneOrNone(
-      new PQ({ text: GET_STUDENT, values: [codigo] })
-    );
-    if (result) {
-      return result;
-    } else {
-      throw new ApolloError("404: Alumno inexistente", "404");
-    }
+  async getStudent(codigo: string, ciclo_actual: string) {
+    const res = await this.prisma.student.findFirst({
+      include: {
+        applicant: true,
+        groupObject: true,
+      },
+      where: {
+        codigo,
+        ciclo_actual
+      }
+    });
+
+    return {...res, ...res.applicant };
   }
 
   async addStudent(student: StudentInput) {
@@ -48,8 +60,8 @@ class StudentsAPI extends DataSource {
     return { id: addedStudent.id, ...student };
   }
 
-  async editStudent(codigo: string, changes: Changes) {
-    const oldStudent = await this.getStudent(codigo);
+  async editStudent(codigo: string, changes: Changes, ciclo: string) {
+    const oldStudent = await this.getStudent(codigo, ciclo);
     const newStudent = Object.assign(oldStudent, changes);
     try {
       this.db.none(

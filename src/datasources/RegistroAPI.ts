@@ -21,7 +21,7 @@ class RegistroAPI extends RESTDataSource {
     return levels;
   }
 
-  async getApplicant(codigo: string): Promise<ApplicantModel> {
+  async getApplicant(codigo: string): Promise<any> {
     const localUrl = this.context.enviroment;
     const APPLICANT_NOT_FOUND = "APPLICANT_NOT_FOUND";
     //alreadyRegistered: {"12345678900": "E3-5"}

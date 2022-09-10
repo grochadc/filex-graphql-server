@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`adds a student 1`] = `
-Object {
+{
   "apellido_materno": "Ocasio",
   "apellido_paterno": "Martinez",
   "carrera": "Abogado",
@@ -40,19 +40,36 @@ Object {
 
 exports[`gets a student 1`] = `
 Object {
-  "apellido_materno": "Valadez",
-  "apellido_paterno": "Aguilera",
+  "apellido_materno": "Ocasio",
+  "apellido_paterno": "Martinez",
+  "applicant": Object {
+    "apellido_materno": "Ocasio",
+    "apellido_paterno": "Martinez",
+    "carrera": "Abogado",
+    "ciclo_ingreso": "2021A",
+    "codigo": "1234567890",
+    "email": "bad@bunny.pr",
+    "externo": false,
+    "genero": "M",
+    "id": 1,
+    "nombre": "Benito Antonio",
+    "telefono": "1234567890",
+  },
+  "applicantId": 1,
   "carrera": "Abogado",
-  "ciclo": "2021A",
-  "codigo": "0987654321",
+  "ciclo_actual": "2022B",
+  "ciclo_ingreso": "2021A",
+  "codigo": "1234567890",
   "curso": "en",
-  "email": "juanga@elnoanoa.mx",
+  "desertor": false,
+  "email": "bad@bunny.pr",
   "externo": false,
   "genero": "M",
-  "grupo": "E1-1",
-  "id": 2,
-  "nivel": "1",
-  "nombre": "Alberto",
+  "groupId": 1,
+  "id": 1,
+  "nivel": 4,
+  "nombre": "Benito Antonio",
+  "situacion": null,
   "telefono": "1234567890",
 }
 `;

@@ -2,8 +2,32 @@ import testServer from "testUtils/testServer";
 import mocks from "../../datasources/StudentsAPI/mocks";
 import { StudentsAPI } from "../../datasources/StudentsAPI";
 import { gql } from "apollo-server";
+import { PrismaClient, Student } from "@prisma/client";
 
-const studentsAPI = new StudentsAPI(mocks.db);
+jest.mock('@prisma/client');
+
+beforeEach(() => {
+  //@ts-ignore
+  PrismaClient.mockClear();
+})
+
+const prisma = new PrismaClient();
+prisma.student.findFirst = jest.fn(() => {
+  return {
+    id: 1,
+    applicantId: 1,
+    ciclo_actual: "2022B",
+    ciclo_ingreso: "2022A",
+    codigo: "1234567890",
+    nivel: 4,
+    curso: "en",
+    situacion: "",
+    groupId: 1,
+    desertor: false
+  } as Student;
+})
+
+const studentsAPI = new StudentsAPI(mocks.db, prisma);
 
 const dataSources = () => {
   return {
@@ -44,6 +68,8 @@ test("gets student", async () => {
     query: GET_STUDENT_QUERY,
     variables: { codigo: "1234567890" }
   });
+
+  expect(prisma.student.findFirst).toHaveBeenCalled()
   expect(res.errors).toBeUndefined();
   expect(res.data).toMatchSnapshot();
 });

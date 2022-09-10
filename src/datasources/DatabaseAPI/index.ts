@@ -235,18 +235,22 @@ class DatabaseAPI extends DataSource {
     options.forEach(option => {
       const { workshop_description, ...simpleOption } = option;
       const foundWorkshopIndex = workshops.findIndex(
-        workshop => workshop.id === option.workshop_id
+        workshop => String(workshop.id) === option.workshop_id
       );
       if (foundWorkshopIndex === -1) {
         const new_workshop = {
-          id: option.workshop_id,
+          id: Number(option.workshop_id),
+          teacher: {},
+          workshop: {},
           name: option.workshop_name,
           description: option.workshop_description,
           levels: option.workshop_levels.map(level => level.toString()),
           options: [simpleOption]
         };
+        //@ts-ignore
         workshops.push(new_workshop);
       } else {
+        //@ts-ignore
         workshops[foundWorkshopIndex].options.push(simpleOption);
       }
     });
