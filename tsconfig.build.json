@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "exclude" : ["node_modules", "**/*.spec.ts", "src/__tests__/", "**/*.test.ts", "dist"],
+        "include": ["src/server.ts"],
+        "outDir": "dist/"
+    }
+}

@@ -1,10 +1,11 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { WorkshopOption, Teacher, Workshop, Student } from '../../node_modules/.prisma/client';
+import { WorkshopOption, Teacher as TeacherModel, Workshop as WorkshopModel, Student as StudentModel } from '../../node_modules/.prisma/client';
 import { ServerContext } from '../server';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -343,8 +344,8 @@ export type QueryMasterlistArgs = {
 };
 
 
-export type QueryMasterlistArgs = {
-  ciclo: Scalars['String'];
+export type QueryParamQueryArgs = {
+  param?: Maybe<Scalars['String']>;
 };
 
 
@@ -361,16 +362,6 @@ export type QuerySectionArgs = {
 
 export type QueryStudentArgs = {
   codigo: Scalars['ID'];
-};
-
-
-export type QueryTeacherArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryTestResultsArgs = {
-  filter?: Maybe<Filter>;
 };
 
 
@@ -664,13 +655,13 @@ export type ResolversTypes = {
   Section: ResolverTypeWrapper<Section>;
   SerializedOptions: SerializedOptions;
   String: ResolverTypeWrapper<Scalars['String']>;
-  Student: ResolverTypeWrapper<Student>;
+  Student: ResolverTypeWrapper<StudentModel>;
   StudentChangesInput: StudentChangesInput;
   StudentInput: StudentInput;
-  Teacher: ResolverTypeWrapper<Teacher>;
+  Teacher: ResolverTypeWrapper<TeacherModel>;
   TeacherOption: ResolverTypeWrapper<WorkshopOption>;
   TestResults: ResolverTypeWrapper<TestResults>;
-  Workshop: ResolverTypeWrapper<Workshop>;
+  Workshop: ResolverTypeWrapper<WorkshopModel>;
   WrittenResultsInput: WrittenResultsInput;
   firebaseInput: FirebaseInput;
   meetLink: ResolverTypeWrapper<MeetLink>;
@@ -707,13 +698,13 @@ export type ResolversParentTypes = {
   Section: Section;
   SerializedOptions: SerializedOptions;
   String: Scalars['String'];
-  Student: Student;
+  Student: StudentModel;
   StudentChangesInput: StudentChangesInput;
   StudentInput: StudentInput;
-  Teacher: Teacher;
+  Teacher: TeacherModel;
   TeacherOption: WorkshopOption;
   TestResults: TestResults;
-  Workshop: Workshop;
+  Workshop: WorkshopModel;
   WrittenResultsInput: WrittenResultsInput;
   firebaseInput: FirebaseInput;
   meetLink: MeetLink;

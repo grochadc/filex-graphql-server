@@ -8,9 +8,9 @@ generates:
       mappers: 
         Option: ../../node_modules/.prisma/client#WorkshopOption
         TeacherOption: ../../node_modules/.prisma/client#WorkshopOption  
-        Teacher: ../../node_modules/.prisma/client#Teacher
-        Workshop: ../../node_modules/.prisma/client#Workshop  
-        Student: ../../node_modules/.prisma/client#Student  
+        Teacher: '../../node_modules/.prisma/client#Teacher as TeacherModel'
+        Workshop: '../../node_modules/.prisma/client#Workshop  as WorkshopModel'
+        Student: '../../node_modules/.prisma/client#Student  as StudentModel'
     plugins:
       - "typescript"
       - "typescript-resolvers"
