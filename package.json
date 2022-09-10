@@ -7,8 +7,7 @@
     "node": "*"
   },
   "scripts": {
-    "start": "node dist/server.js",
-    "build": "npx tsc",
+    "start": "ts-node -T --files src/server.ts",
     "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
     "codegenserver": "ts-node -T --files src/server.ts",
     "publish": "git push heroku master",
@@ -45,7 +44,8 @@
     "typescript": "^4.8.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.0",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.12.7",
     "@graphql-codegen/cli": "2.1.1",
