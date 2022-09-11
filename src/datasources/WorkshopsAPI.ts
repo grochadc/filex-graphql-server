@@ -125,11 +125,12 @@ class WorkshopsAPI extends RESTDataSource {
     });
   }
 
-  async getTeacherReservations(teacherId: string) {
+  async getTeacherReservations(teacherId: number, optionId: number) {
     return this.prisma.workshopReservation.findMany({
       where: {
         option: {
-          teacher_id: Number(teacherId),
+          teacher_id: teacherId,
+          id: optionId
         },
       },
       include: {

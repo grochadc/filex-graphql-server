@@ -164,7 +164,8 @@ export const resolvers: Resolvers = {
   TeacherOption: {
     reservations: async (teacherOption, args, { dataSources }) => {
       const res = await dataSources.workshopsAPI.getTeacherReservations(
-        String(teacherOption.id)
+        teacherOption.teacher_id,
+        teacherOption.id
       );
       const finalResult = res.map((reservation) => {
         return {
