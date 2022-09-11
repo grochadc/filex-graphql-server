@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("HEROKU_POSTGRESQL_TEAL_URL")
 }
 
 model Student {
@@ -155,5 +155,4 @@ model Workshop {
   options     WorkshopOption[]
 
   @@map("workshop")
-
 }

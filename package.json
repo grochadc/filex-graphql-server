@@ -7,8 +7,7 @@
     "node": "*"
   },
   "scripts": {
-    "start": "node dist/server.js",
-    "build": "npx tsc",
+    "start": "npx ts-node -T --files src/server.ts",
     "dev": "nodemon --ext ts,tsx --exec 'ts-node --files src/server.ts'",
     "codegenserver": "ts-node -T --files src/server.ts",
     "publish": "git push heroku master",
@@ -22,12 +21,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "4.2.1",
+    "@prisma/client": "4.3.1",
     "@types/express": "^4.17.13",
     "@types/express-serve-static-core": "^4.17.30",
     "@types/gapi": "^0.0.39",
     "@types/jest": "^29.0.0",
-    "@types/node": "^14.11.2",
+    "@types/node": "^18.7.9",
     "apollo-datasource-firebase": "^0.0.43",
     "apollo-datasource-rest": "^0.9.4",
     "apollo-server": "^2.18.1",
@@ -45,7 +44,8 @@
     "typescript": "^4.8.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.0",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.12.7",
     "@graphql-codegen/cli": "2.1.1",
