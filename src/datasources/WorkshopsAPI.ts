@@ -221,7 +221,7 @@ class WorkshopsAPI extends RESTDataSource {
 
   async saveAttendance(attendance: AttendingStudent[], ) {
     const ids = attendance.filter((student) => student.attended).map(student => Number(student.id));
-    this.prisma.workshopReservation.updateMany({
+    const modified = await this.prisma.workshopReservation.updateMany({
       where: {
         id: {
           in: ids
@@ -231,7 +231,7 @@ class WorkshopsAPI extends RESTDataSource {
         attended: true
       }
     })
-    return true;
+    return modified.count>0;
   }
 
   setWorkshopLink(option_id: string, url: string) {
