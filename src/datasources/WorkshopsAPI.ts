@@ -17,12 +17,14 @@ type Maybe<T> = T | null;
 
 class WorkshopsAPI extends RESTDataSource {
   prisma: PrismaClient;
+  openDate: any;
   constructor(prisma: PrismaClient) {
     super();
     if (prisma === undefined)
       throw new Error("Must include a new PrismaClient() on constrctor");
     this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
+    this.openDate = new Date(2022, 8, 15);
   }
 
   async isOpen(): Promise<boolean> {
@@ -99,11 +101,12 @@ class WorkshopsAPI extends RESTDataSource {
       todayDate.getDate() - 7
     );
 
+
     return this.prisma.workshopReservation.count({
       where: {
         option_id: Number(option_id),
         create_time: {
-          gt: oneWeekAgo,
+          gt: this.openDate,
         },
       },
     });
@@ -130,8 +133,11 @@ class WorkshopsAPI extends RESTDataSource {
       where: {
         option: {
           teacher_id: teacherId,
-          id: optionId
+          id: optionId,
         },
+        create_time: {
+          gt: this.openDate
+        }
       },
       include: {
         option: true,
@@ -167,7 +173,7 @@ class WorkshopsAPI extends RESTDataSource {
       where: {
         student_id: Number(studentId),
         create_time: {
-          gt: lastWeek,
+          gt: this.openDate,
         },
       },
       include: {
@@ -210,8 +216,8 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async resetReservations() {
-    await this.delete(`${this.context.enviroment}/studentsReservations.json`);
-    await this.delete(`${this.context.enviroment}/availableOptions.json`);
+    const now = new Date();
+    await this.put('openDate.json', now.toString());
     return true;
   }
 
