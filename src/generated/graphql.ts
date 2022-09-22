@@ -5,6 +5,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -80,7 +81,7 @@ export type ApplicantResponse = {
 
 export type AttendingStudent = {
   attended: Scalars['Boolean'];
-  id: Scalars['ID'];
+  reservation_id: Scalars['ID'];
 };
 
 export type Carrera = {
@@ -220,8 +221,8 @@ export type MutationSaveRegisteringLevelsArgs = {
 
 export type MutationSaveWorkshopsAttendanceArgs = {
   attendingStudents: Array<AttendingStudent>;
-  option_id: Scalars['ID'];
-  teacher_id: Scalars['ID'];
+  option_id?: Maybe<Scalars['ID']>;
+  teacher_id?: Maybe<Scalars['ID']>;
 };
 
 
@@ -265,7 +266,7 @@ export type Option = {
   isTutorial: Scalars['Boolean'];
   teacher: Teacher;
   time: Scalars['String'];
-  url: Scalars['String'];
+  url?: Maybe<Scalars['String']>;
   workshop: Workshop;
   zoom_id?: Maybe<Scalars['String']>;
 };
@@ -304,6 +305,7 @@ export type Query = {
   paramQuery?: Maybe<Scalars['Boolean']>;
   placementHomePageMessage: HomePageMessage;
   registeringLevels: Array<Scalars['String']>;
+  reservations: Array<Reservation>;
   section: Section;
   student: Student;
   teacher: Teacher;
@@ -350,6 +352,11 @@ export type QueryParamQueryArgs = {
 
 export type QueryRegisteringLevelsArgs = {
   course: Scalars['String'];
+};
+
+
+export type QueryReservationsArgs = {
+  optionId: Scalars['ID'];
 };
 
 
@@ -488,7 +495,7 @@ export type TeacherOption = {
   reservations: Array<Maybe<Reservation>>;
   teacher: Teacher;
   time: Scalars['String'];
-  url: Scalars['String'];
+  url?: Maybe<Scalars['String']>;
   workshop: Workshop;
   zoom_id?: Maybe<Scalars['String']>;
 };
@@ -815,7 +822,7 @@ export type MutationResolvers<ContextType = ServerContext, ParentType extends Re
   saveApplicant?: Resolver<ResolversTypes['ApplicantResponse'], ParentType, ContextType, RequireFields<MutationSaveApplicantArgs, 'codigo' | 'input'>>;
   saveOralResults?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSaveOralResultsArgs, never>>;
   saveRegisteringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationSaveRegisteringLevelsArgs, 'course' | 'levels'>>;
-  saveWorkshopsAttendance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSaveWorkshopsAttendanceArgs, 'attendingStudents' | 'option_id' | 'teacher_id'>>;
+  saveWorkshopsAttendance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSaveWorkshopsAttendanceArgs, 'attendingStudents'>>;
   saveWrittenResults?: Resolver<ResolversTypes['MutationResponse'], ParentType, ContextType, RequireFields<MutationSaveWrittenResultsArgs, never>>;
   setMeetLink?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationSetMeetLinkArgs, 'link'>>;
   setMeetLinks?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationSetMeetLinksArgs, 'links'>>;
@@ -838,7 +845,7 @@ export type OptionResolvers<ContextType = ServerContext, ParentType extends Reso
   isTutorial?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   workshop?: Resolver<ResolversTypes['Workshop'], ParentType, ContextType>;
   zoom_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -866,6 +873,7 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   paramQuery?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryParamQueryArgs, never>>;
   placementHomePageMessage?: Resolver<ResolversTypes['HomePageMessage'], ParentType, ContextType>;
   registeringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryRegisteringLevelsArgs, 'course'>>;
+  reservations?: Resolver<Array<ResolversTypes['Reservation']>, ParentType, ContextType, RequireFields<QueryReservationsArgs, 'optionId'>>;
   section?: Resolver<ResolversTypes['Section'], ParentType, ContextType, RequireFields<QuerySectionArgs, 'course' | 'level'>>;
   student?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<QueryStudentArgs, 'codigo'>>;
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
@@ -949,7 +957,7 @@ export type TeacherOptionResolvers<ContextType = ServerContext, ParentType exten
   reservations?: Resolver<Array<Maybe<ResolversTypes['Reservation']>>, ParentType, ContextType>;
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   workshop?: Resolver<ResolversTypes['Workshop'], ParentType, ContextType>;
   zoom_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
