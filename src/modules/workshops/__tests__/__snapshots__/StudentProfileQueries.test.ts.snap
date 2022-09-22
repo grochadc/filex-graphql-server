@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[Integration Test] gets a student profile 1`] = `
+{
+  "student": {
+    "apellido_materno": "Ocasio",
+    "apellido_paterno": "Martinez",
+    "codigo": "1234567890",
+    "email": "bad@bunny.pr",
+    "id": 1,
+    "nivel": 4,
+    "nombre": "Benito Antonio",
+    "reservation": {
+      "option": {
+        "day": "Lunes",
+        "teacher": {
+          "nombre": "Gonzalo Rocha",
+        },
+        "time": "13:00",
+        "url": null,
+        "workshop": {
+          "name": "Conversation",
+        },
+      },
+    },
+    "reservationCount": 0,
+    "reservationLimit": 5,
+    "telefono": "0001234567",
+  },
+}
+`;
+
+exports[`[Unit Tests] Gets a student full info 1`] = `
+{
+  "student": {
+    "apellido_materno": "Ocasio",
+    "apellido_paterno": "Martinez",
+    "ciclo": "2022A",
+    "codigo": "1234567890",
+    "email": "bad@bunny.pr",
+    "id": 1,
+    "nivel": 4,
+    "nombre": "Benito Antonio",
+    "telefono": "0001234567",
+  },
+}
+`;
+
+exports[`[Unit Tests] Gets a student reservation 1`] = `
+{
+  "student": {
+    "reservation": {
+      "option": {
+        "day": "Lunes",
+        "teacher": {
+          "nombre": "Gonzalo Rocha",
+        },
+        "time": "13:00",
+        "url": null,
+        "workshop": {
+          "name": "Conversation",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`[Unit Tests] Gets a student reservationCount and reservationLimit 1`] = `
+{
+  "student": {
+    "reservationCount": 0,
+    "reservationLimit": 5,
+  },
+}
+`;

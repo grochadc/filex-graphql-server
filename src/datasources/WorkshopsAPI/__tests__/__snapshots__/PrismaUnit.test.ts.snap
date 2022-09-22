@@ -1,0 +1,136 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`api.getStudentReservation gets a reservation 1`] = `
+{
+  "attended": false,
+  "create_time": Any<Date>,
+  "id": "1",
+  "option": {
+    "active": true,
+    "day": "Lunes",
+    "id": 1,
+    "place": "Centro de Aprendizaje Global",
+    "teacher": {
+      "id": 1,
+      "nombre": "Gonzalo Rocha",
+    },
+    "teacher_id": 1,
+    "time": "13:00",
+    "url": null,
+    "workshop": {
+      "description": "Conversation Club",
+      "id": 1,
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+      ],
+      "name": "Conversation",
+    },
+    "workshop_id": 1,
+  },
+  "option_id": 1,
+  "student": {
+    "applicantId": 1,
+    "ciclo_actual": "2022B",
+    "codigo": "1234567890",
+    "curso": "en",
+    "desertor": false,
+    "groupId": 2,
+    "id": 3,
+    "nivel": 4,
+    "situacion": null,
+  },
+  "student_id": 1,
+}
+`;
+
+exports[`api.makeReservation makes a reservation 1`] = `
+{
+  "attended": false,
+  "create_time": Any<Date>,
+  "id": "1",
+  "option": {
+    "active": true,
+    "day": "Lunes",
+    "id": 1,
+    "place": "Centro de Aprendizaje Global",
+    "teacher": {
+      "id": 1,
+      "nombre": "Gonzalo Rocha",
+    },
+    "teacher_id": 1,
+    "time": "13:00",
+    "url": null,
+    "workshop": {
+      "description": "Conversation Club",
+      "id": 1,
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+      ],
+      "name": "Conversation",
+    },
+    "workshop_id": 1,
+  },
+  "option_id": 1,
+  "student": {
+    "applicantId": 1,
+    "ciclo_actual": "2022A",
+    "codigo": "1234567890",
+    "curso": "en",
+    "desertor": false,
+    "groupId": 1,
+    "id": 1,
+    "nivel": 3,
+    "situacion": "AC",
+  },
+  "student_id": 1,
+}
+`;
+
+exports[`student gets a student with all applicant info 1`] = `
+{
+  "applicant": {
+    "apellido_materno": "Ocasio",
+    "apellido_paterno": "Martinez",
+    "carrera": "Abogado (DECH)",
+    "ciclo_ingreso": "2022B",
+    "codigo": "1234567890",
+    "email": "bad@bunny.pr",
+    "externo": false,
+    "genero": "M",
+    "id": 1,
+    "institutional_email": "benito.martinez@alumnos.udg.mx",
+    "nombre": "Benito Antonio",
+    "telefono": "0001234567",
+  },
+  "applicantId": 1,
+  "ciclo_actual": "2022B",
+  "codigo": "1234567890",
+  "curso": "en",
+  "desertor": false,
+  "groupId": 2,
+  "groupObject": {
+    "aula": "F4",
+    "ciclo": "2022B",
+    "course": "en",
+    "id": 2,
+    "name": "E4-1",
+    "nivel": 4,
+    "registrados": 30,
+    "teacherId": 1,
+    "time": "08:00-09:00",
+  },
+  "id": 3,
+  "nivel": 4,
+  "situacion": null,
+}
+`;

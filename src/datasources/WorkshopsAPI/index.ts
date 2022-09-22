@@ -1,30 +1,28 @@
 import { RESTDataSource } from "apollo-datasource-rest";
-import * as R from "ramda";
-import * as utils from "../utils";
-import database, { Option } from "./db";
-import { Workshop, AttendingStudent } from "../generated/graphql";
+import { AttendingStudent } from "../../generated/graphql";
 import {
   WorkshopModel,
-  TeacherModel,
   OptionModel,
-  StudentReservationModel,
-  TeacherReservationModel,
   DatabaseModel,
-} from "../modules/workshops/models";
+} from "../../modules/workshops/models";
 import { PrismaClient } from "@prisma/client";
+import { ApolloError } from "apollo-server";
+import { students } from "datasources/StudentsAPI/mocks";
 
 type Maybe<T> = T | null;
 
 class WorkshopsAPI extends RESTDataSource {
   prisma: PrismaClient;
-  openDate: any;
   constructor(prisma: PrismaClient) {
     super();
     if (prisma === undefined)
       throw new Error("Must include a new PrismaClient() on constrctor");
     this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
-    this.openDate = new Date(2022, 8, 15);
+  }
+
+  getTodaysDate(): Date {
+    return new Date();
   }
 
   async isOpen(): Promise<boolean> {
@@ -40,29 +38,6 @@ class WorkshopsAPI extends RESTDataSource {
       result: !open,
     });
     return !open;
-  }
-
-  async getWorkshops(): Promise<WorkshopModel[]> {
-    const workshops = await this.get(
-      `${this.context.enviroment}/workshops.json`
-    );
-    if (workshops === null)
-      throw new Error(
-        `${this.context.enviroment}/workshops.json returned null`
-      );
-    return Object.values(workshops);
-  }
-
-  async getOptions(): Promise<DatabaseModel["options"]> {
-    return (await this.get(
-      `${this.context.enviroment}/options.json`
-    )) as DatabaseModel["options"];
-  }
-
-  getAvailableOptions(): Promise<Maybe<DatabaseModel["availableOptions"]>> {
-    return this.get(
-      `${this.context.enviroment}/availableOptions.json`
-    ) as Promise<Maybe<DatabaseModel["availableOptions"]>>;
   }
 
   getTeacher(id: string) {
@@ -85,6 +60,35 @@ class WorkshopsAPI extends RESTDataSource {
     });
   }
 
+  async getReservationsByOptionId(option_id: string) {
+    const openDate = await this.getOpenDate();
+    const reservations = await this.prisma.workshopReservation.findMany({
+      where: {
+        option_id: Number(option_id),
+        create_time: {
+          gte: new Date(openDate),
+        },
+      },
+      include: {
+        student: {
+          include: {
+            applicant: true
+          }
+        },
+        option: true
+      }
+    });
+
+    if (null) return [];
+
+    return reservations.map((reservation) => {
+      return {
+        ...reservation,
+        id: String(reservation.id),
+      };
+    });
+  }
+
   async getReservationCount(student_id: string) {
     return this.prisma.workshopReservation.count({
       where: {
@@ -94,19 +98,13 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getOptionReservationCount(option_id: string) {
-    const todayDate = new Date();
-    const oneWeekAgo = new Date(
-      todayDate.getFullYear(),
-      todayDate.getMonth(),
-      todayDate.getDate() - 7
-    );
-
+    const openDate = await this.getOpenDate();
 
     return this.prisma.workshopReservation.count({
       where: {
         option_id: Number(option_id),
         create_time: {
-          gt: this.openDate,
+          gte: new Date(openDate),
         },
       },
     });
@@ -129,6 +127,7 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getTeacherReservations(teacherId: number, optionId: number) {
+    const openDateStr = await this.getOpenDate();
     return this.prisma.workshopReservation.findMany({
       where: {
         option: {
@@ -136,8 +135,8 @@ class WorkshopsAPI extends RESTDataSource {
           id: optionId,
         },
         create_time: {
-          gt: this.openDate
-        }
+          gt: new Date(openDateStr),
+        },
       },
       include: {
         option: true,
@@ -163,17 +162,12 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getStudentReservation(studentId: string) {
-    const today = new Date();
-    const lastWeek = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate() - 7
-    );
+    const openDateString = await this.getOpenDate();
     const reservation = await this.prisma.workshopReservation.findFirst({
       where: {
         student_id: Number(studentId),
         create_time: {
-          gt: this.openDate,
+          gte: new Date(openDateString),
         },
       },
       include: {
@@ -182,15 +176,26 @@ class WorkshopsAPI extends RESTDataSource {
           include: {
             workshop: true,
             teacher: true,
-          }
+          },
         },
       },
     });
-    if(!reservation) return null;
-    return {...reservation, id: String(reservation.id)}
+    if (!reservation) return null;
+    return { ...reservation, id: String(reservation.id) };
   }
 
   async makeReservation(student_id: string, option_id: string) {
+    if (!student_id)
+      throw new Error(
+        "No student_id provided to make a reservation on workshopsAPI.makeReservation"
+      );
+    if (!option_id)
+      throw new Error(
+        "No option_id provided to make a reservation on workshopsAPI.makeReservation"
+      );
+    const currentReservation = await this.getStudentReservation(student_id);
+    if (currentReservation)
+      throw new ApolloError("Student already has a reservation", "409");
     const reservation = await this.prisma.workshopReservation.create({
       data: {
         student_id: Number(student_id),
@@ -201,48 +206,40 @@ class WorkshopsAPI extends RESTDataSource {
         option: {
           include: {
             teacher: true,
-            workshop: true
-          }
+            workshop: true,
+          },
         },
       },
     });
-    return {...reservation, id: String(reservation.id)}
-  }
-
-  deleteReservations(teacher_id: string, option_id: string) {
-    return this.delete(
-      `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`
-    );
+    return { ...reservation, id: String(reservation.id) };
   }
 
   async resetReservations() {
-    const now = new Date();
-    await this.put('openDate.json', now.toString());
+    const now = await this.getTodaysDate();
+    const nowString = now.toISOString();
+    await this.put("system/openDate.json", { result: nowString });
     return true;
   }
 
-  getOptionById(id: string): Promise<OptionModel> {
-    return this.get(`${this.context.enviroment}/options/${id}.json`);
+  async getOpenDate(): Promise<string> {
+    return (await this.get("system/openDate.json")).result;
   }
 
-  async saveAttendance(attendance: AttendingStudent[], ) {
-    const ids = attendance.filter((student) => student.attended).map(student => Number(student.id));
+  async saveAttendance(attendance: AttendingStudent[]) {
+    const reservation_ids = attendance
+      .filter((student) => student.attended)
+      .map((student) => Number(student.reservation_id));
     const modified = await this.prisma.workshopReservation.updateMany({
       where: {
         id: {
-          in: ids
-        }
+          in: reservation_ids,
+        },
       },
       data: {
-        attended: true
-      }
-    })
-    return modified.count>0;
-  }
-
-  setWorkshopLink(option_id: string, url: string) {
-    this.put(`${this.context.enviroment}/options/${option_id}/url.json`, url);
-    return true;
+        attended: true,
+      },
+    });
+    return modified.count > 0;
   }
 
   async getMaxStudentReservations() {
@@ -252,6 +249,47 @@ class WorkshopsAPI extends RESTDataSource {
 
   async getReservationLimit(): Promise<number> {
     return this.get("/reservationLimit.json");
+  }
+  /*************/
+  //DEPRECATED//
+  /*************/
+
+  setWorkshopLink(option_id: string, url: string) {
+    this.put(`${this.context.enviroment}/options/${option_id}/url.json`, url);
+    return true;
+  }
+
+  getOptionById(id: string): Promise<OptionModel> {
+    return this.get(`${this.context.enviroment}/options/${id}.json`);
+  }
+
+  deleteReservations(teacher_id: string, option_id: string) {
+    return this.delete(
+      `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`
+    );
+  }
+
+  getAvailableOptions(): Promise<Maybe<DatabaseModel["availableOptions"]>> {
+    return this.get(
+      `${this.context.enviroment}/availableOptions.json`
+    ) as Promise<Maybe<DatabaseModel["availableOptions"]>>;
+  }
+
+  async getWorkshops(): Promise<WorkshopModel[]> {
+    const workshops = await this.get(
+      `${this.context.enviroment}/workshops.json`
+    );
+    if (workshops === null)
+      throw new Error(
+        `${this.context.enviroment}/workshops.json returned null`
+      );
+    return Object.values(workshops);
+  }
+
+  async getOptions(): Promise<DatabaseModel["options"]> {
+    return (await this.get(
+      `${this.context.enviroment}/options.json`
+    )) as DatabaseModel["options"];
   }
 }
 

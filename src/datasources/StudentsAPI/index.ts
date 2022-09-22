@@ -33,7 +33,9 @@ class StudentsAPI extends DataSource {
   }
 
   async getStudent(codigo: string, ciclo_actual: string) {
-    const res = await this.prisma.student.findFirst({
+    if(codigo === null) throw new Error('Codigo not provided on studentsAPI.getStudent');
+    if(ciclo_actual === null) throw new Error('ciclo_actual not provided on studentsAPI.getStudent');
+    const student = await this.prisma.student.findFirst({
       include: {
         applicant: true,
         groupObject: true,
@@ -43,8 +45,11 @@ class StudentsAPI extends DataSource {
         ciclo_actual
       }
     });
-
-    return {...res, ...res.applicant };
+    if(student === null) throw new Error('Student not found on database');
+    if(student.applicant == null) throw new Error('Applicant info is missing on database');
+    if(student.groupObject == null) throw new Error('Couldnt find a group Object');
+    
+    return student;
   }
 
   async addStudent(student: StudentInput) {

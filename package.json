@@ -16,7 +16,12 @@
     "postdeploy": "heroku logs --tail",
     "database": "heroku config:get DATABASE_URL | xargs pgweb --url",
     "codegen": "graphql-codegen --config codegen.yml",
-    "databaseURL": "heroku config:get HEROKU_POSTGRESQL_TEAL_URL -a filex-database"
+    "databaseURL": "heroku config:get HEROKU_POSTGRESQL_TEAL_URL -a filex-database",
+    "pushTestDb": "dotenv -e .env.test -- npx prisma db push --skip-generate",
+    "generatePrismaTestClient": "dotenv -e .env.test --- npx prisma generate"
+  },
+  "prisma":{
+    "seed": "dotenv -e .env.test ts-node prisma/seed.ts"
   },
   "author": "",
   "license": "ISC",
@@ -54,6 +59,7 @@
     "@graphql-codegen/typescript-resolvers": "2.1.0",
     "@graphql-codegen/visitor-plugin-common": "^2.1.0",
     "babel-jest": "^26.6.3",
+    "dotenv-cli": "^6.0.0",
     "jest": "^29.0.2",
     "jest-mock-extended": "^2.0.7",
     "mockdate": "^3.0.2",

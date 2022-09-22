@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`gets attendance list 1`] = `
+{
+  "teacher": {
+    "id": "1",
+    "nombre": "Gonzalo Rocha",
+    "options": [
+      {
+        "day": "Lunes",
+        "id": "1",
+        "reservations": [
+          {
+            "attended": false,
+            "id": "1",
+            "student": {
+              "apellido_materno": "Ocasio",
+              "apellido_paterno": "Martinez",
+              "codigo": "1234567890",
+              "email": "bad@bunny.pr",
+              "grupo": "E4-1",
+              "nivel": 4,
+              "nombre": "Benito Antonio",
+              "telefono": "0001234567",
+            },
+            "tutorialReason": null,
+          },
+        ],
+        "time": "13:00",
+        "url": null,
+        "workshop": {
+          "id": 1,
+          "name": "Conversation",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`gets attendance list by option 1`] = `
+{
+  "reservations": [
+    {
+      "attended": false,
+      "id": "1",
+      "student": {
+        "apellido_materno": "Ocasio",
+        "apellido_paterno": "Martinez",
+        "codigo": "1234567890",
+        "email": "bad@bunny.pr",
+        "grupo": "E4-1",
+        "nivel": 4,
+        "nombre": "Benito Antonio",
+        "telefono": "3412345678",
+      },
+    },
+  ],
+}
+`;

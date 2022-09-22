@@ -1,4 +1,5 @@
 import { gql, ApolloError } from "apollo-server";
+import { students } from "datasources/StudentsAPI/mocks";
 import { datastore } from "googleapis/build/src/apis/datastore";
 import { GraphQLScalarType, Kind } from "graphql";
 import { Resolvers } from "../../generated/graphql";
@@ -15,6 +16,7 @@ export const typeDefs = gql`
     teachers: [Teacher!]!
     getWorkshopsByCategory(category: String!): Workshop!
     isWorkshopsOpen: Boolean!
+    reservations(optionId: ID!): [Reservation]!
   }
 
   type Workshop {
@@ -32,7 +34,7 @@ export const typeDefs = gql`
     time: String!
     teacher: Teacher!
     workshop: Workshop!
-    url: String!
+    url: String
     zoom_id: String
     isTutorial: Boolean!
     available: Boolean!
@@ -44,7 +46,7 @@ export const typeDefs = gql`
     time: String!
     teacher: Teacher!
     workshop: Workshop!
-    url: String!
+    url: String
     zoom_id: String
     isTutorial: Boolean!
     available: Boolean!
@@ -83,8 +85,8 @@ export const typeDefs = gql`
 
     saveWorkshopsAttendance(
       attendingStudents: [AttendingStudent!]!
-      option_id: ID!
-      teacher_id: ID!
+      option_id: ID
+      teacher_id: ID
     ): Boolean!
 
     resetReservations: Boolean!
@@ -92,7 +94,7 @@ export const typeDefs = gql`
   }
 
   input AttendingStudent {
-    id: ID!
+    reservation_id: ID!
     attended: Boolean!
   }
 `;
@@ -146,11 +148,23 @@ export const resolvers: Resolvers = {
       });
     },
     teacher: async (root, args, { dataSources }) => {
-      return dataSources.workshopsAPI.getTeacher(args.id);
+      const result = await dataSources.workshopsAPI.getTeacher(args.id);
+      return result;
     },
     teachers: async (root, args, { dataSources }) => {
       const res = await dataSources.workshopsAPI.getAllTeachers();
       return res;
+    },
+    reservations: async (root, args, { dataSources }) => {
+      const reservations =
+        await dataSources.workshopsAPI.getReservationsByOptionId(args.optionId);
+      return reservations.map((reservation) => ({
+        ...reservation,
+        student: {
+          ...reservation.student,
+          ...reservation.student.applicant,
+        },
+      }));
     },
   },
   Teacher: {
@@ -232,7 +246,7 @@ export const resolvers: Resolvers = {
     },
     saveWorkshopsAttendance: async (
       root,
-      { attendingStudents, teacher_id, option_id },
+      { attendingStudents },
       { dataSources }
     ) => {
       return dataSources.workshopsAPI.saveAttendance(attendingStudents);
