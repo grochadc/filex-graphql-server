@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { ApolloError, gql } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
 
 export const typeDefs = gql`
@@ -65,14 +65,17 @@ export const typeDefs = gql`
 export const resolvers: Resolvers = {
   Query: {
     student: async (root, args, { dataSources }) => {
-      const res = await dataSources.studentsAPI.getStudent(
+      const student = await dataSources.studentsAPI.getStudent(
         args.codigo,
         "2022B"
       );
+      if(student === null) throw new ApolloError('Student not found on database', '404');
       return ({ 
-        ...res,
-        ciclo: res.ciclo_ingreso, 
-        grupo: res.groupObject?.name,
+        ...student,
+        ...student.applicant,
+        id: student.applicant.id,
+        ciclo: student.applicant.ciclo_ingreso, 
+        grupo: student.groupObject?.name,
       });
     },
     masterlist: async (root, args, { dataSources }) => {
