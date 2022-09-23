@@ -253,6 +253,13 @@ class WorkshopsAPI extends RESTDataSource {
   async getReservationLimit(): Promise<number> {
     return this.get("/reservationLimit.json");
   }
+
+  async setWorkshopLink(option_id, url) {
+    const todayISOString = (await this.getTodaysDate()).toISOString();
+    return this.put("system/openDate.json", {
+      result: todayISOString
+    });
+  }
 }
 
 export { WorkshopsAPI };
