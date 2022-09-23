@@ -253,47 +253,6 @@ class WorkshopsAPI extends RESTDataSource {
   async getReservationLimit(): Promise<number> {
     return this.get("/reservationLimit.json");
   }
-  /*************/
-  //DEPRECATED//
-  /*************/
-
-  setWorkshopLink(option_id: string, url: string) {
-    this.put(`${this.context.enviroment}/options/${option_id}/url.json`, url);
-    return true;
-  }
-
-  getOptionById(id: string): Promise<OptionModel> {
-    return this.get(`${this.context.enviroment}/options/${id}.json`);
-  }
-
-  deleteReservations(teacher_id: string, option_id: string) {
-    return this.delete(
-      `${this.context.enviroment}/teachers/${teacher_id}/raw_reservations/${option_id}.json`
-    );
-  }
-
-  getAvailableOptions(): Promise<Maybe<DatabaseModel["availableOptions"]>> {
-    return this.get(
-      `${this.context.enviroment}/availableOptions.json`
-    ) as Promise<Maybe<DatabaseModel["availableOptions"]>>;
-  }
-
-  async getWorkshops(): Promise<WorkshopModel[]> {
-    const workshops = await this.get(
-      `${this.context.enviroment}/workshops.json`
-    );
-    if (workshops === null)
-      throw new Error(
-        `${this.context.enviroment}/workshops.json returned null`
-      );
-    return Object.values(workshops);
-  }
-
-  async getOptions(): Promise<DatabaseModel["options"]> {
-    return (await this.get(
-      `${this.context.enviroment}/options.json`
-    )) as DatabaseModel["options"];
-  }
 }
 
 export { WorkshopsAPI };
