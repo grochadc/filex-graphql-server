@@ -150,7 +150,8 @@ test("gets a teacher option with all reservations for attendance", async () => {
   expect(attendanceList[0].student.groupObject?.name).toBe("E4-1");
   expect(attendanceList[0].option.day).toBe("Lunes");
   expect(attendanceList[0].attended).toBe(false);
-  expect(attendanceList).toMatchSnapshot();
+  expect(attendanceList[0]).toMatchSnapshot({ create_time: expect.any(Date) });
+  expect(attendanceList[1]).toMatchSnapshot({ create_time: expect.any(Date) });
 
   if (GENERATE_MOCKS) writeMock("getTeacherReservationsMock", attendanceList);
 });

@@ -3,11 +3,12 @@ import { StudentsAPI } from "../../../datasources/StudentsAPI";
 jest.mock("../../../datasources/StudentsAPI");
 import { WorkshopsAPI } from "../../../datasources/WorkshopsAPI";
 jest.mock("../../../datasources/WorkshopsAPI");
+import { mocked } from 'jest-mock';
 
 import getStudentReservationPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getStudentReservationPrismaMock";
 import getStudentPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getStudentPrismaMock";
 import makeReservationPrismaMock from "../../../dataSources/WorkshopsAPI/mocks/makeReservationPrismaMock";
-//import getAllWorkshopsPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getAl"
+import getAllWorkshopsPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getAllWorkshopsPrismaMock";
 
 import testServer from "../../../testUtils/testServer";
 import { gql } from "apollo-server";
@@ -26,22 +27,16 @@ beforeEach(() => {
 });
 
 test("gets selection info", async () => {
+  const mockedWorkshopsAPI = mocked(workshopsAPI);
+  const mockedStudentsAPI = mocked(studentsAPI);
+
+  mockedWorkshopsAPI.isOpen.mockResolvedValue(true);
+  mockedStudentsAPI.getStudent.mockResolvedValue(getStudentPrismaMock);
   //@ts-ignore
-  workshopsAPI.isOpen.mockResolvedValue(true);
-  //@ts-ignore
-  studentsAPI.getStudent.mockResolvedValue(getStudentPrismaMock);
-  //@ts-ignore
-  workshopsAPI.getStudentReservation(getStudentReservationPrismaMock);
-  //@ts-ignore
-  workshopsAPI.getMaxStudentReservations.mockResolvedValue(30);
-  //@ts-ignore
-  workshopsAPI.getAllWorkshops.mockResolvedValue([{
-    id: 1,
-    name: "Conversation", 
-    description: "Conversation club",
-    levels: [1,2,3,4,5,6],
-    options: [{}]
-  }]);
+  mockedWorkshopsAPI.getStudentReservation.mockResolvedValue(getStudentReservationPrismaMock);
+  mockedWorkshopsAPI.getMaxStudentReservations.mockResolvedValue(30);
+  mockedWorkshopsAPI.getAllWorkshops.mockResolvedValue(getAllWorkshopsPrismaMock);
+  mockedWorkshopsAPI.getOptionReservationCount.mockResolvedValue(2);
 
   const result = await server.query({
     query: gql`
@@ -96,10 +91,10 @@ test("gets selection info", async () => {
 
 describe("Making reservations", () => {
   test("makes a reservation on time", async () => {
+    const mockedWorkshopsAPI = mocked(workshopsAPI);
     //@ts-ignore
     workshopsAPI.makeReservation.mockResolvedValue(makeReservationPrismaMock);
-    //@ts-ignore
-    workshopsAPI.getStudentReservation.mockResolvedValue(null);
+    mockedWorkshopsAPI.getStudentReservation.mockResolvedValue(null);
 
     const result = await server.mutate({
       mutation: gql`
@@ -130,7 +125,9 @@ describe("Making reservations", () => {
 
   test("tries to make a reservation when one already exists", async () => {
     //@ts-ignore
-    workshopsAPI.getStudentReservation.mockResolvedValue(getStudentReservationPrismaMock);
+    workshopsAPI.getStudentReservation.mockResolvedValue(
+      getStudentReservationPrismaMock
+    );
 
     const result = await server.mutate({
       mutation: gql`

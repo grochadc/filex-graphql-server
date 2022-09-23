@@ -49,7 +49,10 @@ const option_1: WorkshopOption = {
         };
 
 describe("api.makeReservation", () => {
-  test("makes a reservation", async (student_id = "1", option_id = "1") => {
+  test("makes a reservation", async () => {
+    const student_id = "1";
+    const option_id = "1";
+    
     type MakeReservationResult = WorkshopReservation & {
       student: Student;
       option: WorkshopOption & {
@@ -117,7 +120,9 @@ describe("api.getStudentReservation", () => {
     student: Student;
     option: WorkshopOption & { workshop: Workshop; teacher: Teacher };
   };
-  test("gets a reservation", async (student_id = "1") => {
+  test("gets a reservation", async () => {
+    const student_id = "1";
+    
     const mockValue: ReservationForStudent = {
       id: 1,
       create_time: new Date(2022,9,15),

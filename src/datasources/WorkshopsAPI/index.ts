@@ -19,6 +19,7 @@ class WorkshopsAPI extends RESTDataSource {
       throw new Error("Must include a new PrismaClient() on constrctor");
     this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/workshops/";
+    if (process.env.NODE_ENV === "test") this.initialize({} as any);
   }
 
   getTodaysDate(): Date {
@@ -72,11 +73,11 @@ class WorkshopsAPI extends RESTDataSource {
       include: {
         student: {
           include: {
-            applicant: true
-          }
+            applicant: true,
+          },
         },
-        option: true
-      }
+        option: true,
+      },
     });
 
     if (null) return [];
@@ -222,7 +223,9 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getOpenDate(): Promise<string> {
-    return (await this.get("system/openDate.json")).result;
+    const openDate = await this.get("system/openDate.json");
+    const dateString = openDate.result;
+    return dateString;
   }
 
   async saveAttendance(attendance: AttendingStudent[]) {

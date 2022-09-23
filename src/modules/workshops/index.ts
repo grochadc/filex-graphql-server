@@ -205,7 +205,6 @@ export const resolvers: Resolvers = {
         await dataSources.workshopsAPI.getOptionReservationCount(
           String(option.id)
         );
-      console.log("reservationCOunt", reservationCount);
       return true;
     },
     isTutorial: (option, args, context) => {
