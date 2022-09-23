@@ -73,7 +73,7 @@ export const resolvers: Resolvers = {
       return ({ 
         ...student,
         ...student.applicant,
-        id: student.applicant.id,
+        id: student.id,
         ciclo: student.applicant.ciclo_ingreso, 
         grupo: student.groupObject?.name,
       });
