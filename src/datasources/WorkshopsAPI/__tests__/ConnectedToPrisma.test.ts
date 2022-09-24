@@ -182,6 +182,11 @@ test("gets all teachers", async () => {
   if (GENERATE_MOCKS) writeMock("getAllTeachersPrismaMock", allTeachers);
 });
 
+test.skip("student has two impossible reservations in db", async () => {
+  const data = await workshopsAPI.getStudentReservation("3");
+  expect(data).toBeDefined();
+})
+
 afterEach(async () => {
   await prisma.workshopReservation.deleteMany({});
   await prisma.$executeRaw`

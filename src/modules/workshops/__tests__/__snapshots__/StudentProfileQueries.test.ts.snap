@@ -7,7 +7,7 @@ exports[`[Integration Test] gets a student profile 1`] = `
     "apellido_paterno": "Martinez",
     "codigo": "1234567890",
     "email": "bad@bunny.pr",
-    "id": 1,
+    "id": 3,
     "nivel": 4,
     "nombre": "Benito Antonio",
     "reservation": {
@@ -38,7 +38,7 @@ exports[`[Unit Tests] Gets a student full info 1`] = `
     "ciclo": "2022A",
     "codigo": "1234567890",
     "email": "bad@bunny.pr",
-    "id": 1,
+    "id": 3,
     "nivel": 4,
     "nombre": "Benito Antonio",
     "telefono": "0001234567",

@@ -154,7 +154,7 @@ exports[`gets a teacher option with all reservations for attendance 2`] = `
 exports[`makes a reservation 1`] = `
 {
   "attended": false,
-  "create_time": 2022-09-23T00:00:00.000Z,
+  "create_time": 2022-09-24T00:00:00.000Z,
   "id": "1",
   "option": {
     "active": true,
