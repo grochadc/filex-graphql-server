@@ -182,10 +182,32 @@ test("gets all teachers", async () => {
   if (GENERATE_MOCKS) writeMock("getAllTeachersPrismaMock", allTeachers);
 });
 
+test.only("gets a reservation list by id", async () => {
+  await prisma.workshopReservation.create({
+    data: {
+      student_id: 2,
+      option_id: 1,
+    },
+  });
+
+  await prisma.workshopReservation.create({
+    data: {
+      student_id: 3,
+      option_id: 1,
+    },
+  });
+
+  const reservations = await workshopsAPI.getReservationsByOptionId("1");
+  expect(reservations).toHaveLength(2);
+  expect(reservations).toMatchSnapshot();
+
+  //writeMock('getReservationsByOptionIdPrismaMock', reservations);
+});
+
 test.skip("student has two impossible reservations in db", async () => {
   const data = await workshopsAPI.getStudentReservation("3");
   expect(data).toBeDefined();
-})
+});
 
 afterEach(async () => {
   await prisma.workshopReservation.deleteMany({});

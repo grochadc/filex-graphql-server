@@ -73,6 +73,7 @@ class WorkshopsAPI extends RESTDataSource {
       include: {
         student: {
           include: {
+            groupObject: true,
             applicant: true,
           },
         },

@@ -9,6 +9,7 @@ import prisma from "../../../datasources/testutils/prisma/client";
 
 import getTeacherOptionsPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getTeacherOptionsPrismaMock";
 import getTeacherReservationsPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getTeacherReservationsPrismaMock";
+import getReservationsByOptionIdPrismaMock from "../../../datasources/WorkshopsAPI/mocks/getReservationsByOptionIdPrismaMock";
 
 const workshopsAPI = new WorkshopsAPI(prisma);
 
@@ -81,28 +82,7 @@ test("gets attendance list", async () => {
 
 test("gets attendance list by option", async () => {
   //@ts-ignore
-  workshopsAPI.getReservationsByOptionId.mockResolvedValue([
-    {
-      id: "1",
-      create_time: new Date(),
-      student_id: 3,
-      option_id: 1,
-      attended: false,
-      option: {},
-      student: {
-        codigo: "1234567890",
-        applicant: {
-          nombre: "Benito Antonio",
-          apellido_paterno: "Martinez",
-          apellido_materno: "Ocasio",
-          email: "bad@bunny.pr",
-          telefono: "3412345678",
-          nivel: 4,
-          grupo: "E4-1"
-        },
-      },
-    },
-  ]);
+  workshopsAPI.getReservationsByOptionId.mockResolvedValue(getReservationsByOptionIdPrismaMock);
 
   const result = await server.query({
     query: gql`

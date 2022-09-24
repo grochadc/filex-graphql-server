@@ -161,6 +161,7 @@ export const resolvers: Resolvers = {
       return reservations.map((reservation) => ({
         ...reservation,
         student: {
+          grupo: reservation.student.groupObject.name,
           ...reservation.student,
           ...reservation.student.applicant,
         },
