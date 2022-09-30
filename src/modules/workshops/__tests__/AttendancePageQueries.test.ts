@@ -69,7 +69,7 @@ test("gets attendance list", async () => {
         }
       }
     `,
-    variables: { teacher_id: "1" },
+    variables: { teacher_id: "t_1" },
   });
 
   expect(WorkshopsAPI).toHaveBeenCalled();

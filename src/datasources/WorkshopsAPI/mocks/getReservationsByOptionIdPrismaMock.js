@@ -1,7 +1,7 @@
 module.exports = [
   {
-    "id": "1",
-    "create_time": "2022-09-24T00:00:00.000Z",
+    "id": 1,
+    "create_time": "2022-09-30T00:00:00.000Z",
     "student_id": 2,
     "option_id": 1,
     "attended": false,
@@ -53,8 +53,8 @@ module.exports = [
     }
   },
   {
-    "id": "2",
-    "create_time": "2022-09-24T00:00:00.000Z",
+    "id": 2,
+    "create_time": "2022-09-30T00:00:00.000Z",
     "student_id": 3,
     "option_id": 1,
     "attended": false,

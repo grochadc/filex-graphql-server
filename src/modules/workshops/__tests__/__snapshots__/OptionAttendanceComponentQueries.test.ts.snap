@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`gets an attendance table by using an optionId 1`] = `
+[
+  {
+    "attended": false,
+    "id": "res_1",
+    "student": {
+      "apellido_materno": "Valadez",
+      "apellido_paterno": "Aguilera",
+      "codigo": "0987654321",
+      "email": "juanga@elnoanoa.mx",
+      "grupo": "E4-1",
+      "id": "st_2",
+      "nivel": 4,
+      "nombre": "Alberto",
+      "telefono": "0001234567",
+    },
+    "tutorialReason": null,
+  },
+  {
+    "attended": false,
+    "id": "res_2",
+    "student": {
+      "apellido_materno": "Ocasio",
+      "apellido_paterno": "Martinez",
+      "codigo": "1234567890",
+      "email": "bad@bunny.pr",
+      "grupo": "E4-1",
+      "id": "st_1",
+      "nivel": 4,
+      "nombre": "Benito Antonio",
+      "telefono": "0001234567",
+    },
+    "tutorialReason": null,
+  },
+]
+`;

@@ -61,4 +61,16 @@ export function unwindPrismaStudent(
   };
 }
 
+export const unhashId = (id: string): number => {
+  if (typeof id === "number")
+    throw new Error("unhashId recieved a number instead of a string");
+  if (id.indexOf("_") < 0)
+    throw new Error(
+      'unhashId got a string with incorrect format. Underscore (_) missing. Recieved '+id
+    );
+
+  return Number(id.substring(id.indexOf("_") + 1));
+};
+
+
 

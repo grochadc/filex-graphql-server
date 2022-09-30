@@ -5,7 +5,7 @@ exports[`reservations by optionId 1`] = `
   "reservations": [
     {
       "attended": false,
-      "id": "1",
+      "id": "res_1",
       "student": {
         "apellido_materno": "Valadez",
         "apellido_paterno": "Aguilera",
@@ -20,7 +20,7 @@ exports[`reservations by optionId 1`] = `
     },
     {
       "attended": false,
-      "id": "2",
+      "id": "res_2",
       "student": {
         "apellido_materno": "Ocasio",
         "apellido_paterno": "Martinez",

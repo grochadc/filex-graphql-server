@@ -1,9 +1,7 @@
 import { gql, ApolloError } from "apollo-server";
-import { students } from "datasources/StudentsAPI/mocks";
-import { datastore } from "googleapis/build/src/apis/datastore";
 import { GraphQLScalarType, Kind } from "graphql";
 import { Resolvers } from "../../generated/graphql";
-import { sortWorkshops, sortStudents, unwindPrismaStudent } from "./utils";
+import { unwindPrismaStudent, unhashId } from "./utils";
 
 export const typeDefs = gql`
   scalar Date
@@ -148,7 +146,8 @@ export const resolvers: Resolvers = {
       });
     },
     teacher: async (root, args, { dataSources }) => {
-      const result = await dataSources.workshopsAPI.getTeacher(args.id);
+
+      const result = await dataSources.workshopsAPI.getTeacher(unhashId(args.id));
       return result;
     },
     teachers: async (root, args, { dataSources }) => {
@@ -156,22 +155,62 @@ export const resolvers: Resolvers = {
       return res;
     },
     reservations: async (root, args, { dataSources }) => {
+      const hashId = (id: number): string => {
+        return `res_${id}`;
+      };
+
       const reservations =
         await dataSources.workshopsAPI.getReservationsByOptionId(args.optionId);
-      return reservations.map((reservation) => ({
-        ...reservation,
-        student: {
-          grupo: reservation.student.groupObject.name,
-          ...reservation.student,
-          ...reservation.student.applicant,
-        },
-      }));
+      const result = reservations.map((reservation) => {
+        return {
+          ...reservation,
+          id: hashId(reservation.id),
+        };
+      });
+      return result;
     },
+  },
+  Mutation: {
+    toggleOpenWorkshops: (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.toggleOpen(),
+    makeWorkshopReservation: async (root, args, { dataSources }) => {
+      if(args.student_id.indexOf('st_') < 0) throw new Error(`Got invalid argument for student_id. Recieved ${args.student_id}`);
+      if(args.option_id.indexOf('opt_') < 0) throw new Error(`Got invalid argument for option_id. Recieved ${args.option_id}`);
+
+      const reservation = await dataSources.workshopsAPI.getStudentReservation(
+        unhashId(args.student_id)
+      );
+      if (reservation) {
+        throw new ApolloError(
+          "Student already has a reservation",
+          "RESERVATION_FORBIDDEN"
+        );
+      }
+      return dataSources.workshopsAPI.makeReservation(
+        unhashId(args.student_id),
+        unhashId(args.option_id)
+      );
+    },
+    saveWorkshopsAttendance: async (
+      root,
+      { attendingStudents },
+      { dataSources }
+    ) => {
+      return dataSources.workshopsAPI.saveAttendance(attendingStudents);
+    },
+    resetReservations: (root, args, { dataSources }) =>
+      dataSources.workshopsAPI.resetReservations(),
+    setWorkshopLink: (root, { option_id, url }, { dataSources }) => {
+
+      if(option_id.indexOf('opt_') < 0) throw new Error(`Got invalid format on args.option_id. Got ${option_id}`);
+
+      return dataSources.workshopsAPI.setWorkshopLink(option_id, url)
+    }
   },
   Teacher: {
     options: async (teacher, args, { dataSources }) => {
       const options = await dataSources.workshopsAPI.getTeacherOptions(
-        String(teacher.id)
+        teacher.id
       );
       return options;
     },
@@ -185,7 +224,6 @@ export const resolvers: Resolvers = {
       const finalResult = res.map((reservation) => {
         return {
           ...reservation,
-          id: String(reservation.id),
           student: unwindPrismaStudent(reservation.student),
         };
       });
@@ -194,7 +232,7 @@ export const resolvers: Resolvers = {
     available: async (teacherOption, args, { dataSources }) => {
       const reservationCount =
         await dataSources.workshopsAPI.getOptionReservationCount(
-          String(teacherOption.id)
+          teacherOption.id
         );
       return Boolean(reservationCount < 30);
     },
@@ -204,9 +242,9 @@ export const resolvers: Resolvers = {
     available: async (option, args, { dataSources }) => {
       const reservationCount =
         await dataSources.workshopsAPI.getOptionReservationCount(
-          String(option.id)
+          option.id
         );
-      return true;
+      return Boolean(reservationCount < 20);
     },
     isTutorial: (option, args, context) => {
       return Boolean(option.workshop_id > 1);
@@ -215,45 +253,31 @@ export const resolvers: Resolvers = {
   Student: {
     reservation: async (student, args, { dataSources }) => {
       const reservation = await dataSources.workshopsAPI.getStudentReservation(
-        String(student.id)
+        student.id
       );
       return reservation;
     },
     reservationCount: async (student, args, { dataSources }) => {
-      return dataSources.workshopsAPI.getReservationCount(String(student.id));
+      return dataSources.workshopsAPI.getReservationCount(student.id);
     },
     reservationLimit: (student, args, { dataSources }) => {
       return dataSources.workshopsAPI.getReservationLimit();
     },
   },
-  Mutation: {
-    toggleOpenWorkshops: (root, args, { dataSources }) =>
-      dataSources.workshopsAPI.toggleOpen(),
-    makeWorkshopReservation: async (root, args, { dataSources }) => {
-      const reservation = await dataSources.workshopsAPI.getStudentReservation(
-        args.student_id
-      );
-      if (reservation) {
-        throw new ApolloError(
-          "Student already has a reservation",
-          "RESERVATION_FORBIDDEN"
-        );
-      }
-      return dataSources.workshopsAPI.makeReservation(
-        args.student_id,
-        args.option_id
-      );
+  Reservation: {
+    student: (reservation, args, context) => {
+      const { student } = reservation;
+      //@ts-ignore
+      const group = student.groupObject.name;
+
+      // typescript dice que en student.applicant y student.groupObject no existen
+      //pero el datasource regresa la reservation con include applicant y groupObject
+      return {
+        ...student,
+        //@ts-ignore
+        ...student.applicant,
+        grupo: group.name,
+      };
     },
-    saveWorkshopsAttendance: async (
-      root,
-      { attendingStudents },
-      { dataSources }
-    ) => {
-      return dataSources.workshopsAPI.saveAttendance(attendingStudents);
-    },
-    resetReservations: (root, args, { dataSources }) =>
-      dataSources.workshopsAPI.resetReservations(),
-    setWorkshopLink: (root, { option_id, url }, { dataSources }) =>
-      dataSources.workshopsAPI.setWorkshopLink(option_id, url),
   },
 };

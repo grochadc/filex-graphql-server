@@ -4,8 +4,8 @@ exports[`gets a reservation list by id 1`] = `
 [
   {
     "attended": false,
-    "create_time": 2022-09-24T00:00:00.000Z,
-    "id": "1",
+    "create_time": 2022-09-30T00:00:00.000Z,
+    "id": 1,
     "option": {
       "active": true,
       "day": "Lunes",
@@ -57,8 +57,8 @@ exports[`gets a reservation list by id 1`] = `
   },
   {
     "attended": false,
-    "create_time": 2022-09-24T00:00:00.000Z,
-    "id": "2",
+    "create_time": 2022-09-30T00:00:00.000Z,
+    "id": 2,
     "option": {
       "active": true,
       "day": "Lunes",
@@ -154,7 +154,7 @@ exports[`gets a teacher option with all reservations for attendance 1`] = `
 {
   "attended": false,
   "create_time": Any<Date>,
-  "id": 1,
+  "id": "res_1",
   "option": {
     "active": true,
     "day": "Lunes",
@@ -210,7 +210,7 @@ exports[`gets a teacher option with all reservations for attendance 2`] = `
 {
   "attended": false,
   "create_time": Any<Date>,
-  "id": 2,
+  "id": "res_2",
   "option": {
     "active": true,
     "day": "Lunes",
@@ -265,7 +265,7 @@ exports[`gets a teacher option with all reservations for attendance 2`] = `
 exports[`makes a reservation 1`] = `
 {
   "attended": false,
-  "create_time": 2022-09-24T00:00:00.000Z,
+  "create_time": 2022-09-30T00:00:00.000Z,
   "id": "1",
   "option": {
     "active": true,

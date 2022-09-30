@@ -1,11 +1,11 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { WorkshopOption, Teacher as TeacherModel, Workshop as WorkshopModel, Student as StudentModel } from '../../node_modules/.prisma/client';
+import { Applicant as ApplicantModel, Group as GroupModel, Reservation as ReservationModel } from '../node_modules/.prisma/client';
 import { ServerContext } from '../server';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -305,7 +305,7 @@ export type Query = {
   paramQuery?: Maybe<Scalars['Boolean']>;
   placementHomePageMessage: HomePageMessage;
   registeringLevels: Array<Scalars['String']>;
-  reservations: Array<Reservation>;
+  reservations: Array<Maybe<Reservation>>;
   section: Section;
   student: Student;
   teacher: Teacher;
@@ -429,6 +429,7 @@ export type Student = {
   __typename?: 'Student';
   apellido_materno: Scalars['String'];
   apellido_paterno: Scalars['String'];
+  applicant: Applicant;
   carrera: Scalars['String'];
   ciclo: Scalars['String'];
   codigo: Scalars['ID'];
@@ -436,8 +437,10 @@ export type Student = {
   email: Scalars['String'];
   externo: Scalars['Boolean'];
   genero: Scalars['String'];
+  group?: Maybe<Scalars['String']>;
+  groupObject?: Maybe<Group>;
   grupo: Scalars['String'];
-  id: Scalars['Int'];
+  id: Scalars['String'];
   nivel: Scalars['Int'];
   nombre: Scalars['String'];
   reservation?: Maybe<Reservation>;
@@ -657,7 +660,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   Question: ResolverTypeWrapper<Question>;
   RegisterResponse: ResolverTypeWrapper<RegisterResponse>;
-  Reservation: ResolverTypeWrapper<Omit<Reservation, 'option' | 'student'> & { option: ResolversTypes['Option'], student: ResolversTypes['Student'] }>;
+  Reservation: ResolverTypeWrapper<ReservationModel>;
   Section: ResolverTypeWrapper<Section>;
   SerializedOptions: SerializedOptions;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -700,7 +703,7 @@ export type ResolversParentTypes = {
   Query: {};
   Question: Question;
   RegisterResponse: RegisterResponse;
-  Reservation: Omit<Reservation, 'option' | 'student'> & { option: ResolversParentTypes['Option'], student: ResolversParentTypes['Student'] };
+  Reservation: ReservationModel;
   Section: Section;
   SerializedOptions: SerializedOptions;
   String: Scalars['String'];
@@ -873,7 +876,7 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   paramQuery?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryParamQueryArgs, never>>;
   placementHomePageMessage?: Resolver<ResolversTypes['HomePageMessage'], ParentType, ContextType>;
   registeringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryRegisteringLevelsArgs, 'course'>>;
-  reservations?: Resolver<Array<ResolversTypes['Reservation']>, ParentType, ContextType, RequireFields<QueryReservationsArgs, 'optionId'>>;
+  reservations?: Resolver<Array<Maybe<ResolversTypes['Reservation']>>, ParentType, ContextType, RequireFields<QueryReservationsArgs, 'optionId'>>;
   section?: Resolver<ResolversTypes['Section'], ParentType, ContextType, RequireFields<QuerySectionArgs, 'course' | 'level'>>;
   student?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<QueryStudentArgs, 'codigo'>>;
   teacher?: Resolver<ResolversTypes['Teacher'], ParentType, ContextType, RequireFields<QueryTeacherArgs, 'id'>>;
@@ -924,6 +927,7 @@ export type SectionResolvers<ContextType = ServerContext, ParentType extends Res
 export type StudentResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Student'] = ResolversParentTypes['Student']> = {
   apellido_materno?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   apellido_paterno?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  applicant?: Resolver<ResolversTypes['Applicant'], ParentType, ContextType>;
   carrera?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ciclo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   codigo?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -931,8 +935,10 @@ export type StudentResolvers<ContextType = ServerContext, ParentType extends Res
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   genero?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  group?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  groupObject?: Resolver<Maybe<ResolversTypes['Group']>, ParentType, ContextType>;
   grupo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   nivel?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   nombre?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   reservation?: Resolver<Maybe<ResolversTypes['Reservation']>, ParentType, ContextType>;

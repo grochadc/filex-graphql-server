@@ -8,7 +8,7 @@ export const typeDefs = gql`
   }
 
   type Student {
-    id: Int!
+    id: String!
     codigo: ID!
     nombre: String!
     apellido_paterno: String!
@@ -22,6 +22,9 @@ export const typeDefs = gql`
     curso: String!
     externo: Boolean!
     grupo: String!
+    applicant: Applicant!
+    groupObject: Group
+    group: String
   }
 
   extend type Mutation {
@@ -80,6 +83,16 @@ export const resolvers: Resolvers = {
     },
     masterlist: async (root, args, { dataSources }) => {
       return dataSources.studentsAPI.getAllStudents(args.ciclo);
+    }
+  },
+  Student: {
+    id: (student, args, context)=> {
+      const hashId = (id: number) => `st_${id}`;
+      return hashId(student.id);
+    },
+    grupo: (student, args, context) => {
+      //@ts-ignore
+      return student.groupObject.name;
     }
   },
   Mutation: {

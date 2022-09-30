@@ -117,7 +117,7 @@ describe("Making reservations", () => {
           }
         }
       `,
-      variables: { student_id: 3, option_id: 1 },
+      variables: { student_id: "st_3", option_id: "opt_1" },
     });
 
     expect(result.errors).toBeUndefined();
@@ -150,7 +150,7 @@ describe("Making reservations", () => {
           }
         }
       `,
-      variables: { student_id: 3, option_id: 1 },
+      variables: { student_id: "st_3", option_id: "opt_1" },
     });
 
     expect(result.errors).toBeDefined();

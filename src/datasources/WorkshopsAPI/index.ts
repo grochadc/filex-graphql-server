@@ -1,13 +1,7 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { AttendingStudent } from "../../generated/graphql";
-import {
-  WorkshopModel,
-  OptionModel,
-  DatabaseModel,
-} from "../../modules/workshops/models";
 import { PrismaClient } from "@prisma/client";
 import { ApolloError } from "apollo-server";
-import { students } from "datasources/StudentsAPI/mocks";
 
 type Maybe<T> = T | null;
 
@@ -41,10 +35,11 @@ class WorkshopsAPI extends RESTDataSource {
     return !open;
   }
 
-  getTeacher(id: string) {
+  getTeacher(id: number) {
+    
     return this.prisma.teacher.findUnique({
       where: {
-        id: Number(id),
+        id,
       },
     });
   }
@@ -81,17 +76,12 @@ class WorkshopsAPI extends RESTDataSource {
       },
     });
 
-    if (null) return [];
+    if (reservations === null) return [];
 
-    return reservations.map((reservation) => {
-      return {
-        ...reservation,
-        id: String(reservation.id),
-      };
-    });
+    return reservations;
   }
 
-  async getReservationCount(student_id: string) {
+  async getReservationCount(student_id: number) {
     return this.prisma.workshopReservation.count({
       where: {
         student_id: Number(student_id),
@@ -99,12 +89,12 @@ class WorkshopsAPI extends RESTDataSource {
     });
   }
 
-  async getOptionReservationCount(option_id: string) {
+  async getOptionReservationCount(option_id: number) {
     const openDate = await this.getOpenDate();
 
     return this.prisma.workshopReservation.count({
       where: {
-        option_id: Number(option_id),
+        option_id: option_id,
         create_time: {
           gte: new Date(openDate),
         },
@@ -129,8 +119,11 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getTeacherReservations(teacherId: number, optionId: number) {
+
+    const hashId = (id: number, prepend: string): string => `${[prepend]}_${id}`;
+
     const openDateStr = await this.getOpenDate();
-    return this.prisma.workshopReservation.findMany({
+    const reservations = await this.prisma.workshopReservation.findMany({
       where: {
         option: {
           teacher_id: teacherId,
@@ -150,24 +143,26 @@ class WorkshopsAPI extends RESTDataSource {
         },
       },
     });
+
+    return reservations.map((reservation) => ({...reservation, id: hashId(reservation.id, 'res')}));
   }
 
-  async getTeacherOptions(teacherId: string) {
+  async getTeacherOptions(teacherId: number) {
     return this.prisma.workshopOption.findMany({
       include: {
         workshop: true,
       },
       where: {
-        teacher_id: Number(teacherId),
+        teacher_id: teacherId,
       },
     });
   }
 
-  async getStudentReservation(studentId: string) {
+  async getStudentReservation(studentId: number) {
     const openDateString = await this.getOpenDate();
     const reservation = await this.prisma.workshopReservation.findFirst({
       where: {
-        student_id: Number(studentId),
+        student_id: studentId,
         create_time: {
           gte: new Date(openDateString),
         },
@@ -186,7 +181,7 @@ class WorkshopsAPI extends RESTDataSource {
     return { ...reservation, id: String(reservation.id) };
   }
 
-  async makeReservation(student_id: string, option_id: string) {
+  async makeReservation(student_id: number, option_id: number) {
     if (!student_id)
       throw new Error(
         "No student_id provided to make a reservation on workshopsAPI.makeReservation"
@@ -258,7 +253,7 @@ class WorkshopsAPI extends RESTDataSource {
   async setWorkshopLink(option_id, url) {
     const todayISOString = (await this.getTodaysDate()).toISOString();
     return this.put("system/openDate.json", {
-      result: todayISOString
+      result: todayISOString,
     });
   }
 }

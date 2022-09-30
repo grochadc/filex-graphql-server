@@ -55,7 +55,7 @@ describe("[Unit Tests] Gets a student", () => {
     });
 
     expect(result.errors).toBeUndefined();
-    expect(result.data.student.id).toBe(3);
+    expect(result.data.student.id).toBe("st_3");
     expect(result.data).toMatchSnapshot();
   });
 

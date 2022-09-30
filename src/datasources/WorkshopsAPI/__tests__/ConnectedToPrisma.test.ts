@@ -57,10 +57,13 @@ test("gets a student with applicant info", async () => {
 
 test("makes a reservation", async () => {
   workshopsAPI.getTodaysDate = jest.fn(() => new Date(2022, 8, 13));
-  const studentId = "3";
-  const optionId = "1";
+  const studentId = "st_3";
+  const optionId = "opt_1";
 
-  const reservation = await workshopsAPI.makeReservation(studentId, optionId);
+  const unhashId = (id: string): number => Number(id.substring(id.indexOf('_')+1));
+
+  const reservation = await workshopsAPI.makeReservation(unhashId(studentId), unhashId(optionId));
+
   expect(reservation).toBeDefined();
   expect(reservation.option_id).toBe(1);
   expect(reservation.student.id).toBe(3);
@@ -72,7 +75,7 @@ test("makes a reservation", async () => {
 
   const studentReservation = await prisma.workshopReservation.findFirst({
     where: {
-      student_id: Number(studentId),
+      student_id: unhashId(studentId),
       create_time: {
         gt: new Date(2000, 1, 1),
       },
@@ -91,7 +94,7 @@ test("gets a students reservation", async () => {
     },
   });
 
-  const reservation = await workshopsAPI.getStudentReservation("3");
+  const reservation = await workshopsAPI.getStudentReservation(3);
   expect(reservation).not.toBeNull();
   expect(reservation?.student.codigo).toBe("1234567890");
   expect(reservation?.option.day).toBe("Lunes");
@@ -103,7 +106,7 @@ test("gets a students reservation", async () => {
   }
 });
 
-test("gets a teacher reservation list", async (teacherId = "1") => {
+test("gets a teacher reservation list", async (teacherId = 1) => {
   workshopsAPI.getTodaysDate = jest.fn(() => {
     return new Date(2022, 9, 21);
   });
@@ -157,7 +160,7 @@ test("gets a teacher option with all reservations for attendance", async () => {
 });
 
 test("api.getTeacher", async () => {
-  const teacher = await workshopsAPI.getTeacher("1");
+  const teacher = await workshopsAPI.getTeacher(1);
   expect(teacher).toBeDefined();
   expect(teacher?.nombre).toBe("Gonzalo Rocha");
 
@@ -182,7 +185,7 @@ test("gets all teachers", async () => {
   if (GENERATE_MOCKS) writeMock("getAllTeachersPrismaMock", allTeachers);
 });
 
-test.only("gets a reservation list by id", async () => {
+test("gets a reservation list by id", async () => {
   await prisma.workshopReservation.create({
     data: {
       student_id: 2,
@@ -201,11 +204,11 @@ test.only("gets a reservation list by id", async () => {
   expect(reservations).toHaveLength(2);
   expect(reservations).toMatchSnapshot();
 
-  //writeMock('getReservationsByOptionIdPrismaMock', reservations);
+  if(GENERATE_MOCKS) writeMock('getReservationsByOptionIdPrismaMock', reservations);
 });
 
-test.skip("student has two impossible reservations in db", async () => {
-  const data = await workshopsAPI.getStudentReservation("3");
+test("student has two impossible reservations in db", async () => {
+  const data = await workshopsAPI.getStudentReservation(3);
   expect(data).toBeDefined();
 });
 

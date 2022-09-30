@@ -50,8 +50,8 @@ const option_1: WorkshopOption = {
 
 describe("api.makeReservation", () => {
   test("makes a reservation", async () => {
-    const student_id = "1";
-    const option_id = "1";
+    const student_id = 1;
+    const option_id = 1;
     
     type MakeReservationResult = WorkshopReservation & {
       student: Student;
@@ -150,7 +150,7 @@ describe("api.getStudentReservation", () => {
     //@ts-ignore
     prismaMock.workshopReservation.findFirst.mockResolvedValue(mockValue);
 
-    const reservation = await dataSources.workshopsAPI.getStudentReservation("1");
+    const reservation = await dataSources.workshopsAPI.getStudentReservation(1);
 
     expect(reservation?.student_id).toBe(1);
     expect(reservation).toMatchSnapshot({
