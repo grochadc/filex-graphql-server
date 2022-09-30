@@ -125,8 +125,8 @@ export const resolvers: Resolvers = {
     options: async (option, args, { dataSources }) => {
       const max_students =
         await dataSources.workshopsAPI.getMaxStudentReservations();
-      const res = await dataSources.workshopsAPI.getAllOptions(max_students);
-      return res;
+      const result = await dataSources.workshopsAPI.getAllOptions(max_students);
+      return result;
     },
     workshops: async (root, args, { dataSources }) => {
       const max_students =
@@ -239,6 +239,7 @@ export const resolvers: Resolvers = {
     isTutorial: (teacherOption) => Boolean(teacherOption.workshop_id > 1),
   },
   Option: {
+    id: (option) => {return `opt_${option.id}`},
     available: async (option, args, { dataSources }) => {
       const reservationCount =
         await dataSources.workshopsAPI.getOptionReservationCount(

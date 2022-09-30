@@ -87,6 +87,10 @@ test("gets selection info", async () => {
   });
 
   expect(result.errors).toBeUndefined();
+
+  expect(result.data.workshops[0].options[0].id).toBe("opt_1");
+  expect(result.data.student.id).toBe("st_3");
+
 });
 
 describe("Making reservations", () => {
