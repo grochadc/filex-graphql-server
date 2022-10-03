@@ -36,7 +36,7 @@ test("reservations by optionId", async () => {
           attended
         }
       }
-    `, variables: { optionId: "1" }
+    `, variables: { optionId: "opt_1" }
   });
 
   expect(result.errors).toBeUndefined();

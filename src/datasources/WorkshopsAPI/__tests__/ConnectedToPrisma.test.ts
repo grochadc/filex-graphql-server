@@ -200,7 +200,7 @@ test("gets a reservation list by id", async () => {
     },
   });
 
-  const reservations = await workshopsAPI.getReservationsByOptionId("1");
+  const reservations = await workshopsAPI.getReservationsByOptionId(1);
   expect(reservations).toHaveLength(2);
   expect(reservations).toMatchSnapshot();
 

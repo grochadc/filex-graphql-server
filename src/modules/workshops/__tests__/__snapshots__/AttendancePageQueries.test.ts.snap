@@ -8,7 +8,7 @@ exports[`gets attendance list 1`] = `
     "options": [
       {
         "day": "Lunes",
-        "id": "1",
+        "id": "opt_1",
         "reservations": [
           {
             "attended": false,

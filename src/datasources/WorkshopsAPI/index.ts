@@ -56,11 +56,11 @@ class WorkshopsAPI extends RESTDataSource {
     });
   }
 
-  async getReservationsByOptionId(option_id: string) {
+  async getReservationsByOptionId(option_id: number) {
     const openDate = await this.getOpenDate();
     const reservations = await this.prisma.workshopReservation.findMany({
       where: {
-        option_id: Number(option_id),
+        option_id: option_id,
         create_time: {
           gte: new Date(openDate),
         },

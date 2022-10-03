@@ -146,8 +146,9 @@ export const resolvers: Resolvers = {
       });
     },
     teacher: async (root, args, { dataSources }) => {
-
-      const result = await dataSources.workshopsAPI.getTeacher(unhashId(args.id));
+      const result = await dataSources.workshopsAPI.getTeacher(
+        unhashId(args.id)
+      );
       return result;
     },
     teachers: async (root, args, { dataSources }) => {
@@ -160,7 +161,9 @@ export const resolvers: Resolvers = {
       };
 
       const reservations =
-        await dataSources.workshopsAPI.getReservationsByOptionId(args.optionId);
+        await dataSources.workshopsAPI.getReservationsByOptionId(
+          unhashId(args.optionId)
+        );
       const result = reservations.map((reservation) => {
         return {
           ...reservation,
@@ -174,8 +177,14 @@ export const resolvers: Resolvers = {
     toggleOpenWorkshops: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.toggleOpen(),
     makeWorkshopReservation: async (root, args, { dataSources }) => {
-      if(args.student_id.indexOf('st_') < 0) throw new Error(`Got invalid argument for student_id. Recieved ${args.student_id}`);
-      if(args.option_id.indexOf('opt_') < 0) throw new Error(`Got invalid argument for option_id. Recieved ${args.option_id}`);
+      if (args.student_id.indexOf("st_") < 0)
+        throw new Error(
+          `Got invalid argument for student_id. Recieved ${args.student_id}`
+        );
+      if (args.option_id.indexOf("opt_") < 0)
+        throw new Error(
+          `Got invalid argument for option_id. Recieved ${args.option_id}`
+        );
 
       const reservation = await dataSources.workshopsAPI.getStudentReservation(
         unhashId(args.student_id)
@@ -201,11 +210,13 @@ export const resolvers: Resolvers = {
     resetReservations: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.resetReservations(),
     setWorkshopLink: (root, { option_id, url }, { dataSources }) => {
+      if (option_id.indexOf("opt_") < 0)
+        throw new Error(
+          `Got invalid format on args.option_id. Got ${option_id}`
+        );
 
-      if(option_id.indexOf('opt_') < 0) throw new Error(`Got invalid format on args.option_id. Got ${option_id}`);
-
-      return dataSources.workshopsAPI.setWorkshopLink(option_id, url)
-    }
+      return dataSources.workshopsAPI.setWorkshopLink(option_id, url);
+    },
   },
   Teacher: {
     options: async (teacher, args, { dataSources }) => {
@@ -229,6 +240,9 @@ export const resolvers: Resolvers = {
       });
       return finalResult;
     },
+    id: (teacherOption, args, { dataSources }) => {
+      return `opt_${teacherOption.id}`
+    },
     available: async (teacherOption, args, { dataSources }) => {
       const reservationCount =
         await dataSources.workshopsAPI.getOptionReservationCount(
@@ -239,12 +253,12 @@ export const resolvers: Resolvers = {
     isTutorial: (teacherOption) => Boolean(teacherOption.workshop_id > 1),
   },
   Option: {
-    id: (option) => {return `opt_${option.id}`},
+    id: (option) => {
+      return `opt_${option.id}`;
+    },
     available: async (option, args, { dataSources }) => {
       const reservationCount =
-        await dataSources.workshopsAPI.getOptionReservationCount(
-          option.id
-        );
+        await dataSources.workshopsAPI.getOptionReservationCount(option.id);
       return Boolean(reservationCount < 20);
     },
     isTutorial: (option, args, context) => {

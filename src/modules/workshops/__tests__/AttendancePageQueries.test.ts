@@ -77,6 +77,7 @@ test("gets attendance list", async () => {
   expect(workshopsAPI.getTeacherOptions).toHaveBeenCalled();
   expect(workshopsAPI.getTeacherReservations).toHaveBeenCalled();
   expect(result.errors).toBeUndefined();
+  expect(result.data.teacher.options[0].id).toBe("opt_1");
   expect(result.data).toMatchSnapshot();
 });
 
@@ -103,12 +104,12 @@ test("gets attendance list by option", async () => {
         }
       }
     `,
-    variables: { optionId: "1" },
+    variables: { optionId: "opt_1" },
   });
 
   expect(result.errors).toBeUndefined();
   expect(result.data).toMatchSnapshot();
-  expect(workshopsAPI.getReservationsByOptionId).toHaveBeenCalledWith("1");
+  expect(workshopsAPI.getReservationsByOptionId).toHaveBeenCalledWith(1);
 });
 
 test("saves attendance correctly", async () => {
