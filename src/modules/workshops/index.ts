@@ -82,17 +82,15 @@ export const typeDefs = gql`
     ): Reservation!
 
     saveWorkshopsAttendance(
-      attendingStudents: [AttendingStudent!]!
-      option_id: ID
-      teacher_id: ID
+      attendingStudents: [ReservationInput!]!
     ): Boolean!
 
     resetReservations: Boolean!
     setWorkshopLink(option_id: ID!, url: String!): Boolean!
   }
 
-  input AttendingStudent {
-    reservation_id: ID!
+  input ReservationInput {
+    id: ID!
     attended: Boolean!
   }
 `;
@@ -205,7 +203,11 @@ export const resolvers: Resolvers = {
       { attendingStudents },
       { dataSources }
     ) => {
-      return dataSources.workshopsAPI.saveAttendance(attendingStudents);
+      const mapped = attendingStudents.map((student) => ({
+        ...student,
+        id: unhashId(student.id)
+      }));
+      return dataSources.workshopsAPI.saveAttendance(mapped);
     },
     resetReservations: (root, args, { dataSources }) =>
       dataSources.workshopsAPI.resetReservations(),
@@ -219,6 +221,7 @@ export const resolvers: Resolvers = {
     },
   },
   Teacher: {
+    id: (teacher, args, context) => `t_${teacher.id}`,
     options: async (teacher, args, { dataSources }) => {
       const options = await dataSources.workshopsAPI.getTeacherOptions(
         teacher.id
@@ -241,7 +244,7 @@ export const resolvers: Resolvers = {
       return finalResult;
     },
     id: (teacherOption, args, { dataSources }) => {
-      return `opt_${teacherOption.id}`
+      return `opt_${teacherOption.id}`;
     },
     available: async (teacherOption, args, { dataSources }) => {
       const reservationCount =

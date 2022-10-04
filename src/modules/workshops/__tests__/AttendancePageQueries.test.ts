@@ -83,7 +83,9 @@ test("gets attendance list", async () => {
 
 test("gets attendance list by option", async () => {
   //@ts-ignore
-  workshopsAPI.getReservationsByOptionId.mockResolvedValue(getReservationsByOptionIdPrismaMock);
+  workshopsAPI.getReservationsByOptionId.mockResolvedValue(
+    getReservationsByOptionIdPrismaMock
+  );
 
   const result = await server.query({
     query: gql`
@@ -108,6 +110,7 @@ test("gets attendance list by option", async () => {
   });
 
   expect(result.errors).toBeUndefined();
+  expect(result.data.reservations[0].id).toBe("res_1");
   expect(result.data).toMatchSnapshot();
   expect(workshopsAPI.getReservationsByOptionId).toHaveBeenCalledWith(1);
 });
@@ -117,20 +120,24 @@ test("saves attendance correctly", async () => {
   workshopsAPI.saveAttendance.mockResolvedValue(true);
 
   const attendingStudents = [
-    { reservation_id: "1", attended: true },
-    { reservation_id: "2", attended: false },
+    { id: "res_1", attended: true },
+    { id: "res_2", attended: false },
   ];
 
   const result = await server.query({
     query: gql`
-      mutation saveAttendance($attendingStudents: [AttendingStudent!]!) {
+      mutation saveAttendance($attendingStudents: [ReservationInput!]!) {
         saveWorkshopsAttendance(attendingStudents: $attendingStudents)
       }
     `,
     variables: { attendingStudents },
   });
 
+  console.log(JSON.stringify(result.errors, null, 2));
   expect(result.errors).toBeUndefined();
-  expect(workshopsAPI.saveAttendance).toHaveBeenCalledWith(attendingStudents);
+  expect(workshopsAPI.saveAttendance).toHaveBeenCalledWith([
+    { id: 1, attended: true },
+    { id: 2, attended: false },
+  ]);
   expect(result.data.saveWorkshopsAttendance).toBe(true);
 });

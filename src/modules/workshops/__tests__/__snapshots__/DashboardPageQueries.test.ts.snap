@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`gest the dashboard information 1`] = `
+{
+  "isWorkshopsOpen": true,
+  "teachers": [
+    {
+      "id": "t_1",
+      "nombre": "Gonzalo Rocha",
+    },
+  ],
+}
+`;

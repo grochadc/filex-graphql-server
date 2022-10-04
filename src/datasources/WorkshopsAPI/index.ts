@@ -1,5 +1,4 @@
 import { RESTDataSource } from "apollo-datasource-rest";
-import { AttendingStudent } from "../../generated/graphql";
 import { PrismaClient } from "@prisma/client";
 import { ApolloError } from "apollo-server";
 
@@ -36,7 +35,6 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   getTeacher(id: number) {
-    
     return this.prisma.teacher.findUnique({
       where: {
         id,
@@ -119,8 +117,8 @@ class WorkshopsAPI extends RESTDataSource {
   }
 
   async getTeacherReservations(teacherId: number, optionId: number) {
-
-    const hashId = (id: number, prepend: string): string => `${[prepend]}_${id}`;
+    const hashId = (id: number, prepend: string): string =>
+      `${[prepend]}_${id}`;
 
     const openDateStr = await this.getOpenDate();
     const reservations = await this.prisma.workshopReservation.findMany({
@@ -144,7 +142,10 @@ class WorkshopsAPI extends RESTDataSource {
       },
     });
 
-    return reservations.map((reservation) => ({...reservation, id: hashId(reservation.id, 'res')}));
+    return reservations.map((reservation) => ({
+      ...reservation,
+      id: hashId(reservation.id, "res"),
+    }));
   }
 
   async getTeacherOptions(teacherId: number) {
@@ -224,10 +225,12 @@ class WorkshopsAPI extends RESTDataSource {
     return dateString;
   }
 
-  async saveAttendance(attendance: AttendingStudent[]) {
+  async saveAttendance(
+    attendance: { attended: boolean; id: number }[]
+  ) {
     const reservation_ids = attendance
       .filter((student) => student.attended)
-      .map((student) => Number(student.reservation_id));
+      .map((student) => student.id);
     const modified = await this.prisma.workshopReservation.updateMany({
       where: {
         id: {

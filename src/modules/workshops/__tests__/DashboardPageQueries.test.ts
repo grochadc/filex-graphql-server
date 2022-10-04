@@ -54,6 +54,8 @@ test("gest the dashboard information", async () => {
   });
 
   expect(result.errors).toBeUndefined();
+  expect(result.data.teachers[0].id).toBe("t_1");
+  expect(result.data).toMatchSnapshot();
 });
 
 test("toggles workshopOpen", async () => {

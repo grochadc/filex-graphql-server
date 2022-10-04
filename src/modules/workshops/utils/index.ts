@@ -62,6 +62,7 @@ export function unwindPrismaStudent(
 }
 
 export const unhashId = (id: string): number => {
+  if(id === undefined) throw new Error("unhashId recieved undefined id")
   if (typeof id === "number")
     throw new Error("unhashId recieved a number instead of a string");
   if (id.indexOf("_") < 0)

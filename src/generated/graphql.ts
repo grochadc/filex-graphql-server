@@ -79,11 +79,6 @@ export type ApplicantResponse = {
   telefono: Scalars['String'];
 };
 
-export type AttendingStudent = {
-  attended: Scalars['Boolean'];
-  reservation_id: Scalars['ID'];
-};
-
 export type Carrera = {
   __typename?: 'Carrera';
   id: Scalars['ID'];
@@ -220,9 +215,7 @@ export type MutationSaveRegisteringLevelsArgs = {
 
 
 export type MutationSaveWorkshopsAttendanceArgs = {
-  attendingStudents: Array<AttendingStudent>;
-  option_id?: Maybe<Scalars['ID']>;
-  teacher_id?: Maybe<Scalars['ID']>;
+  attendingStudents: Array<ReservationInput>;
 };
 
 
@@ -410,6 +403,11 @@ export type Reservation = {
   option: Option;
   student: Student;
   tutorialReason?: Maybe<Scalars['String']>;
+};
+
+export type ReservationInput = {
+  attended: Scalars['Boolean'];
+  id: Scalars['ID'];
 };
 
 export type Section = {
@@ -638,7 +636,6 @@ export type ResolversTypes = {
   Applicant: ResolverTypeWrapper<Applicant>;
   ApplicantInput: ApplicantInput;
   ApplicantResponse: ResolverTypeWrapper<ApplicantResponse>;
-  AttendingStudent: AttendingStudent;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Carrera: ResolverTypeWrapper<Carrera>;
   CloseExamResponse: ResolverTypeWrapper<CloseExamResponse>;
@@ -661,6 +658,7 @@ export type ResolversTypes = {
   Question: ResolverTypeWrapper<Question>;
   RegisterResponse: ResolverTypeWrapper<RegisterResponse>;
   Reservation: ResolverTypeWrapper<ReservationModel>;
+  ReservationInput: ReservationInput;
   Section: ResolverTypeWrapper<Section>;
   SerializedOptions: SerializedOptions;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -682,7 +680,6 @@ export type ResolversParentTypes = {
   Applicant: Applicant;
   ApplicantInput: ApplicantInput;
   ApplicantResponse: ApplicantResponse;
-  AttendingStudent: AttendingStudent;
   Boolean: Scalars['Boolean'];
   Carrera: Carrera;
   CloseExamResponse: CloseExamResponse;
@@ -704,6 +701,7 @@ export type ResolversParentTypes = {
   Question: Question;
   RegisterResponse: RegisterResponse;
   Reservation: ReservationModel;
+  ReservationInput: ReservationInput;
   Section: Section;
   SerializedOptions: SerializedOptions;
   String: Scalars['String'];

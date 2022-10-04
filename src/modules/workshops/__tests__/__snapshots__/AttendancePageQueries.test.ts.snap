@@ -3,7 +3,7 @@
 exports[`gets attendance list 1`] = `
 {
   "teacher": {
-    "id": "1",
+    "id": "t_1",
     "nombre": "Gonzalo Rocha",
     "options": [
       {
