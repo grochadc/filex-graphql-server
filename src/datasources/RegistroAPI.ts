@@ -1,8 +1,12 @@
 import { RESTDataSource } from "apollo-datasource-rest";
 import { ApolloError } from "apollo-server";
-import { StudentInput, ApplicantInput } from "../generated/graphql";
+import { StudentInput, ApplicantInput, Applicant } from "../generated/graphql";
 import * as R from "ramda";
 import { PrismaClient, Group } from "@prisma/client";
+
+function convertToIdString(id: number, prepend: string): string {
+  return  prepend + '_' + id.toString();
+}
 
 const ALREADY_REGISTERED = "ALREADY_REGISTERED";
 
@@ -53,12 +57,17 @@ class RegistroAPI extends RESTDataSource {
     return res.groupObject;
   }
 
-  async saveApplicant(codigo: string, applicant: ApplicantInput) {
-    await this.put(
-      `${this.context.enviroment}/applicants/${codigo}.json`,
-      applicant
-    );
-    return applicant;
+  async saveApplicant(codigo: string, applicant: ApplicantInput):Promise<Omit<Applicant, 'curso' | 'groups' | 'nivel' | 'registering'> | Applicant> {
+    const newApplicant = await this.prisma.applicant.create({
+      data: applicant
+    });
+
+    const newId = convertToIdString(newApplicant.id, 'applicant');
+
+    return {
+      ...newApplicant,
+      id: newId
+    };
   }
 
   async getSchedule(id: number) {

@@ -3,11 +3,10 @@ import { StudentModel } from "../../modules/workshops/models";
 import { ParameterizedQuery as PQ } from "pg-promise";
 import { ApolloError } from "apollo-server";
 import { PrismaClient } from "@prisma/client";
-import {Student} from "../../generated/graphql";
+import { StudentInput, ApplicantInput, Applicant } from "../../generated/graphql";
 
-
-type StudentInput = Omit<StudentModel, "id">;
-type Changes = Partial<StudentInput>;
+type MyStudentInput = Omit<StudentModel, "id">;
+type Changes = Partial<MyStudentInput>;
 
 class StudentsAPI extends DataSource {
   db: any;
@@ -27,14 +26,16 @@ class StudentsAPI extends DataSource {
   async getAllStudents(ciclo_actual: string) {
     return this.prisma.student.findMany({
       where: {
-        ciclo_actual
-      }
+        ciclo_actual,
+      },
     });
   }
 
   async getStudent(codigo: string, ciclo_actual: string) {
-    if(codigo === null) throw new Error('Codigo not provided on studentsAPI.getStudent');
-    if(ciclo_actual === null) throw new Error('ciclo_actual not provided on studentsAPI.getStudent');
+    if (codigo === null)
+      throw new Error("Codigo not provided on studentsAPI.getStudent");
+    if (ciclo_actual === null)
+      throw new Error("ciclo_actual not provided on studentsAPI.getStudent");
     const student = await this.prisma.student.findFirst({
       include: {
         applicant: true,
@@ -42,38 +43,58 @@ class StudentsAPI extends DataSource {
       },
       where: {
         codigo,
-        ciclo_actual
-      }
+        ciclo_actual,
+      },
     });
-    if(student === null) throw new Error('Student not found on database');
-    if(student.applicant == null) throw new Error('Applicant info is missing on database');
-    if(student.groupObject == null) throw new Error('Couldnt find a group Object');
-    
+    if (student === null) throw new Error("Student not found on database");
+    if (student.applicant == null)
+      throw new Error("Applicant info is missing on database");
+    if (student.groupObject == null)
+      throw new Error("Couldnt find a group Object");
+
     return student;
   }
 
+  async addApplicant(applicant: ApplicantInput): Promise<Omit<Applicant, 'curso' | 'groups' | 'nivel' | 'registering'>> {
+    const result = await this.prisma.applicant.create({
+      data: applicant
+    });
+
+    return {
+      ...result,
+      id: String(result.id)
+    };
+  }
+
   async addStudent(student: StudentInput) {
-    const addedStudent = await this.db.one(
-      new PQ({
-        text: ADD_STUDENT,
-        values: [
-          student.codigo,
-          student.nombre,
-          student.apellido_materno,
-          student.apellido_paterno,
-          student.genero,
-          student.carrera,
-          student.ciclo,
-          student.telefono,
-          student.email,
-          student.nivel,
-          student.grupo,
-          student.externo,
-          student.curso,
-        ],
-      })
-    );
-    return { id: addedStudent.id, ...student };
+    const applicant = await this.prisma.applicant.findFirst({
+      where: {
+        codigo: student.codigo,
+      },
+    });
+
+    if (applicant === null)
+      throw new Error(
+        "No applicant found on database. Please submit the student's personal information on the Applicant endpoint first."
+      );
+
+    const groupObj = await this.prisma.group.findFirst({
+      where: {
+        name: student.grupo,
+        ciclo: student.cicloActual
+      }
+    })
+
+    return this.prisma.student.create({
+      data: {
+        applicant: { connect: {id: applicant.id} },
+        codigo: student.codigo,
+        curso: student.curso,
+        groupObject: { connect: { id: groupObj.id } },
+        ciclo_actual: student.cicloActual,
+        nivel: student.nivel
+      }
+    })
   }
 
   async editStudent(codigo: string, changes: Changes, ciclo: string) {

@@ -13,6 +13,8 @@ import {
 } from "../generated/graphql";
 import { ApplicantWithMeetLink } from "modules/placement_exam";
 
+import { serializeNumberId } from "../utils";
+
 class PlacementAPI extends RESTDataSource {
   prisma: PrismaClient;
   db: any;
@@ -29,26 +31,16 @@ class PlacementAPI extends RESTDataSource {
     this.baseURL = "https://filex-5726c.firebaseio.com/placement";
   }
 
-  updateFinalResults(input: {
+  async updateFinalResults(input: {
     id: number;
     nivelOral: number;
     nivelFinal: number;
-  }): void {
-    /*
-    this.prisma.testResults.update({
-      where: { id: input.id },
-      data: { nivelOral: input.nivelOral, nivelFinal: input.nivelFinal },
-    });
-    */
-    const sql_query = new PQ({
-      text: UPDATE_FINAL_RESULTS,
-      values: [input.nivelOral, input.nivelFinal, input.id],
-    });
-    this.db.none(sql_query);
-  }
+  }): Promise<any> {
 
-  async addApplicant(applicant) {
-    return this.post(`applications.json`, applicant);
+    return this.prisma.testResults.update({
+        where: { id: input.id },
+        data: { nivelOral: input.nivelOral, nivelFinal: input.nivelFinal },
+      });
   }
 
   async getTestResults(
@@ -60,22 +52,21 @@ class PlacementAPI extends RESTDataSource {
           await this.prisma.testResults.findMany({
             where: {
               nivelFinal: { not: null },
-              id: { gt: 745 },
             },
           })
-        ).map((item) => ({ ...item, id: String(item.id) }));
+        ).map((item) => ({ ...item, id: serializeNumberId(item.id, 'test') }));
       case "NONASSIGNED":
         return (
           await this.prisma.testResults.findMany({
-            where: { nivelFinal: null, id: { gt: 1330 } },
+            where: { nivelFinal: null },
           })
-        ).map((item) => ({ ...item, id: String(item.id) }));
+        ).map((item) => ({ ...item, id: serializeNumberId(item.id, 'test') }));
       default:
         return (
           await this.prisma.testResults.findMany({ where: { id: { gt: 1330 } } })
         ).map((item) => ({
           ...item,
-          id: String(item.id),
+          id: serializeNumberId(item.id, 'test'),
         }));
     }
   }
@@ -84,7 +75,7 @@ class PlacementAPI extends RESTDataSource {
     const posted = await this.prisma.testResults.create({
       data: results,
     });
-    return String(posted.id);
+    return serializeNumberId(posted.id, 'test');
   }
 
   async getMeetLinks(env?: "dev" | "prod") {
@@ -129,26 +120,6 @@ class PlacementAPI extends RESTDataSource {
     return this.put(`${defaultMeetLinksLocation}.json`, JSON.stringify(result));
   }
 
-  async logInUser() {
-    const online = await this.get(`/online.json`);
-    if (online === null) {
-      this.put(`/online.json`, Number(1).toString());
-      return 1;
-    }
-    const counter = Number(online) + 1;
-    this.context.dataSources.sheetsAPI.setOnlineUsers(counter);
-    this.put(`/online.json`, counter.toString());
-    return counter;
-  }
-
-  async logOutUser() {
-    const online = await this.get(`/online.json`);
-    const counter = Number(online) - 1;
-    this.context.dataSources.placementSheetsAPI.setOnlineUsers(counter);
-    this.put(`/online.json`, counter.toString());
-    return counter;
-  }
-
   getCarreras() {
     return this.get("/carreras.json");
   }
@@ -167,6 +138,12 @@ class PlacementAPI extends RESTDataSource {
     });
     return true;
   }
+
+  /* //DEPRECATED
+  async addApplicant(applicant) {
+    return this.post(`applications.json`, applicant);
+  }
+  */
 }
 
 export const POST_TEST_RESULTS = `

@@ -102,9 +102,8 @@ const resolvers: Resolvers = {
     carreras: (root, args, { dataSources }) =>
       dataSources.placementAPI.getCarreras(),
     isClosed: () => getIsClosed(),
-    placementHomePageMessage: (root, args, { dataSources }) => {
-      const msg = dataSources.placementAPI.getHomePageMessage();
-      return msg;
+    placementHomePageMessage: async (root, args, { dataSources }) => {
+      return dataSources.placementAPI.getHomePageMessage()
     },
     testResults: async (root, args, { dataSources }) => {
       return dataSources.placementAPI.getTestResults(args.filter);
@@ -115,7 +114,7 @@ const resolvers: Resolvers = {
     saveOralResults: async (root, { input }, { dataSources }) => {
       const { id, nivelOral, nivelFinal } = input;
       dataSources.placementAPI.updateFinalResults({
-        id: Number(id),
+        id: utils.deSeralizeNumberId(id),
         nivelOral,
         nivelFinal,
       });
@@ -182,7 +181,6 @@ const resolvers: Resolvers = {
 
       const currentLink = getCurrentLink(meetLinks, context.carousel);
 
-      //change SheetsAPI.saveApplicant for PlacementAPI.postTestResults(results/applicant);
       const applicant = composeApplicant(args.input, currentLink);
       const createdId = await dataSources.placementAPI.postTestResults(
         applicant

@@ -4,7 +4,7 @@ import { Resolvers } from "../../generated/graphql";
 export const typeDefs = gql`
   extend type Query {
     registeringLevels(course: String!, course: String!): [String!]!
-    applicant(codigo: ID!): Applicant!
+    unenrolledStudent(codigo: ID!): UnenrolledStudent!
     group(id: Int!): Group!
     groups: [Group!]!
   }
@@ -12,10 +12,9 @@ export const typeDefs = gql`
   extend type Mutation {
     registerStudent(input: StudentInput!, groupId: Int!): RegisterResponse!
     saveRegisteringLevels(levels: [String!]!, course: String!): [String!]!
-    saveApplicant(codigo: String!, input: ApplicantInput!): ApplicantResponse!
   }
 
-  type Applicant {
+  type UnenrolledStudent {
     codigo: ID!
     nombre: String!
     apellido_materno: String!
@@ -35,24 +34,7 @@ export const typeDefs = gql`
     registeredGroup: Group
   }
 
-  input ApplicantInput {
-    codigo: ID!
-    nombre: String!
-    apellido_materno: String!
-    apellido_paterno: String!
-    genero: String!
-    carrera: String!
-    ciclo: String!
-    telefono: String!
-    email: String!
-    institucionalEmail: String
-    nivel: String!
-    curso: String!
-    externo: Boolean!
-    desertor: Boolean!
-  }
-
-  type ApplicantResponse {
+  type EnrolledStudent {
     codigo: ID!
     nombre: String!
     apellido_materno: String!
@@ -98,6 +80,14 @@ export const typeDefs = gql`
     grupo: String!
     group: Group!
   }
+
+  extend type Applicant {
+    registering: Boolean!
+    groups: [Group]!
+    registeredGroup: Group
+    curso: String!
+    nivel: Int!
+  }
 `;
 
 export const resolvers: Resolvers = {
@@ -138,11 +128,11 @@ export const resolvers: Resolvers = {
         args.course
       );
     },
-    saveApplicant: (root, args, { dataSources }) =>
+    /*saveApplicant: (root, args, { dataSources }) =>
       dataSources.registroAPI.saveApplicant(args.codigo, args.input),
+      */
   },
   Applicant: {
-    desertor: () => false,
     registering: async (root, args, { dataSources }) => {
       const registeringLevels =
         await dataSources.registroAPI.getLevelsRegistering(root.curso);

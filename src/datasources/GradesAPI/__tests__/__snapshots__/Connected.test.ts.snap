@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`works 1`] = `
+[
+  {
+    "applicantId": 1,
+    "ciclo_actual": "2022B",
+    "codigo": "1234567890",
+    "curso": "en",
+    "desertor": false,
+    "finalGrade": "100",
+    "groupId": 2,
+    "id": 3,
+    "nivel": 4,
+    "situacion": "A",
+  },
+  {
+    "applicantId": 2,
+    "ciclo_actual": "2022B",
+    "codigo": "0987654321",
+    "curso": "en",
+    "desertor": false,
+    "finalGrade": "90",
+    "groupId": 2,
+    "id": 2,
+    "nivel": 4,
+    "situacion": "A",
+  },
+]
+`;

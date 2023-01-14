@@ -89,3 +89,11 @@ export function addIDsToLinks(links: MeetLink[]): MeetLink[] {
   }
   return links;
 }
+
+export function serializeNumberId(id: number, prepend: string): string {
+  return  prepend + '_' + id.toString();
+}
+
+export function deSeralizeNumberId(id: string): number {
+  return Number(id.slice(id.indexOf('_') + 1));
+}

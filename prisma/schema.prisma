@@ -19,8 +19,10 @@ model Student {
   groupId             Int?                  @map("group_id")
   groupObject         Group?                @relation(fields: [groupId], references: [id])
   desertor            Boolean?
+  finalGrade          String?               @map("final_grade")
   WorkshopReservation WorkshopReservation[]
 
+  @@unique(fields: [codigo, ciclo_actual, curso], name: "codigoCicloCursoID")
   @@map("student")
 }
 
@@ -58,19 +60,19 @@ model Teacher {
 }
 
 model Applicant {
-  id                  Int       @id @default(autoincrement())
-  codigo              String?   @db.VarChar(255)
-  nombre              String?   @db.VarChar(255)
-  apellido_paterno    String?   @db.VarChar(255)
-  apellido_materno    String?   @db.VarChar(255)
-  genero              String?   @db.VarChar(255)
-  carrera             String?   @db.VarChar(255)
-  ciclo_ingreso       String?   @db.VarChar(255)
-  telefono            String?   @db.VarChar(255)
-  email               String?   @db.VarChar(255)
-  institutional_email String?   @db.VarChar(255)
-  externo             Boolean?
-  student             Student[]
+  id                 Int       @id @default(autoincrement())
+  codigo             String?   @db.VarChar(255)
+  nombre             String?   @db.VarChar(255)
+  apellido_paterno   String?   @db.VarChar(255)
+  apellido_materno   String?   @db.VarChar(255)
+  genero             String?   @db.VarChar(255)
+  carrera            String?   @db.VarChar(255)
+  cicloIngreso       String?   @map("ciclo_ingreso") @db.VarChar(255)
+  telefono           String?   @db.VarChar(255)
+  email              String?   @db.VarChar(255)
+  institucionalEmail String?   @map("institutional_email") @db.VarChar(255)
+  externo            Boolean?
+  student            Student[]
 
   @@map("applicant")
 }
