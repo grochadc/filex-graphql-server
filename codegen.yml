@@ -10,7 +10,7 @@ generates:
         TeacherOption: ../../node_modules/.prisma/client#WorkshopOption  
         Teacher: '../../node_modules/.prisma/client#Teacher as TeacherModel'
         Workshop: '../../node_modules/.prisma/client#Workshop  as WorkshopModel'
-        Student: '../../node_modules/.prisma/client#Student  as StudentModel'
+        UnenrolledStudent: '../../node_modules/.prisma/client#Student  as StudentModel'
         DbApplicant: '../node_modules/.prisma/client#Applicant as ApplicantModel'
         DbGroup: '../node_modules/.prisma/client#Group as GroupModel'
         Reservation: '../node_modules/.prisma/client#Reservation as ReservationModel'

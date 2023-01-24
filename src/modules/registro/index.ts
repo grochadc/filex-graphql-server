@@ -1,16 +1,19 @@
 import { gql } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
+import { serializeNumberId, deSeralizeNumberId } from "../../utils";
 
 export const typeDefs = gql`
   extend type Query {
-    registeringLevels(course: String!, course: String!): [String!]!
+    applicant(codigo: ID!): Applicant!
     unenrolledStudent(codigo: ID!): UnenrolledStudent!
-    group(id: Int!): Group!
+    registeringLevels(course: String!, course: String!): [String!]!
     groups: [Group!]!
+    group(id: ID!): Group!
+    masterlist(ciclo: String!): [EnrolledStudent!]!
   }
 
   extend type Mutation {
-    registerStudent(input: StudentInput!, groupId: Int!): RegisterResponse!
+    registerStudent(input: StudentInput!, groupId: String!): RegisterResponse!
     saveRegisteringLevels(levels: [String!]!, course: String!): [String!]!
   }
 
@@ -21,16 +24,16 @@ export const typeDefs = gql`
     apellido_paterno: String!
     genero: String!
     carrera: String!
-    ciclo: String!
+    cicloIngreso: String!
     telefono: String!
     email: String!
     institucionalEmail: String
     nivel: Int!
     curso: String!
     externo: Boolean!
-    desertor: Boolean!
+    desertor: Boolean
     registering: Boolean!
-    groups: [Group!]!
+    groups: [Group]!
     registeredGroup: Group
   }
 
@@ -49,10 +52,11 @@ export const typeDefs = gql`
     curso: String!
     externo: Boolean!
     desertor: Boolean!
+    group: Group!
   }
 
   type Group {
-    id: Int!
+    id: ID!
     ciclo: String!
     name: String!
     time: String!
@@ -81,12 +85,41 @@ export const typeDefs = gql`
     group: Group!
   }
 
-  extend type Applicant {
-    registering: Boolean!
-    groups: [Group]!
-    registeredGroup: Group
+  type Applicant {
+    id: ID!
+    codigo: ID!
+    nombre: String!
+    apellido_paterno: String!
+    apellido_materno: String!
+    genero: String!
+    carrera: String!
+    cicloIngreso: String!
+    telefono: String!
+    email: String!
+    institucionalEmail: String
+    externo: Boolean!
+  }
+
+  input StudentInput {
+    codigo: ID!
     curso: String!
     nivel: Int!
+    grupo: String!
+    cicloActual: String!
+  }
+
+  input ApplicantInput {
+    codigo: ID!
+    nombre: String!
+    apellido_paterno: String!
+    apellido_materno: String!
+    genero: String!
+    carrera: String!
+    cicloIngreso: String!
+    telefono: String!
+    email: String!
+    institucionalEmail: String
+    externo: Boolean!
   }
 `;
 
@@ -95,22 +128,28 @@ export const resolvers: Resolvers = {
     //TODO: type returns string[] but resolver should return Int[] (check in db what is the type for level)
     registeringLevels: (root, args, { dataSources }) =>
       dataSources.registroAPI.getLevelsRegistering(args.course),
-    //@ts-ignore
-    applicant: (root, args, { dataSources }) =>
-      dataSources.registroAPI.getApplicant(args.codigo, "2022B"),
     group: async (root, args, { dataSources }) => {
-      const res = await dataSources.registroAPI.getSchedule(args.id);
-      return { ...res, teacher: res.teacher.nombre };
+      const res = await dataSources.registroAPI.getSchedule(deSeralizeNumberId(args.id));
+      return { ...res, teacher: res.teacher.nombre, id: serializeNumberId(res.id, 'group') };
+    },
+    unenrolledStudent: async (root, args, { dataSources }) => {
+      const student = await dataSources.registroAPI.getUnenrolledStudent(args.codigo, "2023A");
+      return {
+        ...student,
+        ...student.applicant
+      }
     },
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {
       const registeredStudent = await dataSources.registroAPI.registerStudent(
         args.input,
-        args.groupId
+        deSeralizeNumberId(args.groupId)
       );
+
       const currentGroup = {
         ...registeredStudent.groupObject,
+        id: serializeNumberId(registeredStudent.groupObject.id, 'grupo'),
         teacher: registeredStudent.groupObject.teacher.nombre,
       };
       return {
@@ -132,7 +171,7 @@ export const resolvers: Resolvers = {
       dataSources.registroAPI.saveApplicant(args.codigo, args.input),
       */
   },
-  Applicant: {
+  UnenrolledStudent: {
     registering: async (root, args, { dataSources }) => {
       const registeringLevels =
         await dataSources.registroAPI.getLevelsRegistering(root.curso);
@@ -145,17 +184,18 @@ export const resolvers: Resolvers = {
       const result = await dataSources.registroAPI.getSchedules(
         currentLevel,
         course,
-        maxStudents
+        maxStudents,
+        root.ciclo_actual
       );
-      return result.map((el) => ({ ...el, teacher: el.teacher.nombre }));
+      return result.map((el) => ({ ...el, teacher: el.teacher.nombre, id: serializeNumberId(el.id, 'group'), }));
     },
     registeredGroup: async (root, args, { dataSources }) => {
       const res = await dataSources.registroAPI.getAlreadyRegistered(
         root.codigo,
-        "2022B"
+        "2023A"
       );
       if(res==null) return null;
-      return { ...res, teacher: res.teacher.nombre };
+      return { ...res, teacher: res.teacher.nombre, id: serializeNumberId(res.id, 'group') };
     },
   },
 };

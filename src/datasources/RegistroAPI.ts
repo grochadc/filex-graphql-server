@@ -2,10 +2,17 @@ import { RESTDataSource } from "apollo-datasource-rest";
 import { ApolloError } from "apollo-server";
 import { StudentInput, ApplicantInput, Applicant } from "../generated/graphql";
 import * as R from "ramda";
-import { PrismaClient, Group } from "@prisma/client";
+import {
+  PrismaClient,
+  Group,
+  Student,
+  Applicant as PrismaApplicant,
+} from "@prisma/client";
+
+import { serializeNumberId, deSeralizeNumberId } from "../utils";
 
 function convertToIdString(id: number, prepend: string): string {
-  return  prepend + '_' + id.toString();
+  return prepend + "_" + id.toString();
 }
 
 const ALREADY_REGISTERED = "ALREADY_REGISTERED";
@@ -19,6 +26,31 @@ class RegistroAPI extends RESTDataSource {
     }
     this.prisma = prisma;
     this.baseURL = "https://filex-5726c.firebaseio.com/registro";
+  }
+
+  async getUnenrolledStudent(
+    codigo: string,
+    ciclo_actual: string
+  ): Promise<Student & { applicant: PrismaApplicant }> {
+    if (codigo === null)
+      throw new Error(
+        "Codigo not provided on registroAPI.getUnenrolledStudent"
+      );
+    if (ciclo_actual === null)
+      throw new Error(
+        "ciclo_actual not provided on registroAPI.getUnenrolledStudent"
+      );
+
+    const student = await this.prisma.student.findFirst({
+      where: {
+        codigo: codigo,
+        ciclo_actual: ciclo_actual,
+      },
+      include: {
+        applicant: true,
+      },
+    });
+    return student;
   }
 
   async getLevelsRegistering(course: string): Promise<string[]> {
@@ -49,24 +81,30 @@ class RegistroAPI extends RESTDataSource {
       include: {
         groupObject: {
           include: {
-            teacher: true
-          }
+            teacher: true,
+          },
         },
       },
     });
+    if (res === null) return null;
     return res.groupObject;
   }
 
-  async saveApplicant(codigo: string, applicant: ApplicantInput):Promise<Omit<Applicant, 'curso' | 'groups' | 'nivel' | 'registering'> | Applicant> {
+  async saveApplicant(
+    codigo: string,
+    applicant: ApplicantInput
+  ): Promise<
+    Omit<Applicant, "curso" | "groups" | "nivel" | "registering"> | Applicant
+  > {
     const newApplicant = await this.prisma.applicant.create({
-      data: applicant
+      data: applicant,
     });
 
-    const newId = convertToIdString(newApplicant.id, 'applicant');
+    const newId = convertToIdString(newApplicant.id, "applicant");
 
     return {
       ...newApplicant,
-      id: newId
+      id: newId,
     };
   }
 
@@ -82,20 +120,23 @@ class RegistroAPI extends RESTDataSource {
   }
 
   async registerStudent(student: StudentInput, groupId: number) {
-    const { groupObject: registeredGroup, id: currentStudentId } =
-      await this.prisma.student.findFirst({
-        where: {
-          codigo: student.codigo,
-          ciclo_actual: "2022B",
-        },
-        include: {
-          groupObject: {
-            include: {
-              teacher: true,
+    const response =
+      await this.prisma.student
+        .findFirst({
+          where: {
+            codigo: student.codigo,
+            ciclo_actual: "2023A",
+          },
+          include: {
+            groupObject: {
+              include: {
+                teacher: true,
+              },
             },
           },
-        },
-      });
+        });
+
+        const { groupObject: registeredGroup, id: currentStudentId } = response;
 
     if (registeredGroup)
       throw new ApolloError(`${registeredGroup.name}`, ALREADY_REGISTERED);
@@ -153,13 +194,18 @@ class RegistroAPI extends RESTDataSource {
     );
   }
 
-  async getSchedules(level: number, course: string, maxStudents: number) {
+  async getSchedules(
+    level: number,
+    course: string,
+    maxStudents: number,
+    ciclo_actual: string
+  ) {
     return this.prisma.group.findMany({
       include: {
-        teacher: true
+        teacher: true,
       },
       where: {
-        ciclo: "2022B",
+        ciclo: ciclo_actual,
         nivel: level,
         course: course,
         registrados: {

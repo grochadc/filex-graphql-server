@@ -84,7 +84,8 @@ class StudentsAPI extends DataSource {
         ciclo: student.cicloActual
       }
     })
-
+    return Promise.resolve();
+/*
     return this.prisma.student.create({
       data: {
         applicant: { connect: {id: applicant.id} },
@@ -95,6 +96,7 @@ class StudentsAPI extends DataSource {
         nivel: student.nivel
       }
     })
+    */
   }
 
   async editStudent(codigo: string, changes: Changes, ciclo: string) {

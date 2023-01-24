@@ -9,7 +9,8 @@ datasource db {
 
 model Student {
   id                  Int                   @id(map: "student_pkey1") @default(autoincrement())
-  applicant           Applicant             @relation(fields: [codigo], references: [codigo])
+  applicantId         Int                   @map("applicant_id")
+  applicant           Applicant             @relation(fields: [applicantId], references: [id])
   ciclo_actual        String                @db.VarChar(255)
   codigo              String                @db.VarChar(255)
   nivel               Int
@@ -19,6 +20,7 @@ model Student {
   groupObject         Group?                @relation(fields: [groupId], references: [id])
   desertor            Boolean?
   finalGrade          String?               @map("final_grade")
+  WorkshopReservation WorkshopReservation[]
 
   @@unique(fields: [codigo, ciclo_actual, curso], name: "codigoCicloCursoID")
   @@map("student")
@@ -52,6 +54,7 @@ model Teacher {
   id      Int              @id @default(autoincrement())
   nombre  String           @db.VarChar(255)
   groups  Group[]
+  options WorkshopOption[]
 
   @@map("teacher")
 }
@@ -124,6 +127,7 @@ model WorkshopOption {
   day                 String?               @db.VarChar(255)
   time                String?               @db.VarChar(255)
   teacher_id          Int
+  teacher             Teacher               @relation(fields: [teacher_id], references: [id])
   workshop_id         Int
   workshop            Workshop              @relation(fields: [workshop_id], references: [id])
   url                 String?               @db.VarChar(255)
@@ -137,6 +141,7 @@ model WorkshopReservation {
   id          Int            @id @default(autoincrement())
   create_time DateTime       @default(dbgenerated("CURRENT_DATE")) @db.Date
   student_id  Int
+  student     Student        @relation(fields: [student_id], references: [id])
   option_id   Int
   option      WorkshopOption @relation(fields: [option_id], references: [id])
   attended    Boolean?

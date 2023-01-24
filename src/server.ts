@@ -5,12 +5,8 @@ import {
   FirebaseAPI,
   RegistroAPI,
   ExamAPI,
-  WorkshopsAPI,
   StudentsAPI,
   PlacementAPI,
-  //PlacementSheetsAPI,
-  //SheetsAPI,
-  //DatabaseAPI,
 } from "./datasources";
 
 import { PrismaClient } from "@prisma/client";
@@ -22,7 +18,6 @@ export type DataSourcesType = {
   firebaseAPI: FirebaseAPI;
   registroAPI: RegistroAPI;
   examAPI: ExamAPI;
-  workshopsAPI: WorkshopsAPI;
   studentsAPI: StudentsAPI;
   placementAPI: PlacementAPI;
   //placementSheetsAPI: PlacementSheetsAPI;
@@ -48,30 +43,14 @@ const server = new ApolloServer({
     require("./modules/test_questions"),
     require("./modules/firebase_api"),
     require("./modules/registro"),
-    require("./modules/workshops"),
-    require("./modules/grades"),
-    require("./modules/students"),
   ],
   dataSources: () => {
     const result = {
       firebaseAPI: new FirebaseAPI(),
       registroAPI: new RegistroAPI(prisma, db),
       examAPI: new ExamAPI(),
-      workshopsAPI: new WorkshopsAPI(prisma),
       studentsAPI: new StudentsAPI(db, prisma),
       placementAPI: new PlacementAPI(prisma, db),
-      /*
-      placementSheetsAPI: new PlacementSheetsAPI(
-        "1wwQwKIHwQV2lJGweCXscO6Z6YiK4CKwNvzF0S6Z7eAE"
-      ),
-      registroSheetsAPI: new SheetsAPI(
-        "1p7likU0aa7n7EiRxTHtdvfpd-uMg3QM8VY3Kz4ld5og"
-      ),
-      workshopsSheetsAPI: new SheetsAPI(
-        "1AezhkIpOJ-rWg88jGbZb89DI2aSRtRTD4hlQcVF2thQ"
-      ),
-      */
-      //databaseAPI: new DatabaseAPI(db),
     };
     return result;
   },

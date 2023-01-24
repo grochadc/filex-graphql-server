@@ -5,7 +5,7 @@ export const typeDefs = gql`
   extend type Query {
     student(codigo: ID!): Student!
     applicant(codigo: ID!): Applicant!
-    masterlist(ciclo: String!): [Student!]!
+    masterlist(ciclo: String!): [EnrolledStudent!]!
   }
 
   type Applicant {
@@ -98,6 +98,10 @@ export const resolvers: Resolvers = {
     },
     masterlist: async (root, args, { dataSources }) => {
       return dataSources.studentsAPI.getAllStudents(args.ciclo);
+    },
+    //@ts-ignore
+    applicant: (root, args, { dataSources }) => {
+      return dataSources.registroAPI.getApplicant(args.codigo, "2023A");
     },
   },
   Student: {
