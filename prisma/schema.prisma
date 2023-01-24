@@ -85,8 +85,10 @@ model Group {
   nivel       Int
   registrados Int       @default(0)
   course      String?   @db.VarChar(255)
+  message     String?   @db.VarChar(255)
   student     Student[]
 
+  @@unique(fields: [ciclo, course, name], name: "cicloCursoName")
   @@map("group_table")
 }
 

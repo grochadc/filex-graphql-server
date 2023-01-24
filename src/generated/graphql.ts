@@ -93,6 +93,7 @@ export type Group = {
   aula: Scalars['String'];
   ciclo: Scalars['String'];
   id: Scalars['ID'];
+  message?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   teacher: Scalars['String'];
   time: Scalars['String'];
@@ -334,7 +335,7 @@ export type UnenrolledStudent = {
   cicloIngreso: Scalars['String'];
   codigo: Scalars['ID'];
   curso: Scalars['String'];
-  desertor: Scalars['Boolean'];
+  desertor?: Maybe<Scalars['Boolean']>;
   email: Scalars['String'];
   externo: Scalars['Boolean'];
   genero: Scalars['String'];
@@ -569,6 +570,7 @@ export type GroupResolvers<ContextType = ServerContext, ParentType extends Resol
   aula?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ciclo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   teacher?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -681,7 +683,7 @@ export type UnenrolledStudentResolvers<ContextType = ServerContext, ParentType e
   cicloIngreso?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   codigo?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   curso?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  desertor?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  desertor?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   genero?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

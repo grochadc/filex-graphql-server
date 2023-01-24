@@ -62,6 +62,7 @@ export const typeDefs = gql`
     time: String!
     aula: String!
     teacher: String!
+    message: String
   }
 
   input SerializedOptions {
