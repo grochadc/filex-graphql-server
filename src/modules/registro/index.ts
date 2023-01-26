@@ -130,15 +130,40 @@ export const resolvers: Resolvers = {
     registeringLevels: (root, args, { dataSources }) =>
       dataSources.registroAPI.getLevelsRegistering(args.course),
     group: async (root, args, { dataSources }) => {
-      const res = await dataSources.registroAPI.getSchedule(deSeralizeNumberId(args.id));
-      return { ...res, teacher: res.teacher.nombre, id: serializeNumberId(res.id, 'group') };
+      const res = await dataSources.registroAPI.getSchedule(
+        deSeralizeNumberId(args.id)
+      );
+      return {
+        ...res,
+        teacher: res.teacher.nombre,
+        id: serializeNumberId(res.id, "group"),
+      };
     },
     unenrolledStudent: async (root, args, { dataSources }) => {
-      const student = await dataSources.registroAPI.getUnenrolledStudent(args.codigo, "2023A");
+      const student = await dataSources.registroAPI.getUnenrolledStudent(
+        args.codigo,
+        "2023A"
+      );
       return {
         ...student,
-        ...student.applicant
-      }
+        ...student.applicant,
+      };
+    },
+    masterlist: async (root, args, { dataSources }) => {
+      const studentsFromDatabase = await dataSources.studentsAPI.getAllStudents(
+        args.ciclo
+      );
+      return studentsFromDatabase.map((student) => ({
+        ...student,
+        ...student.applicant,
+        nivel: student.nivel.toString(),
+        group: {
+          ...student.groupObject,
+          id: serializeNumberId(student.groupObject.id, 'group'),
+          teacher: student.groupObject.teacher.nombre,
+        },
+        ciclo: student.applicant.cicloIngreso,
+      }));
     },
   },
   Mutation: {
@@ -150,7 +175,7 @@ export const resolvers: Resolvers = {
 
       const currentGroup = {
         ...registeredStudent.groupObject,
-        id: serializeNumberId(registeredStudent.groupObject.id, 'grupo'),
+        id: serializeNumberId(registeredStudent.groupObject.id, "grupo"),
         teacher: registeredStudent.groupObject.teacher.nombre,
       };
       return {
@@ -159,7 +184,7 @@ export const resolvers: Resolvers = {
         grupo: registeredStudent.groupObject.name,
         group: currentGroup,
         nivel: String(registeredStudent.nivel),
-        ciclo: registeredStudent.ciclo_actual
+        ciclo: registeredStudent.ciclo_actual,
       };
     },
     saveRegisteringLevels: (root, args, { dataSources }) => {
@@ -188,15 +213,23 @@ export const resolvers: Resolvers = {
         maxStudents,
         root.ciclo_actual
       );
-      return result.map((el) => ({ ...el, teacher: el.teacher.nombre, id: serializeNumberId(el.id, 'group'), }));
+      return result.map((el) => ({
+        ...el,
+        teacher: el.teacher.nombre,
+        id: serializeNumberId(el.id, "group"),
+      }));
     },
     registeredGroup: async (root, args, { dataSources }) => {
       const res = await dataSources.registroAPI.getAlreadyRegistered(
         root.codigo,
         "2023A"
       );
-      if(res==null) return null;
-      return { ...res, teacher: res.teacher.nombre, id: serializeNumberId(res.id, 'group') };
+      if (res == null) return null;
+      return {
+        ...res,
+        teacher: res.teacher.nombre,
+        id: serializeNumberId(res.id, "group"),
+      };
     },
   },
 };
