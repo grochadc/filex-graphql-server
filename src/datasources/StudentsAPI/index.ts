@@ -43,6 +43,14 @@ class StudentsAPI extends DataSource {
           },
         },
       },
+      include: {
+        applicant: true,
+        groupObject: {
+          include: {
+            teacher: true,
+          },
+        },
+      },
     });
 
     return students;
