@@ -5,7 +5,6 @@ export const typeDefs = gql`
   extend type Query {
     student(codigo: ID!): Student!
     applicant(codigo: ID!): Applicant!
-    masterlist(ciclo: String!): [EnrolledStudent!]!
   }
 
   type Applicant {
@@ -95,9 +94,6 @@ export const resolvers: Resolvers = {
         ciclo: student.applicant.cicloIngreso,
         grupo: student.groupObject?.name,
       };
-    },
-    masterlist: async (root, args, { dataSources }) => {
-      return dataSources.studentsAPI.getAllStudents(args.ciclo);
     },
     //@ts-ignore
     applicant: (root, args, { dataSources }) => {

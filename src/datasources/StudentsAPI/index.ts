@@ -3,7 +3,11 @@ import { StudentModel } from "../../modules/workshops/models";
 import { ParameterizedQuery as PQ } from "pg-promise";
 import { ApolloError } from "apollo-server";
 import { PrismaClient } from "@prisma/client";
-import { StudentInput, ApplicantInput, Applicant } from "../../generated/graphql";
+import {
+  StudentInput,
+  ApplicantInput,
+  Applicant,
+} from "../../generated/graphql";
 
 type MyStudentInput = Omit<StudentModel, "id">;
 type Changes = Partial<MyStudentInput>;
@@ -24,11 +28,24 @@ class StudentsAPI extends DataSource {
   }
 
   async getAllStudents(ciclo_actual: string) {
-    return this.prisma.student.findMany({
+    const students = await this.prisma.student.findMany({
       where: {
         ciclo_actual,
+        groupId: {
+          not: null
+        }
+      },
+      include: {
+        applicant: true,
+        groupObject: {
+          include: {
+            teacher: true,
+          },
+        },
       },
     });
+
+    return students;
   }
 
   async getStudent(codigo: string, ciclo_actual: string) {
@@ -55,14 +72,16 @@ class StudentsAPI extends DataSource {
     return student;
   }
 
-  async addApplicant(applicant: ApplicantInput): Promise<Omit<Applicant, 'curso' | 'groups' | 'nivel' | 'registering'>> {
+  async addApplicant(
+    applicant: ApplicantInput
+  ): Promise<Omit<Applicant, "curso" | "groups" | "nivel" | "registering">> {
     const result = await this.prisma.applicant.create({
-      data: applicant
+      data: applicant,
     });
 
     return {
       ...result,
-      id: String(result.id)
+      id: String(result.id),
     };
   }
 
@@ -81,11 +100,11 @@ class StudentsAPI extends DataSource {
     const groupObj = await this.prisma.group.findFirst({
       where: {
         name: student.grupo,
-        ciclo: student.cicloActual
-      }
-    })
+        ciclo: student.cicloActual,
+      },
+    });
     return Promise.resolve();
-/*
+    /*
     return this.prisma.student.create({
       data: {
         applicant: { connect: {id: applicant.id} },
