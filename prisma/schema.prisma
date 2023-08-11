@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("HEROKU_POSTGRESQL_TEAL_URL")
+  url      = env("STACKHERO_POSTGRESQL_HOST")
 }
 
 model Student {
@@ -35,7 +35,7 @@ model TestResults {
   carrera            String   @db.VarChar(255)
   telefono           String   @db.VarChar(255)
   email              String   @db.VarChar(255)
-  institucionalEmail String?  @map("institucionalemail") @db.VarChar(255)
+  institucionalEmail String?  @map("institucional_email") @db.VarChar(255)
   nivelEscrito       Int      @map("nivel_escrito")
   curso              String   @db.VarChar(255)
   externo            Boolean?

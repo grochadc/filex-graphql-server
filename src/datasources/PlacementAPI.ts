@@ -63,7 +63,7 @@ class PlacementAPI extends RESTDataSource {
         ).map((item) => ({ ...item, id: serializeNumberId(item.id, 'test') }));
       default:
         return (
-          await this.prisma.testResults.findMany({ where: { id: { gt: 1330 } } })
+          await this.prisma.testResults.findMany()
         ).map((item) => ({
           ...item,
           id: serializeNumberId(item.id, 'test'),

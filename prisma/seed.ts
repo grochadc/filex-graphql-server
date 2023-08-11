@@ -2,13 +2,13 @@ import { PrismaClient, Workshop } from "@prisma/client";
 
 console.log(
   "Initializing new prisma client with url ",
-  process.env.HEROKU_POSTGRESQL_TEAL_URL
+  process.env.STACKHERO_POSTGRESQL_HOST
 );
 
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.HEROKU_POSTGRESQL_TEAL_URL,
+      url: process.env.STACKHERO_POSTGRESQL_HOST,
     },
   },
 });
@@ -24,10 +24,10 @@ async function main() {
       apellido_materno: "Ocasio",
       genero: "M",
       carrera: "Abogado (DECH)",
-      ciclo_ingreso: "2022A",
+      cicloIngreso: "2022A",
       telefono: "0001234567",
       email: "bad@bunny.pr",
-      institutional_email: "benito.martinez@cusur.udg.mx",
+      institucionalEmail: "benito.martinez@cusur.udg.mx",
       externo: false,
     },
   });
@@ -41,10 +41,10 @@ async function main() {
       apellido_materno: "Valadez",
       genero: "M",
       carrera: "Agrobiotecnologia (AGB)",
-      ciclo_ingreso: "2022B",
+      cicloIngreso: "2022B",
       telefono: "0001234567",
       email: "juanga@elnoanoa.mx",
-      institutional_email: "alberto.aguilera@alumnos.udg.mx",
+      institucionalEmail: "alberto.aguilera@alumnos.udg.mx",
       externo: false,
     },
   });
@@ -91,7 +91,6 @@ async function main() {
   const benito_student_2022A = await prisma.student.create({
     data: {
       id: 1,
-      applicantId: 1,
       ciclo_actual: "2022A",
       codigo: "1234567890",
       nivel: 3,
@@ -105,7 +104,6 @@ async function main() {
   const juanga_student_2022B = await prisma.student.create({
     data: {
       id: 2,
-      applicantId: 2,
       ciclo_actual: "2022B",
       codigo: "0987654321",
       nivel: 4,
@@ -119,7 +117,6 @@ async function main() {
   const benito_student_2022B = await prisma.student.create({
     data: {
       id: 3,
-      applicantId: 1,
       ciclo_actual: "2022B",
       codigo: "1234567890",
       nivel: 4,
@@ -164,7 +161,7 @@ async function main2() {
   })
 }
 
-main2()
+main()
   .then(async () => {
     await prisma.$disconnect();
   })
