@@ -125,7 +125,7 @@ class RegistroAPI extends RESTDataSource {
         .findFirst({
           where: {
             codigo: student.codigo,
-            ciclo_actual: "2023A",
+            ciclo_actual: "2023B",
           },
           include: {
             groupObject: {
