@@ -10,7 +10,7 @@ datasource db {
 model Student {
   id                  Int                   @id(map: "student_pkey1") @default(autoincrement())
   applicant           Applicant             @relation(fields: [codigo], references: [codigo])
-  ciclo_actual        String                @db.VarChar(255)
+  cicloActual         String                @map("ciclo_actual") @db.VarChar(255)
   codigo              String                @db.VarChar(255)
   nivel               Int
   curso               String                @db.VarChar(255)
@@ -20,7 +20,7 @@ model Student {
   desertor            Boolean?
   finalGrade          String?               @map("final_grade")
 
-  @@unique(fields: [codigo, ciclo_actual, curso], name: "codigoCicloCursoID")
+  @@unique(fields: [codigo, cicloActual, curso], name: "codigoCicloCursoID")
   @@map("student")
 }
 
@@ -44,6 +44,7 @@ model TestResults {
   meetLink           String?  @map("meetlink") @db.VarChar(255)
   nivelOral          Int?     @map("nivel_oral")
   nivelFinal         Int?     @map("nivel_final")
+  comment            String?  @db.VarChar(255)
 
   @@map("test_results")
 }

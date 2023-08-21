@@ -5,7 +5,7 @@ import { serializeNumberId, deSeralizeNumberId } from "../../utils";
 export const typeDefs = gql`
   extend type Query {
     applicant(codigo: ID!): Applicant!
-    unenrolledStudent(codigo: ID!): UnenrolledStudent!
+    unenrolledStudent(codigo: ID!, cicloActual: String!): UnenrolledStudent!
     registeringLevels(course: String!, course: String!): [String!]!
     groups: [Group!]!
     group(id: ID!): Group!
@@ -142,7 +142,7 @@ export const resolvers: Resolvers = {
     unenrolledStudent: async (root, args, { dataSources }) => {
       const student = await dataSources.registroAPI.getUnenrolledStudent(
         args.codigo,
-        "2023A"
+        args.cicloActual
       );
       return {
         ...student,
@@ -222,7 +222,7 @@ export const resolvers: Resolvers = {
     registeredGroup: async (root, args, { dataSources }) => {
       const res = await dataSources.registroAPI.getAlreadyRegistered(
         root.codigo,
-        "2023A"
+        "2023B"
       );
       if (res == null) return null;
       return {

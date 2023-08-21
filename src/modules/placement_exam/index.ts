@@ -46,6 +46,7 @@ const typeDefs = gql`
     meetLink: String
     nivelOral: Int
     nivelFinal: Int
+    comment: String
   }
 
   type HomePageMessage {
@@ -106,7 +107,7 @@ const resolvers: Resolvers = {
       return dataSources.placementAPI.getHomePageMessage()
     },
     testResults: async (root, args, { dataSources }) => {
-      return dataSources.placementAPI.getTestResults(args.filter);
+      return (await dataSources.placementAPI.getTestResults(args.filter));
     },
   },
 

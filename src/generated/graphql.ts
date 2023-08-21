@@ -258,6 +258,7 @@ export type QueryTestResultsArgs = {
 
 
 export type QueryUnenrolledStudentArgs = {
+  cicloActual: Scalars['String'];
   codigo: Scalars['ID'];
 };
 
@@ -311,6 +312,7 @@ export type TestResults = {
   carrera: Scalars['String'];
   ciclo: Scalars['String'];
   codigo: Scalars['String'];
+  comment?: Maybe<Scalars['String']>;
   curso: Scalars['String'];
   email: Scalars['String'];
   externo: Scalars['Boolean'];
@@ -621,7 +623,7 @@ export type QueryResolvers<ContextType = ServerContext, ParentType extends Resol
   registeringLevels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryRegisteringLevelsArgs, 'course'>>;
   section?: Resolver<ResolversTypes['Section'], ParentType, ContextType, RequireFields<QuerySectionArgs, 'course' | 'level'>>;
   testResults?: Resolver<Array<Maybe<ResolversTypes['TestResults']>>, ParentType, ContextType, RequireFields<QueryTestResultsArgs, never>>;
-  unenrolledStudent?: Resolver<ResolversTypes['UnenrolledStudent'], ParentType, ContextType, RequireFields<QueryUnenrolledStudentArgs, 'codigo'>>;
+  unenrolledStudent?: Resolver<ResolversTypes['UnenrolledStudent'], ParentType, ContextType, RequireFields<QueryUnenrolledStudentArgs, 'cicloActual' | 'codigo'>>;
 };
 
 export type QuestionResolvers<ContextType = ServerContext, ParentType extends ResolversParentTypes['Question'] = ResolversParentTypes['Question']> = {
@@ -659,6 +661,7 @@ export type TestResultsResolvers<ContextType = ServerContext, ParentType extends
   carrera?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ciclo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   codigo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  comment?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   curso?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   externo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
