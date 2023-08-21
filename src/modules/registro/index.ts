@@ -184,7 +184,7 @@ export const resolvers: Resolvers = {
         grupo: registeredStudent.groupObject.name,
         group: currentGroup,
         nivel: String(registeredStudent.nivel),
-        ciclo: registeredStudent.ciclo_actual,
+        ciclo: registeredStudent.cicloActual,
       };
     },
     saveRegisteringLevels: (root, args, { dataSources }) => {
@@ -211,7 +211,7 @@ export const resolvers: Resolvers = {
         currentLevel,
         course,
         maxStudents,
-        root.ciclo_actual
+        root.cicloActual
       );
       return result.map((el) => ({
         ...el,

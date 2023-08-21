@@ -44,7 +44,7 @@ class RegistroAPI extends RESTDataSource {
     const student = await this.prisma.student.findFirst({
       where: {
         codigo: codigo,
-        ciclo_actual: ciclo_actual,
+        cicloActual: ciclo_actual,
       },
       include: {
         applicant: true,
@@ -62,7 +62,7 @@ class RegistroAPI extends RESTDataSource {
   async getApplicant(codigo: string, ciclo: string) {
     const res = await this.prisma.student.findFirst({
       where: {
-        ciclo_actual: ciclo,
+        cicloActual: ciclo,
         codigo: codigo,
       },
       include: {
@@ -75,7 +75,7 @@ class RegistroAPI extends RESTDataSource {
   async getAlreadyRegistered(codigo: string, ciclo: string) {
     const res = await this.prisma.student.findFirst({
       where: {
-        ciclo_actual: ciclo,
+        cicloActual: ciclo,
         codigo,
       },
       include: {
@@ -125,7 +125,7 @@ class RegistroAPI extends RESTDataSource {
         .findFirst({
           where: {
             codigo: student.codigo,
-            ciclo_actual: "2023B",
+            cicloActual: "2023B",
           },
           include: {
             groupObject: {

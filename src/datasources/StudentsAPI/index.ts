@@ -27,10 +27,10 @@ class StudentsAPI extends DataSource {
     this.prisma = prisma;
   }
 
-  async getAllStudents(ciclo_actual: string) {
+  async getAllStudents(cicloActual: string) {
     const students = await this.prisma.student.findMany({
       where: {
-        ciclo_actual,
+        cicloActual: cicloActual,
         groupId: {
           not: null
         }
@@ -48,10 +48,10 @@ class StudentsAPI extends DataSource {
     return students;
   }
 
-  async getStudent(codigo: string, ciclo_actual: string) {
+  async getStudent(codigo: string, cicloActual: string) {
     if (codigo === null)
       throw new Error("Codigo not provided on studentsAPI.getStudent");
-    if (ciclo_actual === null)
+    if (cicloActual === null)
       throw new Error("ciclo_actual not provided on studentsAPI.getStudent");
     const student = await this.prisma.student.findFirst({
       include: {
@@ -60,7 +60,7 @@ class StudentsAPI extends DataSource {
       },
       where: {
         codigo,
-        ciclo_actual,
+        cicloActual,
       },
     });
     if (student === null) throw new Error("Student not found on database");
