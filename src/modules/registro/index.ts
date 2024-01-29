@@ -1,6 +1,6 @@
 import { gql } from "apollo-server";
 import { Resolvers } from "../../generated/graphql";
-import { serializeNumberId, deSeralizeNumberId } from "../../utils";
+import { serializeNumberId, deSeralizeNumberId, calculateCicloActual } from "../../utils";
 
 export const typeDefs = gql`
   extend type Query {
@@ -168,11 +168,6 @@ export const resolvers: Resolvers = {
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {
-      function calculateCicloActual(date: Date): string {
-        const year = date.getFullYear().toString();
-        const semester = date.getMonth() > 6 ? "B" : "A";
-        return year + semester;
-      };
       const registeredStudent = await dataSources.registroAPI.registerStudent(
         args.input,
         deSeralizeNumberId(args.groupId),
@@ -225,10 +220,10 @@ export const resolvers: Resolvers = {
         id: serializeNumberId(el.id, "group"),
       }));
     },
-    registeredGroup: async (root, args, { dataSources }) => {
+    registeredGroup: async (root, args, { dataSources },) => {
       const res = await dataSources.registroAPI.getAlreadyRegistered(
         root.codigo,
-        "2023B"
+        calculateCicloActual(new Date())
       );
       if (res == null) return null;
       return {

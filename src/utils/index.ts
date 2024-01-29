@@ -97,3 +97,9 @@ export function serializeNumberId(id: number, prepend: string): string {
 export function deSeralizeNumberId(id: string): number {
   return Number(id.slice(id.indexOf('_') + 1));
 }
+
+export function calculateCicloActual(date: Date): string {
+  const year = date.getFullYear().toString();
+  const semester = date.getMonth() > 6 ? "B" : "A";
+  return year + semester;
+};
