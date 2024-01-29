@@ -119,13 +119,13 @@ class RegistroAPI extends RESTDataSource {
     });
   }
 
-  async registerStudent(student: StudentInput, groupId: number) {
+  async registerStudent(student: StudentInput, groupId: number, cicloActual: string) {
     const response =
       await this.prisma.student
         .findFirst({
           where: {
             codigo: student.codigo,
-            cicloActual: "2023B",
+            cicloActual: cicloActual, //!!!!!!!!!!!!!!Tiene que ser el nuevo semestre!! 2024A!!!!!!!!!!!
           },
           include: {
             groupObject: {

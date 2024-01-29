@@ -168,9 +168,15 @@ export const resolvers: Resolvers = {
   },
   Mutation: {
     registerStudent: async (root, args, { dataSources }) => {
+      function calculateCicloActual(date: Date): string {
+        const year = date.getFullYear().toString();
+        const semester = date.getMonth() > 6 ? "B" : "A";
+        return year + semester;
+      };
       const registeredStudent = await dataSources.registroAPI.registerStudent(
         args.input,
-        deSeralizeNumberId(args.groupId)
+        deSeralizeNumberId(args.groupId),
+        calculateCicloActual(new Date())
       );
 
       const currentGroup = {
